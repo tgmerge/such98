@@ -222,6 +222,7 @@ public class NetUtil {
     }
 
     //POST Topic/Board/{boardId}	向服务器创建一个新的主题。
+    // todo do some test
     protected static final class PostBoardTopic extends CcAPI {
         public PostBoardTopic(AQuery aq, int boardId,
                               String title, String content,
@@ -303,6 +304,7 @@ public class NetUtil {
     // API: User
 
     //GET User/Name/{name}	根据用户名获取用户的信息。
+    // todo more test: 用户名含有特殊字符
     protected static final class GetNameUser extends CcAPI {
         public GetNameUser(AQuery aq, String userName,
                            Object handler, String callback) {
@@ -337,6 +339,8 @@ public class NetUtil {
     }
 
     //GET Board/{boardId}/Subs	获取某个版面的直接子版面。
+    // todo failed: returned 403 on requesting boardID=6
+    // NetUtil.callCcAPI(new NetUtil.GetSubBoards(aq, 6, 0, null, 10, that, "callbackMethod"));
     protected static final class GetSubBoards extends CcAPI {
         public GetSubBoards(AQuery aq, int boardId,
                             Integer pageFrom, Integer pageTo, Integer pageSize,
@@ -368,7 +372,7 @@ public class NetUtil {
             super(aq, handler, callback);
             String idPart = "";
             for (int i = 0; i < boardIds.length; i ++) {
-                idPart += "id[" + i + "]={" + boardIds[i] + "}&";
+                idPart += "id[" + i + "]=" + boardIds[i] + "&";
             }
             this.setURL(URL_CC98API + "Board?" + idPart, pageFrom, pageTo, pageSize)
                 .addAuthorization();
@@ -416,7 +420,7 @@ public class NetUtil {
     }
 
     //PUT Me	设置当前用户的信息。
-    // todo do something to implement
+    // todo not support
     protected static final class PutMe extends CcAPI {
         public PutMe(AQuery aq, String data,
                      Object handler, String callback) {
@@ -463,21 +467,25 @@ public class NetUtil {
     // GET Message?userName={userName}&filter={filter}	获取当前用户的短消息。
     // todo username没有经过转义可能造成问题
     protected static final class GetUserMessage extends CcAPI {
-        public GetUserMessage(AQuery aq, String userName,
-                                    Integer pageFrom, Integer pageTo, Integer pageSize,
-                                    Object handler, String callback) {
+        public static final int FILTER_NONE = 0;
+        public static final int FILTER_SEND = 1;
+        public static final int FILTER_RECEIVE = 2;
+        public static final int FILTER_BOTH = 3;
+        public GetUserMessage(AQuery aq, String userName, int filter,
+                              Integer pageFrom, Integer pageTo, Integer pageSize,
+                              Object handler, String callback) {
             super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Message?userName=" + userName + "&filter=Both", pageFrom, pageTo, pageSize)
+            this.setURL(URL_CC98API + "Message?userName=" + userName + "&filter=" + filter, pageFrom, pageTo, pageSize)
                 .addAuthorization();
         }
         protected CcAPI execute() { return this.getRequest(); }
     }
 
     // DELETE Message/{id}	删除当前用户的特定短消息。
-    // todo do something to implement
+    // todo not implemented
 
     // PUT Message/{id}	修改现有短消息的内容。
-    // todo not implemented
+    // todo not supported
     protected static final class PutMessage extends CcAPI {
         public PutMessage(AQuery aq, int messageId,
                           String receiverName, String title, String content,
