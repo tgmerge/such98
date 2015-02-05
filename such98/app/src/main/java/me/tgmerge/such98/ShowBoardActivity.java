@@ -1,42 +1,28 @@
 package me.tgmerge.such98;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-
-import com.androidquery.AQuery;
 
 
-public class LoginActivity extends ActionBarActivity {
+public class ShowBoardActivity extends ActionBarActivity {
 
-    private AQuery aq;
-
-    public final static String LOGIN_STATUS = "me.tgmerge.such98.LoginActivity.LOGINSTATUS";
-    public final static int LOGIN_STATUS_SUCCESS = 200;
-    public final static int LOGIN_STATUS_FAIL = 0;
+    public static final String TYPE_ROOT = "rootBoard";
+    public static final String TYPE_ID = "idBoard";
+    public static final String TYPE_CUSTOM = "customBoard";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        aq = new AQuery(this);
-/*
-        String token = NetUtil.getInstance(this).getAccessToken();
-        if (token != null && !(token.equals(""))) {
-            startActivity(new Intent(this, DisplayActivity.class));
-        }
-*/
+        setContentView(R.layout.activity_show_board);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login, menu);
+        getMenuInflater().inflate(R.menu.menu_show_board, menu);
         return true;
     }
 
@@ -53,9 +39,5 @@ public class LoginActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onLoginButtonClicked(View view) {
-        startActivity(new Intent(this, LoginPageActivity.class));
     }
 }

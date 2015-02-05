@@ -3,7 +3,7 @@
     package="me.tgmerge.such98" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -26,6 +26,10 @@
         <activity
             android:name=".DisplayActivity"
             android:label="@string/title_activity_display" >
+        </activity>
+        <activity
+            android:name=".ShowBoardActivity"
+            android:label="@string/title_activity_show_board" >
         </activity>
     </application>
 

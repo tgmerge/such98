@@ -29,8 +29,17 @@ public class LoginPageActivity extends ActionBarActivity {
         setContentView(R.layout.activity_login_page);
 
         aq = new AQuery(this);
+        OAuthUtil oa = new OAuthUtil(
+                "https://login.cc98.org/OAuth/Authorize",
+                "https://login.cc98.org/OAuth/Token",
+                "all*",
+                "17bd1fe0-39e7-488f-ac6a-071c86e1f083",
+                "fdf5b427-918e-4237-9897-838eefe478f8"
+        );
 
-        final WebView webView = (WebView) findViewById(R.id.webView_login);
+        WebView webView = (WebView) findViewById(R.id.webView_login);
+        oa.fire(webView);
+/*
         CustomWebViewClient client = new CustomWebViewClient();
         client.activityContext = this;
         webView.setWebViewClient(client);
@@ -42,6 +51,7 @@ public class LoginPageActivity extends ActionBarActivity {
                 NetUtil.encodeURIComponent(getString(R.string.app_name)),
                 NetUtil.encodeURIComponent(LoginPageActivity.REDIRECT_URI));
         webView.loadUrl(url);
+        */
     }
 
 
@@ -67,7 +77,7 @@ public class LoginPageActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
+/*
     class CustomWebViewClient extends WebViewClient {
         protected Context activityContext = null;
 
@@ -96,4 +106,5 @@ public class LoginPageActivity extends ActionBarActivity {
             return false;
         }
     }
+*/
 }
