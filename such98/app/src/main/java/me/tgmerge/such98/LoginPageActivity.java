@@ -30,28 +30,15 @@ public class LoginPageActivity extends ActionBarActivity {
 
         aq = new AQuery(this);
         OAuthUtil oa = new OAuthUtil(
+                this,
                 "https://login.cc98.org/OAuth/Authorize",
                 "https://login.cc98.org/OAuth/Token",
                 "all*",
                 "17bd1fe0-39e7-488f-ac6a-071c86e1f083",
                 "fdf5b427-918e-4237-9897-838eefe478f8"
         );
-
         WebView webView = (WebView) findViewById(R.id.webView_login);
-        oa.fire(webView);
-/*
-        CustomWebViewClient client = new CustomWebViewClient();
-        client.activityContext = this;
-        webView.setWebViewClient(client);
-        String url = String.format(
-                LoginPageActivity.OAUTH_URL,
-                NetUtil.encodeURIComponent("token"),
-                NetUtil.encodeURIComponent(getString(R.string.appConfig_clientID)),
-                NetUtil.encodeURIComponent("all*"),
-                NetUtil.encodeURIComponent(getString(R.string.app_name)),
-                NetUtil.encodeURIComponent(LoginPageActivity.REDIRECT_URI));
-        webView.loadUrl(url);
-        */
+        oa.fire(webView, LoginActivity.class);
     }
 
 
@@ -77,34 +64,4 @@ public class LoginPageActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-/*
-    class CustomWebViewClient extends WebViewClient {
-        protected Context activityContext = null;
-
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (url.startsWith(LoginPageActivity.REDIRECT_URI)) {
-                Intent intent = new Intent(this.activityContext, LoginActivity.class);
-                Pattern pattern = Pattern.compile("access_token=([^$&]+)");
-                Matcher matcher = pattern.matcher(url);
-                if (matcher.find()) {
-                    String token = matcher.group(1);
-                    SharedPreferences sharedPref = activityContext.getSharedPreferences(
-                            getString(R.string.appConfig_preferenceFileKey_settings),
-                            activityContext.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString(
-                            getString(R.string.appConfig_valueKey_settings_accessToken),
-                            token);
-                    editor.commit();
-                } else {
-                    intent.putExtra(LoginActivity.LOGIN_STATUS, LoginActivity.LOGIN_STATUS_FAIL);
-                }
-                startActivity(intent);
-            }
-            // TODO: if failed then display failed message
-            return false;
-        }
-    }
-*/
 }

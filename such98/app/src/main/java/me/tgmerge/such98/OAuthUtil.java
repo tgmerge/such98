@@ -1,6 +1,8 @@
 package me.tgmerge.such98;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -20,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class OAuthUtil {
 
-    static private OAuthUtil mInstance;
+    static private OAuthUtil mInstance = null;
     private Context mCtx;
 
     // for auth server
@@ -31,8 +33,19 @@ public class OAuthUtil {
     private String mScope;
     public String mWebViewInitURL = "http://localhost/start";
     private String mWebViewRedirURL = "http://localhost/redir";
+    private Class<?> mToActivity;
+
+    protected OAuthUtil getInstance() {
+        return mInstance;
+    }
+
+    protected OAuthUtil(Context ctx) {
+        mInstance = this;
+        mCtx = ctx;
+    }
 
     // for storage
+    private SharedPreferences mSharedPref;
     private String mFileKey;
     private String mKey_accessToken = "accessToken";
     private String mKey_refreshToken = "refreshToken";
@@ -42,13 +55,14 @@ public class OAuthUtil {
     protected OAuthUtil(Context ctx, String authorizeURL, String tokenURL, String scope,
                         String clientID, String clientSecret) {
         mInstance = this;
-        this.mCtx = ctx.getApplicationContext();
+        this.mCtx = ctx;
         this.mAuthorizeURL = authorizeURL;
         this.mTokenURL = tokenURL;
         this.mScope = scope;
         this.mClientID = clientID;
         this.mClientSecret = clientSecret;
         this.mFileKey = this.getClass().getPackage().getName() + "." + this.getClass().getName();
+        this.mSharedPref = mCtx.getSharedPreferences(this.mFileKey, mCtx.MODE_PRIVATE);
     }
 
     private class MyJSInterface
@@ -58,10 +72,11 @@ public class OAuthUtil {
         public void processHTML(String html)
         {
             Log.d("INTERFACE", html);
-            Matcher m1 = Pattern.compile("\"access_token\":\"([^\"},])+\"").matcher(html);
-            Matcher m2 = Pattern.compile("\"refresh_token\":\"([^\"},])+\"").matcher(html);
+            Matcher m1 = Pattern.compile("\"access_token\":\"([^\"},]+)\"").matcher(html);
+            Matcher m2 = Pattern.compile("\"refresh_token\":\"([^\"},]+)\"").matcher(html);
             if (m1.find() && m2.find()) {
                 setToken(m1.group(1), m2.group(1));
+                mCtx.startActivity(new Intent(mCtx, mToActivity));
             }
         }
     }
@@ -139,25 +154,25 @@ public class OAuthUtil {
     }
 
     private final void setToken(String accessToken, String refreshToken) {
-        SharedPreferences sharedPref = mCtx.getSharedPreferences(this.mFileKey, mCtx.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
+        SharedPreferences.Editor editor = mSharedPref.edit();
         editor.putString(this.mKey_accessToken, accessToken);
         editor.putString(this.mKey_refreshToken, refreshToken);
         editor.commit();
     }
 
     protected final String getAccessToken() {
-        return "";
+        return mSharedPref.getString(this.mKey_accessToken, "");
     }
 
     protected final String refreshToken() {
-        // todo
+        // todo post a http request
         return "";
     }
 
     // main method to call.
     // config webview, add some method to handle OAuth, then load OAuth url
-    protected final void fire(WebView webView) {
+    protected final void fire(WebView webView, Class<?> toActivity) {
+        this.mToActivity = toActivity;
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new OAuthWebViewClient());
         webView.addJavascriptInterface(new MyJSInterface(), JSINTERFACE);
