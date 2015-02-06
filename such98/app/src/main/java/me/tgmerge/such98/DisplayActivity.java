@@ -39,7 +39,7 @@ public class DisplayActivity extends ActionBarActivity {
         //NetUtil.getInstance(this).clearAccessToken();
         //NetUtil.callCcAPI(new NetUtil.GetNewTopic(aq, 0, null, 10, that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.GetBoardTopic(aq, 100, 10, null, 10, that, "callbackMethod"));
-        NetUtil.callCcAPI(new NetUtil.GetHotTopic(aq, 0, null, 10, that, "callbackMethod"));
+        //NetUtil.callCcAPI(new NetUtil.GetHotTopic(aq, 0, null, 10, that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.GetTopic(aq, 4473926, that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.PostTopicPost(aq, 2803718, "re", "post", that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.GetTopicPost(aq, 2803718, 0, null, 10, that, "callbackMethod"));
@@ -59,7 +59,7 @@ public class DisplayActivity extends ActionBarActivity {
         //NetUtil.callCcAPI(new NetUtil.PostMessage(aq, "tgmerge", "testTitle", "testContent", this, "callbackMethod"));
         OAuthUtil oa = OAuthUtil.getInstance();
         aq.find(R.id.editText).text(oa.getAccessToken());
-        oa.refreshToken(this);
+        //oa.refreshToken(this);
         //aq.find(R.id.editText_token).text(oa.getAccessToken());
 /*
         AjaxCallback<String> cb = new AjaxCallback<String>();

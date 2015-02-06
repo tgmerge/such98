@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.androidquery.AQuery;
 
@@ -57,8 +58,10 @@ public class LoginActivity extends ActionBarActivity {
 
     public void onLoginButtonClicked(View view) {
         if (oa.getAccessToken().equals("")) {
+            Toast.makeText(this, "LoginActivity: token not exists", Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, LoginPageActivity.class));
         } else {
+            Toast.makeText(this, "LoginActivity: token exists", Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, DisplayActivity.class));
         }
     }

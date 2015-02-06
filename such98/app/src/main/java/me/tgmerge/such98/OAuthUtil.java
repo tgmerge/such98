@@ -2,7 +2,6 @@ package me.tgmerge.such98;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -10,23 +9,8 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
-import com.androidquery.util.XmlDom;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EncodingUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,13 +18,20 @@ import java.util.regex.Pattern;
  * Created by tgmerge on 2/5.
  * handle cc98 OAuth login process.
  * 使用:
- *     先用OAuthutil(任意上下文ctx, OAuth参数)初始化实例
- *     再用fire(活动上下文ctx, webview, 成功后开启的活动, 失败后开启的活动)在webView中打开oauth过程
+ *     用OAuthutil(任意上下文ctx, OAuth参数)初始化实例
  *
- *     其后可以用getInstance()返回实例，如果没有初始化过，该方法返回null
+ *     其后，用getInstance()返回实例，如果没有初始化过，该方法返回null
+ *
+ *     用fire(活动上下文ctx, webview, OAuthCallback)在webView中打开oauth过程
+ *         其中，覆盖OAuthCallback的两个方法onSuccess和onFailure，刷新/获取token之后，根据情况会调用它们
+ *
  *     用getAccessToken()获取access token
+ *
  *     用clearToken()清除token
- *     用refreshToken(Activity)刷新token
+ *
+ *     用refreshToken(Activity, OAuthCallback)刷新token
+ *
+ * 算是能用了
  */
 public class OAuthUtil {
 
@@ -57,8 +48,6 @@ public class OAuthUtil {
     private String mScope;
     public String mWebViewInitURL = "http://localhost/start";
     private String mWebViewRedirURL = "http://localhost/redir";
-    private Class<?> mSuccActivity;
-    private Class<?> mFailActivity;
 
     private SharedPreferences mSharedPref;
     private String mFileKey;
@@ -97,17 +86,16 @@ public class OAuthUtil {
     // 如果成功，将存储access token和refresh token，并开启succActivity
     // 如果失败，将开启failActivity
     @SuppressWarnings("unused")
-    protected final void fire(Context ctx, WebView webView, Class<?> succActivity, Class<?> failActivity) {
+    protected final void fire(Context ctx, WebView webView, OAuthCallback callback) {
         logDebug("fire: firing on " + webView.toString());
         this.mCtx = ctx;
-        this.mSuccActivity = succActivity;
-        this.mFailActivity = failActivity;
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new OAuthWebViewClient());
-        webView.addJavascriptInterface(new MyJSInterface(), JSINTERFACE);
+        webView.addJavascriptInterface(new MyJSInterface(webView, callback), JSINTERFACE);
         webView.loadUrl(mWebViewInitURL);
     }
 
+    @SuppressWarnings("unused")
     protected final String getAccessToken() {
         logDebug("getAccessToken: returning");
         return mSharedPref.getString(this.mKey_accessToken, "");
@@ -123,10 +111,8 @@ public class OAuthUtil {
     // 如果成功，将更新access token
     // 如果失败， todo
     @SuppressWarnings("unused")
-    protected final void refreshToken(final Activity ctx) {
-        logDebug("refreshToken: refreshing token");
-
-/*
+    protected final void refreshToken(final Activity ctx, final OAuthCallback callback) {
+        /*
         // todo I'm out... javax.net.ssl.SSLPeerUnverifiedException: No peer certificate
         // todo I'll use an invisible webview to handle this
         new Thread(new Runnable() {
@@ -149,24 +135,24 @@ public class OAuthUtil {
                 }
             }
         }).start();
-*/
+        */
 
+        logDebug("refreshToken: refreshing token");
+
+        // 在ctx上创建一个webview，并执行更新token的工作
         Thread th = new Thread() {
             public void run() {
-
                 ctx.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         WebView webView = new WebView(ctx);
                         webView.getSettings().setJavaScriptEnabled(true);
                         webView.setWebViewClient(new OAuthWebViewClient());
-                        webView.addJavascriptInterface(new MyRefreshTokenJSInterface(), JSINTERFACE);
-
+                        webView.addJavascriptInterface(new MyJSInterface(webView, callback), JSINTERFACE);
                         String postLoad = "grant_type=refresh_token";
                         postLoad += "&refresh_token=" + getRefreshToken();
                         postLoad += "&client_id=" + mClientID;
                         postLoad += "&client_secret=" + mClientSecret;
-
                         webView.postUrl(mTokenURL, EncodingUtils.getBytes(postLoad, "UTF-8"));
                     }
                 });
@@ -179,26 +165,36 @@ public class OAuthUtil {
 
     // 在使用refreshToken()、使用fire()时传递此对象，覆盖onSuccess和onFail方法
     // 它们会在获取/刷新token成功或失败时被调用
-    protected class OnTokenStoredCallBack {
+    protected class OAuthCallback {
         public void onSuccess() {}
-        public void onFail() {}
+        public void onFailure() {}
     }
 
     // - 私有类 -
 
     private final class MyJSInterface {
-        @JavascriptInterface
-        @SuppressWarnings("unused")
-        public void processHTML(String html) {
-            processTokenHTML(html, true);
-        }
-    }
+        private OAuthCallback mCallback;
+        private WebView mWebView;
 
-    private final class MyRefreshTokenJSInterface {
+        public MyJSInterface(WebView webView, OAuthCallback callback) {
+            mCallback = callback;
+            mWebView = webView;
+        }
+
         @JavascriptInterface
         @SuppressWarnings("unused")
         public void processHTML(String html) {
-            processTokenHTML(html, false);
+            logDebug("processHTML: " + (html.length() > 20 ? html.substring(0, 20) : html));
+            processTokenHTML(html, mCallback);
+
+            // 处理accesstoken结束后，删除webview
+            mWebView.post(new Runnable() {
+                @Override
+                public void run() {
+                    logDebug("processHTML: destroying webview");
+                    mWebView.destroy();
+                }
+            });
         }
     }
 
@@ -249,7 +245,8 @@ public class OAuthUtil {
                     authCode = m.group(1);
                 } else {
                     // token not found, login failed
-                    startFailActivity(mCtx, mFailActivity);
+                    // startFailActivity(mCtx, mFailActivity);
+                    // todo do something to reflect callback!
                 }
 
                 String postLoad = "grant_type=authorization_code";
@@ -281,19 +278,15 @@ public class OAuthUtil {
 
     // - 私有方法 -
 
-    private final void processTokenHTML(String html, boolean willStartActivity) {
+    private final void processTokenHTML(String html, OAuthCallback callback) {
         logDebug("processTokenHTML: processing " + html.substring(0, 10));
         Matcher m1 = Pattern.compile("\"access_token\":\"([^\"},]+)\"").matcher(html);
         Matcher m2 = Pattern.compile("\"refresh_token\":\"([^\"},]+)\"").matcher(html);
         if (m1.find() && m2.find()) {
             setToken(m1.group(1), m2.group(1));
-            if (willStartActivity) {
-                startSuccActivity(mCtx, mSuccActivity);
-            }
+            callback.onSuccess();
         } else {
-            if (willStartActivity) {
-                startFailActivity(mCtx, mFailActivity);
-            }
+            callback.onFailure();
         }
     }
 
@@ -303,16 +296,6 @@ public class OAuthUtil {
         editor.putString(this.mKey_accessToken, accessToken);
         editor.putString(this.mKey_refreshToken, refreshToken);
         editor.commit();
-    }
-
-    private static final void startSuccActivity(Context ctx, Class<?> activity) {
-        logDebug("startSuccActivity: starting " + activity.toString());
-        ctx.startActivity(new Intent(ctx, activity));
-    }
-
-    private static final void startFailActivity(Context ctx, Class<?> activity) {
-        logDebug("startFailActivity: starting " + activity.toString());
-        ctx.startActivity(new Intent(ctx, activity));
     }
 
     private final String getRefreshToken() {

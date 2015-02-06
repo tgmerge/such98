@@ -2,18 +2,13 @@ package me.tgmerge.such98;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
-
-import com.androidquery.AQuery;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import android.widget.Toast;
 
 
 public class LoginPageActivity extends ActionBarActivity {
@@ -23,9 +18,23 @@ public class LoginPageActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_page);
 
-        OAuthUtil oa = OAuthUtil.getInstance();
+        final OAuthUtil oa = OAuthUtil.getInstance();
+        final Context that = this;
+
         WebView webView = (WebView) findViewById(R.id.webView_login);
-        oa.fire(this, webView, DisplayActivity.class, LoginActivity.class);
+        oa.fire(this, webView, oa.new OAuthCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(that, "Login success" + oa.getAccessToken(), Toast.LENGTH_LONG).show();
+                startActivity(new Intent(that, DisplayActivity.class));
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(that, "Login failed", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(that, LoginActivity.class));
+            }
+        });
     }
 
 
