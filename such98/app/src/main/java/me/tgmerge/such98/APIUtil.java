@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
 import com.androidquery.util.XmlDom;
 
 import java.io.UnsupportedEncodingException;
@@ -14,29 +15,29 @@ import java.net.URLEncoder;
 /**
  * Created by tgmerge on 2/4.
  */
-public class NetUtil {
+public class APIUtil {
 
-    // NetUtil is a singleton class
+    // APIUtil is a singleton class
 
     // context of the whole application,
-    // will be set on NetUtil instance creates
+    // will be set on APIUtil instance creates
     private static Context mCtx = null;
 
     // the only instance of the class,
-    // will be set on first NetUtil instance creates
-    private static NetUtil mInstance = null;
+    // will be set on first APIUtil instance creates
+    private static APIUtil mInstance = null;
 
 
     // constructor
-    public NetUtil(final Context context){
+    public APIUtil(final Context context){
         mCtx = context;
     }
 
-    // returns a NetUtil instance,
+    // returns a APIUtil instance,
     // which is the only instance of the whole application
-    public static final synchronized NetUtil getInstance(final Context context) {
+    public static final synchronized APIUtil getInstance(final Context context) {
         if (mInstance == null) {
-            mInstance = new NetUtil(context.getApplicationContext());
+            mInstance = new APIUtil(context.getApplicationContext());
         }
         return mInstance;
     }
@@ -108,7 +109,33 @@ public class NetUtil {
 
     //
 
+    // working - - -
+
+    // API调用后的回调，覆盖onSuccess和onFailure两个方法
+    protected class APICallback {
+        public void onSuccess(XmlDom xml, AjaxStatus status) {}
+        public void onFailure(XmlDom xml, AjaxStatus status) {}
+    }
+
+
     public static final void callCcAPI(final CcAPI api) { api.execute(); }
+
+    protected static final void callAPI(final CcAPI api, final APICallback callback) {
+    /*
+        api.execute(..., callback=new Ajaxcallback() {
+            callback(url, xml, status) {
+                if status == success:
+                    callback.onoSuccess(url, xml, status);
+                elif status == token expired:
+                    OAuthUtil.refreshToken( succ={retry this request, succ=succ, fail=fail}, failure=callback.onfailure );
+                elif status == other error:
+                    callback.onfailure(url, xml, status);
+            }
+    */
+    }
+    //private static final void apicb(String url, )
+
+    // working - - -
 
     abstract protected static class CcAPI {
 
@@ -142,7 +169,7 @@ public class NetUtil {
         }
 
         protected final CcAPI addAuthorization() {
-            mCb.header("Authorization", "Bearer " + NetUtil.getInstance(mCtx).getAccessToken());
+            mCb.header("Authorization", "Bearer " + APIUtil.getInstance(mCtx).getAccessToken());
             return this;
         }
 
@@ -153,11 +180,6 @@ public class NetUtil {
 
         protected final CcAPI addHeader(String key, String value) {
             mCb.header(key, value);
-            return this;
-        }
-
-        protected final CcAPI setCallback(Object handler, String callback) {
-            mCb.weakHandler(handler, callback);
             return this;
         }
 
@@ -340,7 +362,7 @@ public class NetUtil {
 
     //GET Board/{boardId}/Subs	获取某个版面的直接子版面。
     // todo failed: returned 403 on requesting boardID=6
-    // NetUtil.callCcAPI(new NetUtil.GetSubBoards(aq, 6, 0, null, 10, that, "callbackMethod"));
+    // APIUtil.callCcAPI(new APIUtil.GetSubBoards(aq, 6, 0, null, 10, that, "callbackMethod"));
     protected static final class GetSubBoards extends CcAPI {
         public GetSubBoards(AQuery aq, int boardId,
                             Integer pageFrom, Integer pageTo, Integer pageSize,

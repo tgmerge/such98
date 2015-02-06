@@ -1,17 +1,14 @@
 package me.tgmerge.such98;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.androidquery.util.XmlDom;
 
@@ -27,7 +24,7 @@ public class DisplayActivity extends ActionBarActivity {
 
         aq = new AQuery(this);
 
-        String token = NetUtil.getInstance(this).getAccessToken();
+        String token = APIUtil.getInstance(this).getAccessToken();
         aq.find(R.id.editText_token).text(token);
 
         // TODO some test here
@@ -36,27 +33,27 @@ public class DisplayActivity extends ActionBarActivity {
 
     public void test() {
         Context that = this;
-        //NetUtil.getInstance(this).clearAccessToken();
-        //NetUtil.callCcAPI(new NetUtil.GetNewTopic(aq, 0, null, 10, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetBoardTopic(aq, 100, 10, null, 10, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetHotTopic(aq, 0, null, 10, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetTopic(aq, 4473926, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.PostTopicPost(aq, 2803718, "re", "post", that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetTopicPost(aq, 2803718, 0, null, 10, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetPost(aq, 786144012, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetNameUser(aq, "tgmerge", that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetIdUser(aq, "389794", that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetRootBoard(aq, 0, null, 10, that, "callbackMethod"));
-        // failed NetUtil.callCcAPI(new NetUtil.GetSubBoards(aq, 6, 0, null, 10, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetBoard(aq, 6, that, "callbackMethod"));
+        //APIUtil.getInstance(this).clearAccessToken();
+        //APIUtil.callCcAPI(new APIUtil.GetNewTopic(aq, 0, null, 10, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetBoardTopic(aq, 100, 10, null, 10, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetHotTopic(aq, 0, null, 10, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetTopic(aq, 4473926, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.PostTopicPost(aq, 2803718, "re", "post", that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetTopicPost(aq, 2803718, 0, null, 10, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetPost(aq, 786144012, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetNameUser(aq, "tgmerge", that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetIdUser(aq, "389794", that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetRootBoard(aq, 0, null, 10, that, "callbackMethod"));
+        // failed APIUtil.callCcAPI(new APIUtil.GetSubBoards(aq, 6, 0, null, 10, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetBoard(aq, 6, that, "callbackMethod"));
         //int[] a = {6, 100};
-        //NetUtil.callCcAPI(new NetUtil.GetMultiBoards(aq, a, 0, null, 10, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetBasicMe(aq, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetCustomBoardsMe(aq, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetMe(aq, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetSystemSetting(aq, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetUserMessage(aq, "tgmerge", NetUtil.GetUserMessage.FILTER_SEND, 0, null, 10, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.PostMessage(aq, "tgmerge", "testTitle", "testContent", this, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetMultiBoards(aq, a, 0, null, 10, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetBasicMe(aq, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetCustomBoardsMe(aq, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetMe(aq, that, "callbackMethod"));
+        APIUtil.callCcAPI(new APIUtil.GetSystemSetting(aq, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.GetUserMessage(aq, "tgmerge", APIUtil.GetUserMessage.FILTER_SEND, 0, null, 10, that, "callbackMethod"));
+        //APIUtil.callCcAPI(new APIUtil.PostMessage(aq, "tgmerge", "testTitle", "testContent", this, "callbackMethod"));
         OAuthUtil oa = OAuthUtil.getInstance();
         aq.find(R.id.editText).text(oa.getAccessToken());
         //oa.refreshToken(this);
