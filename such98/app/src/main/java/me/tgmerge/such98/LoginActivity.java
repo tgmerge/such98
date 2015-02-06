@@ -13,23 +13,23 @@ import com.androidquery.AQuery;
 public class LoginActivity extends ActionBarActivity {
 
     private AQuery aq;
-
-    public final static String LOGIN_STATUS = "me.tgmerge.such98.LoginActivity.LOGINSTATUS";
-    public final static int LOGIN_STATUS_SUCCESS = 200;
-    public final static int LOGIN_STATUS_FAIL = 0;
+    private OAuthUtil oa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        aq = new AQuery(this);
-/*
-        String token = NetUtil.getInstance(this).getAccessToken();
-        if (token != null && !(token.equals(""))) {
-            startActivity(new Intent(this, DisplayActivity.class));
+        oa = OAuthUtil.getInstance();
+        if (oa == null) {
+            oa = new OAuthUtil(
+                    this,
+                    "https://login.cc98.org/OAuth/Authorize",
+                    "https://login.cc98.org/OAuth/Token",
+                    "all*",
+                    "17bd1fe0-39e7-488f-ac6a-071c86e1f083",
+                    "fdf5b427-918e-4237-9897-838eefe478f8");
         }
-*/
     }
 
 
@@ -56,6 +56,10 @@ public class LoginActivity extends ActionBarActivity {
     }
 
     public void onLoginButtonClicked(View view) {
-        startActivity(new Intent(this, LoginPageActivity.class));
+        if (oa.getAccessToken().equals("")) {
+            startActivity(new Intent(this, LoginPageActivity.class));
+        } else {
+            startActivity(new Intent(this, DisplayActivity.class));
+        }
     }
 }

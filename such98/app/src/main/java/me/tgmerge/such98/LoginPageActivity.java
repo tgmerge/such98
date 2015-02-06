@@ -18,28 +18,16 @@ import java.util.regex.Pattern;
 
 public class LoginPageActivity extends ActionBarActivity {
 
-    private AQuery aq;
-
-    private static final String OAUTH_URL = "https://login.cc98.org/OAuth/Authorize?response_type=%1$s&client_id=%2$s&scope=%3$s&state=%4$s&redirect_uri=%5$s";
-    private static final String REDIRECT_URI = "http://localhost/";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_page);
 
-        aq = new AQuery(this);
-        OAuthUtil oa = new OAuthUtil(
-                this,
-                "https://login.cc98.org/OAuth/Authorize",
-                "https://login.cc98.org/OAuth/Token",
-                "all*",
-                "17bd1fe0-39e7-488f-ac6a-071c86e1f083",
-                "fdf5b427-918e-4237-9897-838eefe478f8"
-        );
+        OAuthUtil oa = OAuthUtil.getInstance();
         WebView webView = (WebView) findViewById(R.id.webView_login);
-        oa.fire(webView, LoginActivity.class);
+        oa.fire(this, webView, DisplayActivity.class, LoginActivity.class);
     }
+
 
 
     @Override

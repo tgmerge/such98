@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,7 +39,7 @@ public class DisplayActivity extends ActionBarActivity {
         //NetUtil.getInstance(this).clearAccessToken();
         //NetUtil.callCcAPI(new NetUtil.GetNewTopic(aq, 0, null, 10, that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.GetBoardTopic(aq, 100, 10, null, 10, that, "callbackMethod"));
-        //NetUtil.callCcAPI(new NetUtil.GetHotTopic(aq, 0, null, 10, that, "callbackMethod"));
+        NetUtil.callCcAPI(new NetUtil.GetHotTopic(aq, 0, null, 10, that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.GetTopic(aq, 4473926, that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.PostTopicPost(aq, 2803718, "re", "post", that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.GetTopicPost(aq, 2803718, 0, null, 10, that, "callbackMethod"));
@@ -56,8 +57,28 @@ public class DisplayActivity extends ActionBarActivity {
         //NetUtil.callCcAPI(new NetUtil.GetSystemSetting(aq, that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.GetUserMessage(aq, "tgmerge", NetUtil.GetUserMessage.FILTER_SEND, 0, null, 10, that, "callbackMethod"));
         //NetUtil.callCcAPI(new NetUtil.PostMessage(aq, "tgmerge", "testTitle", "testContent", this, "callbackMethod"));
-    }
+        OAuthUtil oa = OAuthUtil.getInstance();
+        aq.find(R.id.editText).text(oa.getAccessToken());
+        oa.refreshToken(this);
+        //aq.find(R.id.editText_token).text(oa.getAccessToken());
+/*
+        AjaxCallback<String> cb = new AjaxCallback<String>();
 
+        cb.type(String.class)
+                .weakHandler(this, "handler1")
+                .url("http://api.cc98.org/")
+                .param("grant_type", "refresh_token")
+                .param("refresh_token", "www")
+                .param("client_id", "www")
+                .param("client_secret", "www");
+        aq.ajax(cb);
+*/
+    }
+/*
+    public void handler1(String url, String object, AjaxStatus status) {
+        Log.d("callback!","callback!" + object + status.toString());
+    }
+*/
     public void callbackMethod(String url, XmlDom xml, AjaxStatus status) {
 
         String msg;
@@ -81,10 +102,10 @@ public class DisplayActivity extends ActionBarActivity {
                 Toast.makeText(this, code + " " + message + ", re-login", Toast.LENGTH_LONG).show();
 
                 // finish this activity, and start login activity
-                NetUtil.getInstance(this).clearAccessToken();
-                Intent intent = new Intent(this, LoginActivity.class);
-                finish();
-                startActivity(intent);
+                OAuthUtil.getInstance().clearToken();
+                //Intent intent = new Intent(this, LoginActivity.class);
+                //finish();
+                //startActivity(intent);
             }
         }
         aq.find(R.id.editText).text(msg);
