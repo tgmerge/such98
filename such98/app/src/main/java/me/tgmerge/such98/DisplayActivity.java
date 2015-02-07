@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,44 +47,39 @@ public class DisplayActivity extends ActionBarActivity {
         }
 
         // topic
-        tests.add(new APIUtil.GetNewTopic(0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.GetBoardTopic(100, 0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.GetHotTopic(0, null, 10, new MyCallback()));
-            // untested: PostBoardTopic
-        tests.add(new APIUtil.GetTopic(4473926, new MyCallback()));
-
+        tests.add(new APIUtil.GetNewTopic(this, 0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.GetBoardTopic(this, 100, 0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.GetHotTopic(this, 0, null, 10, new MyCallback()));
+        // untested: PostBoardTopic
+        tests.add(new APIUtil.GetTopic(this, 4473926, new MyCallback()));
         // post
-            // untested: tests.add(new APIUtil.PostTopicPost(2803718, "title", "content", new MyCallback()));
-        tests.add(new APIUtil.GetTopicPost(2803718, 0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.GetPost(786144012, new MyCallback()));
-            // untested: tests.add(new APIUtil.PutPost();
-
+        // untested: tests.add(new APIUtil.PostTopicPost(this, 2803718, "title", "content", new MyCallback()));
+        tests.add(new APIUtil.GetTopicPost(this, 2803718, 0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.GetPost(this, 786144012, new MyCallback()));
+        // untested: tests.add(new APIUtil.PutPost();
         // user
-        tests.add(new APIUtil.GetNameUser("tgmerge", new MyCallback()));
-        tests.add(new APIUtil.GetIdUser(389794, new MyCallback()));
-
+        tests.add(new APIUtil.GetNameUser(this, "tgmerge", new MyCallback()));
+        tests.add(new APIUtil.GetIdUser(this, 389794, new MyCallback()));
         // board
-        tests.add(new APIUtil.GetRootBoard(0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.GetSubBoards(6, 0, null, 5, new MyCallback()));
-        tests.add(new APIUtil.GetBoard(6, new MyCallback()));
+        tests.add(new APIUtil.GetRootBoard(this, 0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.GetSubBoards(this, 6, 0, null, 5, new MyCallback()));
+        tests.add(new APIUtil.GetBoard(this, 6, new MyCallback()));
         int [] a = {6, 100};
-        tests.add(new APIUtil.GetMultiBoards(a, 0, null, 10, new MyCallback()));
-
+        tests.add(new APIUtil.GetMultiBoards(this, a, 0, null, 10, new MyCallback()));
         // me
-        tests.add(new APIUtil.GetMe(new MyCallback()));
-        tests.add(new APIUtil.GetBasicMe(new MyCallback()));
-        tests.add(new APIUtil.GetCustomBoardsMe(new MyCallback()));
-            // untested: put me
 
-        // Systemconfig
-        tests.add(new APIUtil.GetSystemSetting(new MyCallback()));
-
+        tests.add(new APIUtil.GetMe(this, new MyCallback()));
+        tests.add(new APIUtil.GetBasicMe(this, new MyCallback()));
+        tests.add(new APIUtil.GetCustomBoardsMe(this, new MyCallback()));
+        // untested: put me
+        // System config
+        tests.add(new APIUtil.GetSystemSetting(this, new MyCallback()));
         // message
-        tests.add(new APIUtil.GetMessage(23878541, new MyCallback()));
-        tests.add(new APIUtil.GetUserMessage("tgmerge", APIUtil.GetUserMessage.FILTER_SEND, 0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.DeleteMessage(23880005, new MyCallback()));
-            // untested: put message
-        tests.add(new APIUtil.PostMessage("tgmerge", "testTitle", "testContent", new MyCallback()));
+        tests.add(new APIUtil.GetMessage(this, 23878541, new MyCallback()));
+        tests.add(new APIUtil.GetUserMessage(this, "tgmerge", APIUtil.GetUserMessage.FILTER_SEND, 0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.DeleteMessage(this, 23880005, new MyCallback()));
+        // untested: put message
+        tests.add(new APIUtil.PostMessage(this, "tgmerge", "testTitle", "testContent", new MyCallback()));
     }
 
     public void test() {

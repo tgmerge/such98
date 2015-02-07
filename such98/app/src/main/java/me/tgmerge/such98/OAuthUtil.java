@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * Created by tgmerge on 2/5.
  * handle cc98 OAuth login process.
  * 使用:
- *     用OAuthutil(任意上下文ctx, OAuth参数)初始化实例
+ *     用OAuthutil(Activity ctx, OAuth参数)初始化实例
  *
  *     其后，用getInstance()返回实例，如果没有初始化过，该方法返回null
  *
@@ -39,7 +39,7 @@ public class OAuthUtil {
     // 上下文，存储，OAuth参数
 
     static private OAuthUtil mInstance = null;
-    private Context mCtx;
+    private Activity mCtx;
 
     private String mAuthorizeURL;
     private String mTokenURL;
@@ -59,7 +59,7 @@ public class OAuthUtil {
     // - 类方法 -
 
     // ctx
-    protected OAuthUtil(Context ctx, String authorizeURL, String tokenURL, String scope,
+    protected OAuthUtil(Activity ctx, String authorizeURL, String tokenURL, String scope,
                         String clientID, String clientSecret) {
         logDebug("OAuthUtil: initializing, authURL = " + authorizeURL);
         mInstance = this;
@@ -86,7 +86,7 @@ public class OAuthUtil {
     // 如果成功，将存储access token和refresh token，并开启succActivity
     // 如果失败，将开启failActivity
     @SuppressWarnings("unused")
-    protected final void fire(Context ctx, WebView webView, OAuthCallback callback) {
+    protected final void fire(Activity ctx, WebView webView, OAuthCallback callback) {
         logDebug("fire: firing on " + webView.toString());
         this.mCtx = ctx;
         webView.getSettings().setJavaScriptEnabled(true);
@@ -112,55 +112,28 @@ public class OAuthUtil {
     // 如果失败， todo
     @SuppressWarnings("unused")
     protected final void refreshToken(final Activity ctx, final OAuthCallback callback) {
-        /*
         // todo I'm out... javax.net.ssl.SSLPeerUnverifiedException: No peer certificate
         // todo I'll use an invisible webview to handle this
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // http request
-                HttpClient client = new DefaultHttpClient();
-                HttpPost post = new HttpPost(that.mTokenURL);
-                List<NameValuePair> pairs = new ArrayList<>();
-                pairs.add(new BasicNameValuePair("grant_type", "refresh_token"));
-                pairs.add(new BasicNameValuePair("refresh_token", getRefreshToken()));
-                pairs.add(new BasicNameValuePair("client_id", mClientID));
-                pairs.add(new BasicNameValuePair("client_secret", mClientSecret));
-                try{
-                    post.setEntity(new UrlEncodedFormEntity(pairs));
-                    HttpResponse response = client.execute(post);
-                    that.logDebug("XXX response " + response.toString());
-                } catch (IOException e) {
-                    that.logError("refreshToken error: " + e.toString());
-                }
-            }
-        }).start();
-        */
 
         logDebug("refreshToken: refreshing token");
 
-        // 在ctx上创建一个webview，并执行更新token的工作
-        Thread th = new Thread() {
-            public void run() {
-                ctx.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        WebView webView = new WebView(ctx);
-                        webView.getSettings().setJavaScriptEnabled(true);
-                        webView.setWebViewClient(new OAuthWebViewClient());
-                        webView.addJavascriptInterface(new MyJSInterface(webView, callback), JSINTERFACE);
-                        String postLoad = "grant_type=refresh_token";
-                        postLoad += "&refresh_token=" + getRefreshToken();
-                        postLoad += "&client_id=" + mClientID;
-                        postLoad += "&client_secret=" + mClientSecret;
-                        webView.postUrl(mTokenURL, EncodingUtils.getBytes(postLoad, "UTF-8"));
-                    }
-                });
-            }
-        };
+        mCtx = ctx;
 
-        th.start();
-        // todo
+        // 在ctx上创建一个webview，并执行更新token的工作
+        ctx.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                WebView webView = new WebView(ctx);
+                webView.getSettings().setJavaScriptEnabled(true);
+                webView.setWebViewClient(new OAuthWebViewClient());
+                webView.addJavascriptInterface(new MyJSInterface(webView, callback), JSINTERFACE);
+                String postLoad = "grant_type=refresh_token";
+                postLoad += "&refresh_token=" + getRefreshToken();
+                postLoad += "&client_id=" + mClientID;
+                postLoad += "&client_secret=" + mClientSecret;
+                webView.postUrl(mTokenURL, EncodingUtils.getBytes(postLoad, "UTF-8"));
+            }
+        });
     }
 
     // 在使用refreshToken()、使用fire()时传递此对象，覆盖onSuccess和onFail方法
@@ -184,11 +157,11 @@ public class OAuthUtil {
         @JavascriptInterface
         @SuppressWarnings("unused")
         public void processHTML(String html) {
-            logDebug("processHTML: " + (html.length() > 20 ? html.substring(0, 20) : html));
+            logDebug("processHTML: " + (html == null ? html : html));
             processTokenHTML(html, mCallback);
 
-            // 处理accesstoken结束后，删除webview
-            mWebView.post(new Runnable() {
+            // 处理access token结束后，删除webview
+            mCtx.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     logDebug("processHTML: destroying webview");

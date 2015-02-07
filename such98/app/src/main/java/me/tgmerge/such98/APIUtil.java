@@ -1,5 +1,6 @@
 package me.tgmerge.such98;
 
+import android.app.Activity;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -40,10 +41,12 @@ public class APIUtil {
         private String mURL = "";
         private RequestParams mParams = new RequestParams();
         private boolean mHasAuthHead = false;
+        private Activity mAct = null;
 
-        public APIRequest(APICallback callback) {
+        public APIRequest(Activity act, APICallback callback) {
             logDebug("APIRequest: a request is initializing, callback: " + callback.toString());
             mCallback = callback;
+            mAct = act;
         }
 
         protected void setURL(String url) {
@@ -91,19 +94,51 @@ public class APIUtil {
                 }
 
                 @Override
-                public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                public void onFailure(final int statCode, final Header[] headers, final byte[] body, final Throwable error) {
                     logError("MyAPIHandler: callback: onError");
-                    mCallback.onFailure(statCode, headers, body, error);
+                    if (statCode == 401) {
+                        OAuthUtil oa = OAuthUtil.getInstance();
+                        if (oa == null) {
+                            logError("MyAPIHandler: callback: tried to refresh token, but OAuthUtil returned null");
+                            mCallback.onFailure(statCode, headers, body, error);
+                        } else {
+                            logDebug("MyAPIHandler: callback: trying to refresh token");
+                            oa.refreshToken(mAct, new OAuthUtil.OAuthCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    logDebug("MyAPIHandler: refreshToken: success");
+                                    execute();
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                    mAct.runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            logError("MyAPIHandler: refreshToken: failed");
+                                            logError("...code=" + statCode);
+                                            if (body != null) logError("...body=" + new String(body));
+                                            logError("...error=" + error.toString());
+                                            mCallback.onFailure(statCode, headers, body, error);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    } else {
+                        mCallback.onFailure(statCode, headers, body, error);
+                    }
                     removeHeaders();
                 }
             }
 
             addHeader("Accept", "application/xml");
-            OAuthUtil oa = OAuthUtil.getInstance();
-            if (oa == null) {
-                logError("APIRequest: addAuthorization: OAuthUtil.getInstance() returns null");
-            } else {
-                addHeader("Authorization", "Bearer " + oa.getAccessToken());
+            if (mHasAuthHead) {
+                OAuthUtil oa = OAuthUtil.getInstance();
+                if (oa == null) {
+                    logError("APIRequest: addAuthorization: OAuthUtil.getInstance() returns null");
+                } else {
+                    addHeader("Authorization", "Bearer " + oa.getAccessToken());
+                }
             }
 
             if (type == METHOD_GET) {
@@ -136,8 +171,8 @@ public class APIUtil {
     // GET Topic/New	获取论坛的最新主题。
     @SuppressWarnings("unused")
     protected static final class GetNewTopic extends APIRequest {
-        public GetNewTopic(Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
-            super(callback);
+        public GetNewTopic(Activity act, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Topic/New", pageFrom, pageTo, pageSize);
         }
         protected void execute() { this.fire(METHOD_GET); }
@@ -146,8 +181,8 @@ public class APIUtil {
     // GET Topic/Board/{boardId}	获取特定版面的主题。主题按照最后发言顺序排序。
     @SuppressWarnings("unused")
     protected static final class GetBoardTopic extends APIRequest {
-        public GetBoardTopic(int boardId, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
-            super(callback);
+        public GetBoardTopic(Activity act, int boardId, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Topic/Board/" + boardId, pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
@@ -157,8 +192,8 @@ public class APIUtil {
     // GET Topic/Hot	获取论坛的热门主题。
     @SuppressWarnings("unused")
     protected final static class GetHotTopic extends APIRequest {
-        public GetHotTopic(Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
-            super(callback);
+        public GetHotTopic(Activity act, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Topic/Hot", pageFrom, pageTo, pageSize);
         }
         protected void execute() { this.fire(METHOD_GET); }
@@ -168,8 +203,8 @@ public class APIUtil {
     // todo do some test
     @SuppressWarnings("unused")
     protected static final class PostBoardTopic extends APIRequest {
-        public PostBoardTopic(int boardId, String title, String content, APICallback callback) {
-            super(callback);
+        public PostBoardTopic(Activity act, int boardId, String title, String content, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Topic/Board/" + boardId);
             this.addParam("Title", title);
             this.addParam("Content", content);
@@ -181,8 +216,8 @@ public class APIUtil {
     //GET Topic/{id}	获取给定 ID 的主题的信息。
     @SuppressWarnings("unused")
     protected static final class GetTopic extends APIRequest {
-        public GetTopic(int topicId, APICallback callback) {
-            super(callback);
+        public GetTopic(Activity act, int topicId, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Topic/" + topicId);
             this.addAuthorization();
         }
@@ -193,8 +228,8 @@ public class APIUtil {
     //GET Post/Topic/{topicId}	获取特定主题的用户发言。
     @SuppressWarnings("unused")
     protected static final class GetTopicPost extends APIRequest {
-        public GetTopicPost(int topicId, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
-            super(callback);
+        public GetTopicPost(Activity act, int topicId, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Post/Topic/" + topicId, pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
@@ -204,8 +239,8 @@ public class APIUtil {
     //GET Post/{id}	获取一个特定的发言。
     @SuppressWarnings("unused")
     protected static final class GetPost extends APIRequest {
-        public GetPost(int postId, APICallback callback) {
-            super(callback);
+        public GetPost(Activity act, int postId, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Post/" + postId);
             this.addAuthorization();
         }
@@ -215,8 +250,8 @@ public class APIUtil {
     //POST Post/Topic/{topicId}	为特定的主题追加新的发言。
     @SuppressWarnings("unused")
     protected static final class PostTopicPost extends APIRequest {
-        public PostTopicPost(int topicId, String title, String content, APICallback callback) {
-            super(callback);
+        public PostTopicPost(Activity act, int topicId, String title, String content, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Post/Topic/" + topicId);
             this.addParam("Title", title);
             this.addParam("Content", content);
@@ -229,8 +264,8 @@ public class APIUtil {
     // todo not support
     @SuppressWarnings("unused")
     protected static final class PutPost extends APIRequest {
-        public PutPost(int postId, String title, String content, APICallback callback) {
-            super(callback);
+        public PutPost(Activity act, int postId, String title, String content, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Post/" + postId);
             this.addParam("Title", title);
             this.addParam("Content", content);
@@ -244,8 +279,8 @@ public class APIUtil {
     // todo more test: 用户名含有特殊字符
     @SuppressWarnings("unused")
     protected static final class GetNameUser extends APIRequest {
-        public GetNameUser(String userName, APICallback callback) {
-            super(callback);
+        public GetNameUser(Activity act, String userName, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "User/Name/" + userName);
         }
         protected void execute() { this.fire(METHOD_GET); }
@@ -254,8 +289,8 @@ public class APIUtil {
     //GET User/{id}	获取具有指定标识的用户的信息。
     @SuppressWarnings("unused")
     protected static final class GetIdUser extends APIRequest {
-        public GetIdUser(int userId, APICallback callback) {
-            super(callback);
+        public GetIdUser(Activity act, int userId, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "User/" + userId);
         }
         protected void execute() { this.fire(METHOD_GET); }
@@ -265,8 +300,8 @@ public class APIUtil {
     //GET Board/Root	获取所有根版面的信息。
     @SuppressWarnings("unused")
     protected static final class GetRootBoard extends APIRequest {
-        public GetRootBoard(Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
-            super(callback);
+        public GetRootBoard(Activity act, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Board/Root", pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
@@ -274,12 +309,11 @@ public class APIUtil {
     }
 
     //GET Board/{boardId}/Subs	获取某个版面的直接子版面。
-    // todo failed: returned 403 on requesting boardID=6
     // APIUtil.callCcAPI(new APIUtil.GetSubBoards(aq, 6, 0, null, 10, that, "callbackMethod"));
     @SuppressWarnings("unused")
     protected static final class GetSubBoards extends APIRequest {
-        public GetSubBoards(int boardId, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
-            super(callback);
+        public GetSubBoards(Activity act, int boardId, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Board/" + boardId + "/Subs", pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
@@ -289,8 +323,8 @@ public class APIUtil {
     //GET Board/{id}	获取给定版面的信息。
     @SuppressWarnings("unused")
     protected static final class GetBoard extends APIRequest {
-        public GetBoard(int boardId, APICallback callback) {
-            super(callback);
+        public GetBoard(Activity act, int boardId, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Board/" + boardId);
             this.addAuthorization();
         }
@@ -300,8 +334,8 @@ public class APIUtil {
     //GET Board?id[0]={id[0]}&id[1]={id[1]}	一次性获取多个版面的的信息。
     @SuppressWarnings("unused")
     protected static final class GetMultiBoards extends APIRequest {
-        public GetMultiBoards(int[] boardIds, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
-            super(callback);
+        public GetMultiBoards(Activity act, int[] boardIds, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(act, callback);
             String idPart = "";
             for (int i = 0; i < boardIds.length; i ++) {
                 idPart += "id[" + i + "]=" + boardIds[i] + "&";
@@ -318,8 +352,8 @@ public class APIUtil {
     // GET Me/Basic	获取当前登录用户的基本信息。
     @SuppressWarnings("unused")
     protected static final class GetBasicMe extends APIRequest {
-        public GetBasicMe(APICallback callback) {
-            super(callback);
+        public GetBasicMe(Activity act, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Me/Basic");
             this.addAuthorization();
         }
@@ -329,8 +363,8 @@ public class APIUtil {
     //GET Me/CustomBoards	获取当前用户的自定义版面。
     @SuppressWarnings("unused")
     protected static final class GetCustomBoardsMe extends APIRequest {
-        public GetCustomBoardsMe(APICallback callback) {
-            super(callback);
+        public GetCustomBoardsMe(Activity act, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Me/CustomBoards");
             this.addAuthorization();
         }
@@ -340,8 +374,8 @@ public class APIUtil {
     //GET Me	获取当前用户的信息。
     @SuppressWarnings("unused")
     protected static final class GetMe extends APIRequest {
-        public GetMe(APICallback callback) {
-            super(callback);
+        public GetMe(Activity act, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Me");
             this.addAuthorization();
         }
@@ -352,9 +386,8 @@ public class APIUtil {
     // todo not support
     @SuppressWarnings("unused")
     protected static final class PutMe extends APIRequest {
-        public PutMe(String data,
-                     APICallback callback) {
-            super(callback);
+        public PutMe(Activity act, String data, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Me");
             this.addParam("todo what the key is this", data);
             this.addAuthorization();
@@ -362,16 +395,12 @@ public class APIUtil {
         protected void execute() { this.fire(METHOD_PUT); }
     }
 
-    // API: test
-    //GET TellMePassword	快告诉我密码！
-    // todo will not implement
-
     // API: SystemSetting
     //GET SystemSetting	获取 CC98 API 系统的的当前设置。
     @SuppressWarnings("unused")
     protected static final class GetSystemSetting extends APIRequest {
-        public GetSystemSetting(APICallback callback) {
-            super(callback);
+        public GetSystemSetting(Activity act, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "SystemSetting");
             this.addAuthorization();
         }
@@ -382,8 +411,8 @@ public class APIUtil {
     // GET Message/{id}	获取一条特定的短消息。
     @SuppressWarnings("unused")
     protected static final class GetMessage extends APIRequest {
-        public GetMessage(int messageId, APICallback callback) {
-            super(callback);
+        public GetMessage(Activity act, int messageId, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Message/" + messageId);
             this.addAuthorization();
         }
@@ -395,8 +424,8 @@ public class APIUtil {
     @SuppressWarnings("unused")
     protected static final class GetUserMessage extends APIRequest {
         public static final int FILTER_NONE = 0, FILTER_SEND = 1, FILTER_RECEIVE = 2, FILTER_BOTH = 3;
-        public GetUserMessage(String userName, int filter, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
-            super(callback);
+        public GetUserMessage(Activity act, String userName, int filter, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Message?userName=" + userName + "&filter=" + filter, pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
@@ -404,11 +433,10 @@ public class APIUtil {
     }
 
     // DELETE Message/{id}	删除当前用户的特定短消息。
-    // todo not implemented
     @SuppressWarnings("unused")
     protected static final class DeleteMessage extends APIRequest {
-        public DeleteMessage(int messageId, APICallback callback) {
-            super(callback);
+        public DeleteMessage(Activity act, int messageId, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Message/" + messageId);
             this.addAuthorization();
         }
@@ -419,8 +447,8 @@ public class APIUtil {
     // todo not supported
     @SuppressWarnings("unused")
     protected static final class PutMessage extends APIRequest {
-        public PutMessage(int messageId, String receiverName, String title, String content, APICallback callback) {
-            super(callback);
+        public PutMessage(Activity act, int messageId, String receiverName, String title, String content, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Message/" + messageId);
             this.addParam("ReceiverName", receiverName);
             this.addParam("Title", title);
@@ -433,8 +461,8 @@ public class APIUtil {
     //POST Message	创建一条新的短消息。
     @SuppressWarnings("unused")
     protected static final class PostMessage extends APIRequest {
-        public PostMessage(String receiverName, String title, String content, APICallback callback) {
-            super(callback);
+        public PostMessage(Activity act, String receiverName, String title, String content, APICallback callback) {
+            super(act, callback);
             this.setURL(URL_CC98API + "Message");
             this.addParam("ReceiverName", receiverName);
             this.addParam("Title", title);
@@ -444,7 +472,7 @@ public class APIUtil {
         protected void execute() { this.fire(METHOD_POST); }
     }
 
-    // utility methods
+    // - utility methods -
 
     // Similar to javascript encodeURIComponent
     public static final String encodeURIComponent(final String s) {
