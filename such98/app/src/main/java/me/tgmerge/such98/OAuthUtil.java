@@ -165,7 +165,7 @@ public class OAuthUtil {
 
     // 在使用refreshToken()、使用fire()时传递此对象，覆盖onSuccess和onFail方法
     // 它们会在获取/刷新token成功或失败时被调用
-    protected class OAuthCallback {
+    protected static class OAuthCallback {
         public void onSuccess() {}
         public void onFailure() {}
     }

@@ -1,51 +1,453 @@
 package me.tgmerge.such98;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
-import com.androidquery.util.XmlDom;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.apache.http.Header;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-/**
- * Created by tgmerge on 2/4.
- */
+
+// 使用
+//      new APIUtil.PostTopicPost(2803718, "title", "content", new APIUtil.APICallback() {
+//          @Override
+//          public void onSuccess(int statCode, Header[] headers, byte[] body) {
+//              Toast.makeText(that, new String(body), Toast.LENGTH_LONG).show();
+//          }
+//
+//          @Override
+//          public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+//              Toast.makeText(that, statCode + ", " + error.toString(), Toast.LENGTH_LONG).show();
+//          }
+//      }).execute();
+
 public class APIUtil {
 
-    // APIUtil is a singleton class
+    private static final AsyncHttpClient sClient = new AsyncHttpClient();
+    private static final String URL_CC98API = "http://api.cc98.org/";
+    private static final int METHOD_GET    = 0;
+    private static final int METHOD_POST   = 1;
+    private static final int METHOD_PUT    = 2;
+    private static final int METHOD_DELETE = 3;
 
-    // context of the whole application,
-    // will be set on APIUtil instance creates
-    private static Context mCtx = null;
+    protected abstract static class APIRequest {
 
-    // the only instance of the class,
-    // will be set on first APIUtil instance creates
-    private static APIUtil mInstance = null;
+        private APICallback mCallback = null;
+        private String mURL = "";
+        private RequestParams mParams = new RequestParams();
+        private boolean mHasAuthHead = false;
 
-
-    // constructor
-    public APIUtil(final Context context){
-        mCtx = context;
-    }
-
-    // returns a APIUtil instance,
-    // which is the only instance of the whole application
-    public static final synchronized APIUtil getInstance(final Context context) {
-        if (mInstance == null) {
-            mInstance = new APIUtil(context.getApplicationContext());
+        public APIRequest(APICallback callback) {
+            logDebug("APIRequest: a request is initializing, callback: " + callback.toString());
+            mCallback = callback;
         }
-        return mInstance;
+
+        protected void setURL(String url) {
+            mURL = url;
+        }
+
+        protected void setURL(String url, Integer pageFrom, Integer pageTo, Integer pageSize) {
+            String pagedURL = url;
+            pagedURL = addURIParamIfExists(pagedURL, "From", pageFrom);
+            pagedURL = addURIParamIfExists(pagedURL, "To", pageTo);
+            pagedURL = addURIParamIfExists(pagedURL, "Size", pageSize);
+            this.setURL(pagedURL);
+        }
+
+        protected void addHeader(String key, String value) {
+            sClient.addHeader(key, value);
+        }
+
+        protected void addParam(String key, String value) {
+            mParams.put(key, value);
+        }
+
+        protected void removeHeaders() {
+            sClient.removeAllHeaders();
+        }
+
+        protected void addAuthorization() {
+            mHasAuthHead = true;
+        }
+
+        protected void fire(int type) {
+            logDebug("APIRequest: firing a request, method=" + type + " URL=" + mURL);
+
+            class MyAPIHandler extends AsyncHttpResponseHandler {
+                @Override
+                public void onStart() {
+                    logDebug("MyAPIHandler: callback: onStart");
+                }
+
+                @Override
+                public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                    logDebug("MyAPIHandler: callback: onSuccess");
+                    mCallback.onSuccess(statCode, headers, body);
+                    removeHeaders();
+                }
+
+                @Override
+                public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                    logError("MyAPIHandler: callback: onError");
+                    mCallback.onFailure(statCode, headers, body, error);
+                    removeHeaders();
+                }
+            }
+
+            addHeader("Accept", "application/xml");
+            OAuthUtil oa = OAuthUtil.getInstance();
+            if (oa == null) {
+                logError("APIRequest: addAuthorization: OAuthUtil.getInstance() returns null");
+            } else {
+                addHeader("Authorization", "Bearer " + oa.getAccessToken());
+            }
+
+            if (type == METHOD_GET) {
+                sClient.get(mURL, new MyAPIHandler());
+            } else if (type == METHOD_POST) {
+                sClient.post(mURL, mParams, new MyAPIHandler());
+            } else if (type == METHOD_PUT) {
+                sClient.put(mURL, mParams, new MyAPIHandler());
+            } else if (type == METHOD_DELETE) {
+                sClient.delete(mURL, new MyAPIHandler());
+            }
+        }
+
+        @SuppressWarnings("unused")
+        abstract protected void execute();
     }
 
-    // Some utility methods
+    // API调用后的回调，使用时覆盖onSuccess和onFailure两个方法
+    protected static class APICallback {
+        public void onSuccess(int statCode, Header[] headers, byte[] body) {
+            Log.d("onsuccess", "success");
+        }
+
+        public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+            Log.d("onfailure", "failure");
+        }
+    }
+
+    // API: Topic
+    // GET Topic/New	获取论坛的最新主题。
+    @SuppressWarnings("unused")
+    protected static final class GetNewTopic extends APIRequest {
+        public GetNewTopic(Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Topic/New", pageFrom, pageTo, pageSize);
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    // GET Topic/Board/{boardId}	获取特定版面的主题。主题按照最后发言顺序排序。
+    @SuppressWarnings("unused")
+    protected static final class GetBoardTopic extends APIRequest {
+        public GetBoardTopic(int boardId, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Topic/Board/" + boardId, pageFrom, pageTo, pageSize);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    // GET Topic/Hot	获取论坛的热门主题。
+    @SuppressWarnings("unused")
+    protected final static class GetHotTopic extends APIRequest {
+        public GetHotTopic(Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Topic/Hot", pageFrom, pageTo, pageSize);
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //POST Topic/Board/{boardId}	向服务器创建一个新的主题。
+    // todo do some test
+    @SuppressWarnings("unused")
+    protected static final class PostBoardTopic extends APIRequest {
+        public PostBoardTopic(int boardId, String title, String content, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Topic/Board/" + boardId);
+            this.addParam("Title", title);
+            this.addParam("Content", content);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_POST); }
+    }
+
+    //GET Topic/{id}	获取给定 ID 的主题的信息。
+    @SuppressWarnings("unused")
+    protected static final class GetTopic extends APIRequest {
+        public GetTopic(int topicId, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Topic/" + topicId);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    // API: Post
+    //GET Post/Topic/{topicId}	获取特定主题的用户发言。
+    @SuppressWarnings("unused")
+    protected static final class GetTopicPost extends APIRequest {
+        public GetTopicPost(int topicId, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Post/Topic/" + topicId, pageFrom, pageTo, pageSize);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //GET Post/{id}	获取一个特定的发言。
+    @SuppressWarnings("unused")
+    protected static final class GetPost extends APIRequest {
+        public GetPost(int postId, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Post/" + postId);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //POST Post/Topic/{topicId}	为特定的主题追加新的发言。
+    @SuppressWarnings("unused")
+    protected static final class PostTopicPost extends APIRequest {
+        public PostTopicPost(int topicId, String title, String content, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Post/Topic/" + topicId);
+            this.addParam("Title", title);
+            this.addParam("Content", content);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_POST); }
+    }
+
+    // PUT Post/{id}	修改一个现有发言。
+    // todo not support
+    @SuppressWarnings("unused")
+    protected static final class PutPost extends APIRequest {
+        public PutPost(int postId, String title, String content, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Post/" + postId);
+            this.addParam("Title", title);
+            this.addParam("Content", content);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_PUT); }
+    }
+
+    // API: User
+    //GET User/Name/{name}	根据用户名获取用户的信息。
+    // todo more test: 用户名含有特殊字符
+    @SuppressWarnings("unused")
+    protected static final class GetNameUser extends APIRequest {
+        public GetNameUser(String userName, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "User/Name/" + userName);
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //GET User/{id}	获取具有指定标识的用户的信息。
+    @SuppressWarnings("unused")
+    protected static final class GetIdUser extends APIRequest {
+        public GetIdUser(int userId, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "User/" + userId);
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    // API: Board
+    //GET Board/Root	获取所有根版面的信息。
+    @SuppressWarnings("unused")
+    protected static final class GetRootBoard extends APIRequest {
+        public GetRootBoard(Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Board/Root", pageFrom, pageTo, pageSize);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //GET Board/{boardId}/Subs	获取某个版面的直接子版面。
+    // todo failed: returned 403 on requesting boardID=6
+    // APIUtil.callCcAPI(new APIUtil.GetSubBoards(aq, 6, 0, null, 10, that, "callbackMethod"));
+    @SuppressWarnings("unused")
+    protected static final class GetSubBoards extends APIRequest {
+        public GetSubBoards(int boardId, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Board/" + boardId + "/Subs", pageFrom, pageTo, pageSize);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //GET Board/{id}	获取给定版面的信息。
+    @SuppressWarnings("unused")
+    protected static final class GetBoard extends APIRequest {
+        public GetBoard(int boardId, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Board/" + boardId);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //GET Board?id[0]={id[0]}&id[1]={id[1]}	一次性获取多个版面的的信息。
+    @SuppressWarnings("unused")
+    protected static final class GetMultiBoards extends APIRequest {
+        public GetMultiBoards(int[] boardIds, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(callback);
+            String idPart = "";
+            for (int i = 0; i < boardIds.length; i ++) {
+                idPart += "id[" + i + "]=" + boardIds[i] + "&";
+            }
+            this.setURL(URL_CC98API + "Board?" + idPart, pageFrom, pageTo, pageSize);
+            this.addAuthorization();
+        }
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
+    }
+
+    // API: Me
+    // GET Me/Basic	获取当前登录用户的基本信息。
+    @SuppressWarnings("unused")
+    protected static final class GetBasicMe extends APIRequest {
+        public GetBasicMe(APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Me/Basic");
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //GET Me/CustomBoards	获取当前用户的自定义版面。
+    @SuppressWarnings("unused")
+    protected static final class GetCustomBoardsMe extends APIRequest {
+        public GetCustomBoardsMe(APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Me/CustomBoards");
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //GET Me	获取当前用户的信息。
+    @SuppressWarnings("unused")
+    protected static final class GetMe extends APIRequest {
+        public GetMe(APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Me");
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    //PUT Me	设置当前用户的信息。
+    // todo not support
+    @SuppressWarnings("unused")
+    protected static final class PutMe extends APIRequest {
+        public PutMe(String data,
+                     APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Me");
+            this.addParam("todo what the key is this", data);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_PUT); }
+    }
+
+    // API: test
+    //GET TellMePassword	快告诉我密码！
+    // todo will not implement
+
+    // API: SystemSetting
+    //GET SystemSetting	获取 CC98 API 系统的的当前设置。
+    @SuppressWarnings("unused")
+    protected static final class GetSystemSetting extends APIRequest {
+        public GetSystemSetting(APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "SystemSetting");
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    // API: Message
+    // GET Message/{id}	获取一条特定的短消息。
+    @SuppressWarnings("unused")
+    protected static final class GetMessage extends APIRequest {
+        public GetMessage(int messageId, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Message/" + messageId);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    // GET Message?userName={userName}&filter={filter}	获取当前用户的短消息。
+    // todo username没有经过转义可能造成问题
+    @SuppressWarnings("unused")
+    protected static final class GetUserMessage extends APIRequest {
+        public static final int FILTER_NONE = 0, FILTER_SEND = 1, FILTER_RECEIVE = 2, FILTER_BOTH = 3;
+        public GetUserMessage(String userName, int filter, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Message?userName=" + userName + "&filter=" + filter, pageFrom, pageTo, pageSize);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_GET); }
+    }
+
+    // DELETE Message/{id}	删除当前用户的特定短消息。
+    // todo not implemented
+    @SuppressWarnings("unused")
+    protected static final class DeleteMessage extends APIRequest {
+        public DeleteMessage(int messageId, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Message/" + messageId);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_DELETE); }
+    }
+
+    // PUT Message/{id}	修改现有短消息的内容。
+    // todo not supported
+    @SuppressWarnings("unused")
+    protected static final class PutMessage extends APIRequest {
+        public PutMessage(int messageId, String receiverName, String title, String content, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Message/" + messageId);
+            this.addParam("ReceiverName", receiverName);
+            this.addParam("Title", title);
+            this.addParam("Content", content);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_PUT); }
+    }
+
+    //POST Message	创建一条新的短消息。
+    @SuppressWarnings("unused")
+    protected static final class PostMessage extends APIRequest {
+        public PostMessage(String receiverName, String title, String content, APICallback callback) {
+            super(callback);
+            this.setURL(URL_CC98API + "Message");
+            this.addParam("ReceiverName", receiverName);
+            this.addParam("Title", title);
+            this.addParam("Content", content);
+            this.addAuthorization();
+        }
+        protected void execute() { this.fire(METHOD_POST); }
+    }
+
+    // utility methods
 
     // Similar to javascript encodeURIComponent
-    public static String encodeURIComponent(final String s) {
+    public static final String encodeURIComponent(final String s) {
         String result;
 
         try {
@@ -64,476 +466,30 @@ public class APIUtil {
     }
 
     // Add a parameter to passed-in URL.
-    // if the "value" arg is null, no modification is done to uri.
-    private static String addURIParamIfExists(String uri, String key, String value) {
-        if (uri == null || uri.equals("")) {
-            return uri;
+    // if the "value" arg is null, no modification is done to URL.
+    private static final String addURIParamIfExists(String url, String key, String value) {
+        if (url == null || url.equals("")) {
+            return url;
         }
-        if (!uri.contains("?")) {
-            uri += "?";
+        if (!url.contains("?")) {
+            url += "?";
         }
-        if (!(uri.endsWith("&") || uri.endsWith("?"))) {
-            uri += "&";
+        if (!(url.endsWith("&") || url.endsWith("?"))) {
+            url += "&";
         }
-        uri += key + "=" + encodeURIComponent(value);
-        return uri;
+        url += key + "=" + encodeURIComponent(value);
+        return url;
     }
-    private static String addURIParamIfExists(String uri, String key, Integer value) {
-        return (value == null) ? uri : addURIParamIfExists(uri, key, String.valueOf(value));
-    }
-
-    // returns accessToken from shared preferences file.
-    // if not found, returns null string
-    public final String getAccessToken() {
-        SharedPreferences sharedPref = mCtx.getSharedPreferences(
-                mCtx.getString(R.string.appConfig_preferenceFileKey_settings),
-                Context.MODE_PRIVATE);
-        return sharedPref.getString(
-                mCtx.getString(R.string.appConfig_valueKey_settings_accessToken),
-                "");
-        // TODO: start Login intent if "" is returned
+    private static final String addURIParamIfExists(String url, String key, Integer value) {
+        return (value == null) ? url : addURIParamIfExists(url, key, String.valueOf(value));
     }
 
-
-    // clear accessToken from shared preferences file.
-    public final void clearAccessToken() {
-        SharedPreferences sharedPref = mCtx.getSharedPreferences(
-                mCtx.getString(R.string.appConfig_preferenceFileKey_settings),
-                mCtx.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(
-                mCtx.getString(R.string.appConfig_valueKey_settings_accessToken),
-                "");
-        editor.commit();
+    private static final void logDebug(String msg) {
+        Log.d("APIUtil", msg);
     }
 
-    //
-
-    // working - - -
-
-    // API调用后的回调，覆盖onSuccess和onFailure两个方法
-    protected class APICallback {
-        public void onSuccess(XmlDom xml, AjaxStatus status) {}
-        public void onFailure(XmlDom xml, AjaxStatus status) {}
+    private static final void logError(String msg) {
+        Log.e("APIUtil", msg);
     }
 
-
-    public static final void callCcAPI(final CcAPI api) { api.execute(); }
-
-    protected static final void callAPI(final CcAPI api, final APICallback callback) {
-    /*
-        api.execute(..., callback=new Ajaxcallback() {
-            callback(url, xml, status) {
-                if status == success:
-                    callback.onoSuccess(url, xml, status);
-                elif status == token expired:
-                    OAuthUtil.refreshToken( succ={retry this request, succ=succ, fail=fail}, failure=callback.onfailure );
-                elif status == other error:
-                    callback.onfailure(url, xml, status);
-            }
-    */
-    }
-    //private static final void apicb(String url, )
-
-    // working - - -
-
-    abstract protected static class CcAPI {
-
-        private AjaxCallback<XmlDom> mCb;
-        private AQuery mAq;
-
-        public static final String URL_CC98API = "http://api.cc98.org/";
-
-        public CcAPI(AQuery aq) {
-            mAq = aq;
-        }
-
-        public CcAPI(AQuery aq, Object handler, String callback) {
-            mAq = aq;
-            mCb = new AjaxCallback<>();
-            mCb.type(XmlDom.class).weakHandler(handler, callback);
-        }
-
-        protected final CcAPI setURL(String url) {
-            mCb.url(url);
-            return this;
-        }
-
-        protected final CcAPI setURL(String url, Integer pageFrom, Integer pageTo, Integer pageSize) {
-            String pagedURL = url;
-            pagedURL = addURIParamIfExists(pagedURL, "From", pageFrom);
-            pagedURL = addURIParamIfExists(pagedURL, "To", pageTo);
-            pagedURL = addURIParamIfExists(pagedURL, "Size", pageSize);
-            mCb.url(pagedURL);
-            return this;
-        }
-
-        protected final CcAPI addAuthorization() {
-            mCb.header("Authorization", "Bearer " + APIUtil.getInstance(mCtx).getAccessToken());
-            return this;
-        }
-
-        protected final CcAPI addPayload(String key, String value) {
-            mCb.param(key, value);
-            return this;
-        }
-
-        protected final CcAPI addHeader(String key, String value) {
-            mCb.header(key, value);
-            return this;
-        }
-
-        // TODO not sure is it GET or POST
-        protected final CcAPI getRequest() {
-            mCb.header("Accept", "application/xml");
-            mCb.params(null);
-            mAq.ajax(mCb);
-            return this;
-        }
-
-        // TODO not sure is it GET or POST
-        protected final CcAPI postRequest() {
-            mCb.header("Accept", "application/xml")
-               .header("Content-Type", "application/x-www-form-urlencoded");
-            mAq.ajax(mCb);
-            return this;
-        }
-
-        // TODO do something
-        protected final CcAPI putRequest() {
-            Log.e("CcAPI", "PUT is not supported yet");
-            return this;
-        }
-
-        abstract protected CcAPI execute();
-    }
-
-    // API: Topic
-    // GET Topic/New	获取论坛的最新主题。
-    protected static final class GetNewTopic extends CcAPI {
-        public GetNewTopic(AQuery aq,
-                           Integer pageFrom, Integer pageTo, Integer pageSize,
-                           Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Topic/New", pageFrom, pageTo, pageSize);
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    // GET Topic/Board/{boardId}	获取特定版面的主题。主题按照最后发言顺序排序。
-    protected static final class GetBoardTopic extends CcAPI {
-        public GetBoardTopic(AQuery aq, int boardId,
-                             Integer pageFrom, Integer pageTo, Integer pageSize,
-                             Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Topic/Board/" + boardId, pageFrom, pageTo, pageSize)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //GET Topic/Hot	获取论坛的热门主题。
-    protected static final class GetHotTopic extends CcAPI {
-        public GetHotTopic(AQuery aq,
-                           Integer pageFrom, Integer pageTo, Integer pageSize,
-                           Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Topic/Hot", pageFrom, pageTo, pageSize);
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //POST Topic/Board/{boardId}	向服务器创建一个新的主题。
-    // todo do some test
-    protected static final class PostBoardTopic extends CcAPI {
-        public PostBoardTopic(AQuery aq, int boardId,
-                              String title, String content,
-                              Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Topic/Board/" + boardId)
-                .addPayload("Title", title)
-                .addPayload("Content", content)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.postRequest(); }
-    }
-
-    //GET Topic/{id}	获取给定 ID 的主题的信息。
-    protected static final class GetTopic extends CcAPI {
-        public GetTopic(AQuery aq, int topicId,
-                        Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Topic/" + topicId)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    // API: Post
-
-    //POST Post/Topic/{topicId}	为特定的主题追加新的发言。
-    protected static final class PostTopicPost extends CcAPI {
-        public PostTopicPost(AQuery aq, int topicId,
-                             String title, String content,
-                             Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Post/Topic/" + topicId)
-                .addPayload("Title", title)
-                .addPayload("Content", content)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.postRequest(); }
-    }
-
-    //GET Post/Topic/{topicId}	获取特定主题的用户发言。
-    protected static final class GetTopicPost extends CcAPI {
-        public GetTopicPost(AQuery aq, int topicId,
-                            Integer pageFrom, Integer pageTo, Integer pageSize,
-                            Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Post/Topic/" + topicId, pageFrom, pageTo, pageSize)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //GET Post/{id}	获取一个特定的发言。
-    protected static final class GetPost extends CcAPI {
-        public GetPost(AQuery aq, int postId,
-                       Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Post/" + postId)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    // PUT Post/{id}	修改一个现有发言。
-    // todo not support
-    protected static final class PutPost extends CcAPI {
-        public PutPost(AQuery aq, int postId,
-                       String title, String content,
-                       Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Post/" + postId)
-                .addPayload("Title", title)
-                .addPayload("Content", content)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.putRequest(); }
-    }
-
-    // API: User
-
-    //GET User/Name/{name}	根据用户名获取用户的信息。
-    // todo more test: 用户名含有特殊字符
-    protected static final class GetNameUser extends CcAPI {
-        public GetNameUser(AQuery aq, String userName,
-                           Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "User/Name/" + userName);
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //GET User/{id}	获取具有指定标识的用户的信息。
-    protected static final class GetIdUser extends CcAPI {
-        public GetIdUser(AQuery aq, String userId,
-                         Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "User/" + userId);
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    // API: Board
-
-    //GET Board/Root	获取所有根版面的信息。
-    protected static final class GetRootBoard extends CcAPI {
-        public GetRootBoard(AQuery aq,
-                            Integer pageFrom, Integer pageTo, Integer pageSize,
-                            Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Board/Root", pageFrom, pageTo, pageSize)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //GET Board/{boardId}/Subs	获取某个版面的直接子版面。
-    // todo failed: returned 403 on requesting boardID=6
-    // APIUtil.callCcAPI(new APIUtil.GetSubBoards(aq, 6, 0, null, 10, that, "callbackMethod"));
-    protected static final class GetSubBoards extends CcAPI {
-        public GetSubBoards(AQuery aq, int boardId,
-                            Integer pageFrom, Integer pageTo, Integer pageSize,
-                            Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Board/" + boardId + "/Subs", pageFrom, pageTo, pageSize)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //GET Board/{id}	获取给定版面的信息。
-    protected static final class GetBoard extends CcAPI {
-        public GetBoard(AQuery aq, int boardId,
-                        Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Board/" + boardId)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //GET Board?id[0]={id[0]}&id[1]={id[1]}	一次性获取多个版面的的信息。
-    // todo test and support
-    protected static final class GetMultiBoards extends CcAPI {
-        public GetMultiBoards(AQuery aq, int[] boardIds,
-                              Integer pageFrom, Integer pageTo, Integer pageSize,
-                              Object handler, String callback) {
-            super(aq, handler, callback);
-            String idPart = "";
-            for (int i = 0; i < boardIds.length; i ++) {
-                idPart += "id[" + i + "]=" + boardIds[i] + "&";
-            }
-            this.setURL(URL_CC98API + "Board?" + idPart, pageFrom, pageTo, pageSize)
-                .addAuthorization();
-            Log.e("CCAPI GETMULTIBOARDS", "unsupported method");
-        }
-        protected CcAPI execute() {
-            Log.e("CCAPI GETMULTIBOARDS", "unsupported method");
-            return this.getRequest();
-        }
-    }
-
-    // API: Me
-
-    // GET Me/Basic	获取当前登录用户的基本信息。
-    protected static final class GetBasicMe extends CcAPI {
-        public GetBasicMe(AQuery aq,
-                          Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Me/Basic")
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //GET Me/CustomBoards	获取当前用户的自定义版面。
-    protected static final class GetCustomBoardsMe extends CcAPI {
-        public GetCustomBoardsMe(AQuery aq,
-                                 Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Me/CustomBoards")
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //GET Me	获取当前用户的信息。
-    protected static final class GetMe extends CcAPI {
-        public GetMe(AQuery aq,
-                     Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Me")
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    //PUT Me	设置当前用户的信息。
-    // todo not support
-    protected static final class PutMe extends CcAPI {
-        public PutMe(AQuery aq, String data,
-                     Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Me")
-                .addPayload("todo what the key is this", data)
-                .addAuthorization();
-            Log.e("CCAPI GETMULTIBOARDS", "unsupported method");
-        }
-        protected CcAPI execute() { return this.putRequest(); }
-    }
-
-    // API: test
-
-    //GET TellMePassword	快告诉我密码！
-    // todo will not implement
-
-    // API: SystemSetting
-
-    //GET SystemSetting	获取 CC98 API 系统的的当前设置。
-    protected static final class GetSystemSetting extends CcAPI {
-        public GetSystemSetting(AQuery aq,
-                                Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "SystemSetting")
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    // API: Message
-
-    // GET Message/{id}	获取一条特定的短消息。
-    protected static final class GetMessage extends CcAPI {
-        public GetMessage(AQuery aq, int messageId,
-                          Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Message/" + messageId)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    // GET Message?userName={userName}&filter={filter}	获取当前用户的短消息。
-    // todo username没有经过转义可能造成问题
-    protected static final class GetUserMessage extends CcAPI {
-        public static final int FILTER_NONE = 0;
-        public static final int FILTER_SEND = 1;
-        public static final int FILTER_RECEIVE = 2;
-        public static final int FILTER_BOTH = 3;
-        public GetUserMessage(AQuery aq, String userName, int filter,
-                              Integer pageFrom, Integer pageTo, Integer pageSize,
-                              Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Message?userName=" + userName + "&filter=" + filter, pageFrom, pageTo, pageSize)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.getRequest(); }
-    }
-
-    // DELETE Message/{id}	删除当前用户的特定短消息。
-    // todo not implemented
-
-    // PUT Message/{id}	修改现有短消息的内容。
-    // todo not supported
-    protected static final class PutMessage extends CcAPI {
-        public PutMessage(AQuery aq, int messageId,
-                          String receiverName, String title, String content,
-                          Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Message/" + messageId)
-                .addPayload("ReceiverName", receiverName)
-                .addPayload("Title", title)
-                .addPayload("Content", content)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.putRequest(); }
-    }
-
-    //POST Message	创建一条新的短消息。
-    protected static final class PostMessage extends CcAPI {
-        public PostMessage(AQuery aq,
-                           String receiverName, String title, String content,
-                           Object handler, String callback) {
-            super(aq, handler, callback);
-            this.setURL(URL_CC98API + "Message")
-                .addPayload("ReceiverName", receiverName)
-                .addPayload("Title", title)
-                .addPayload("Content", content)
-                .addAuthorization();
-        }
-        protected CcAPI execute() { return this.postRequest(); }
-    }
 }

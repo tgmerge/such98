@@ -16,8 +16,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp" />
     <Button android:id="@+id/button_Retry"
+        android:text="Test"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onRetryButtonClicked"/>
+        android:onClick="onTestButtonClicked"/>
+    <Button android:id="@+id/button_Relogin"
+        android:text="relogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onReloginButtonClicked"/>
 
 </LinearLayout>

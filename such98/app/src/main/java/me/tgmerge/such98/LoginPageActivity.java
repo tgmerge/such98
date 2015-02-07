@@ -22,7 +22,7 @@ public class LoginPageActivity extends ActionBarActivity {
         final Context that = this;
 
         WebView webView = (WebView) findViewById(R.id.webView_login);
-        oa.fire(this, webView, oa.new OAuthCallback() {
+        oa.fire(this, webView, new OAuthUtil.OAuthCallback() {
             @Override
             public void onSuccess() {
                 Toast.makeText(that, "Login success" + oa.getAccessToken(), Toast.LENGTH_LONG).show();

@@ -1,115 +1,114 @@
 package me.tgmerge.such98;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxStatus;
-import com.androidquery.util.XmlDom;
+import org.apache.http.Header;
+
+import java.util.Vector;
 
 
 public class DisplayActivity extends ActionBarActivity {
 
-    private AQuery aq;
+    private Activity that;
+    private EditText text;
+
+    Vector<APIUtil.APIRequest> tests = new Vector<>();
+    int testNo = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display);
 
-        aq = new AQuery(this);
+        text = (EditText) findViewById(R.id.editText);
+        that = this;
 
-        String token = APIUtil.getInstance(this).getAccessToken();
-        aq.find(R.id.editText_token).text(token);
+        class MyCallback extends APIUtil.APICallback {
+            @Override
+            public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                if (body != null) {
+                    text.setText(new String(body));
+                } else {
+                    text.setText("Empty response, statcode=" + statCode);
+                }
+            }
+            @Override
+            public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                text.setText("ERROR " + statCode + ", " + error.toString());
+            }
+        }
 
-        // TODO some test here
-        test();
+        // topic
+        tests.add(new APIUtil.GetNewTopic(0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.GetBoardTopic(100, 0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.GetHotTopic(0, null, 10, new MyCallback()));
+            // untested: PostBoardTopic
+        tests.add(new APIUtil.GetTopic(4473926, new MyCallback()));
+
+        // post
+            // untested: tests.add(new APIUtil.PostTopicPost(2803718, "title", "content", new MyCallback()));
+        tests.add(new APIUtil.GetTopicPost(2803718, 0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.GetPost(786144012, new MyCallback()));
+            // untested: tests.add(new APIUtil.PutPost();
+
+        // user
+        tests.add(new APIUtil.GetNameUser("tgmerge", new MyCallback()));
+        tests.add(new APIUtil.GetIdUser(389794, new MyCallback()));
+
+        // board
+        tests.add(new APIUtil.GetRootBoard(0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.GetSubBoards(6, 0, null, 5, new MyCallback()));
+        tests.add(new APIUtil.GetBoard(6, new MyCallback()));
+        int [] a = {6, 100};
+        tests.add(new APIUtil.GetMultiBoards(a, 0, null, 10, new MyCallback()));
+
+        // me
+        tests.add(new APIUtil.GetMe(new MyCallback()));
+        tests.add(new APIUtil.GetBasicMe(new MyCallback()));
+        tests.add(new APIUtil.GetCustomBoardsMe(new MyCallback()));
+            // untested: put me
+
+        // Systemconfig
+        tests.add(new APIUtil.GetSystemSetting(new MyCallback()));
+
+        // message
+        tests.add(new APIUtil.GetMessage(23878541, new MyCallback()));
+        tests.add(new APIUtil.GetUserMessage("tgmerge", APIUtil.GetUserMessage.FILTER_SEND, 0, null, 10, new MyCallback()));
+        tests.add(new APIUtil.DeleteMessage(23880005, new MyCallback()));
+            // untested: put message
+        tests.add(new APIUtil.PostMessage("tgmerge", "testTitle", "testContent", new MyCallback()));
     }
 
     public void test() {
-        Context that = this;
-        //APIUtil.getInstance(this).clearAccessToken();
-        //APIUtil.callCcAPI(new APIUtil.GetNewTopic(aq, 0, null, 10, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetBoardTopic(aq, 100, 10, null, 10, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetHotTopic(aq, 0, null, 10, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetTopic(aq, 4473926, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.PostTopicPost(aq, 2803718, "re", "post", that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetTopicPost(aq, 2803718, 0, null, 10, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetPost(aq, 786144012, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetNameUser(aq, "tgmerge", that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetIdUser(aq, "389794", that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetRootBoard(aq, 0, null, 10, that, "callbackMethod"));
-        // failed APIUtil.callCcAPI(new APIUtil.GetSubBoards(aq, 6, 0, null, 10, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetBoard(aq, 6, that, "callbackMethod"));
-        //int[] a = {6, 100};
-        //APIUtil.callCcAPI(new APIUtil.GetMultiBoards(aq, a, 0, null, 10, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetBasicMe(aq, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetCustomBoardsMe(aq, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetMe(aq, that, "callbackMethod"));
-        APIUtil.callCcAPI(new APIUtil.GetSystemSetting(aq, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.GetUserMessage(aq, "tgmerge", APIUtil.GetUserMessage.FILTER_SEND, 0, null, 10, that, "callbackMethod"));
-        //APIUtil.callCcAPI(new APIUtil.PostMessage(aq, "tgmerge", "testTitle", "testContent", this, "callbackMethod"));
-        OAuthUtil oa = OAuthUtil.getInstance();
-        aq.find(R.id.editText).text(oa.getAccessToken());
-        //oa.refreshToken(this);
-        //aq.find(R.id.editText_token).text(oa.getAccessToken());
-/*
-        AjaxCallback<String> cb = new AjaxCallback<String>();
-
-        cb.type(String.class)
-                .weakHandler(this, "handler1")
-                .url("http://api.cc98.org/")
-                .param("grant_type", "refresh_token")
-                .param("refresh_token", "www")
-                .param("client_id", "www")
-                .param("client_secret", "www");
-        aq.ajax(cb);
-*/
-    }
-/*
-    public void handler1(String url, String object, AjaxStatus status) {
-        Log.d("callback!","callback!" + object + status.toString());
-    }
-*/
-    public void callbackMethod(String url, XmlDom xml, AjaxStatus status) {
-
-        String msg;
-
-        if (xml != null) {
-            // successful ajax call, show status code and content
-            msg = "Success\n";
-            msg += status.getCode() + "\n";
-            msg += xml.toString() + "\n";
+        if(testNo < tests.size()) {
+            Toast.makeText(that, "Test #" + testNo + ", " + tests.get(testNo).getClass().getName(), Toast.LENGTH_LONG).show();
+            tests.get(testNo).execute();
+            testNo ++;
         } else {
-            // ajax error, show some info
-            msg = "Fail";
-            msg += "\nerror: " + status.getError();
-            msg += "\ncode:" + status.getCode();
-            msg += "\nmessage" + status.getMessage();
-
-            int code = status.getCode();
-            String message = status.getMessage();
-            if (code == 401 || code == 403) {
-                // token is expired or something, redo the login
-                Toast.makeText(this, code + " " + message + ", re-login", Toast.LENGTH_LONG).show();
-
-                // finish this activity, and start login activity
-                OAuthUtil.getInstance().clearToken();
-                //Intent intent = new Intent(this, LoginActivity.class);
-                //finish();
-                //startActivity(intent);
-            }
+            Toast.makeText(that, "Test all done", Toast.LENGTH_LONG).show();
         }
-        aq.find(R.id.editText).text(msg);
     }
 
-    public void onRetryButtonClicked(View view) {
+    public void onTestButtonClicked(View view) {
         test();
+    }
+
+    public void onReloginButtonClicked(View view) {
+        OAuthUtil oa = OAuthUtil.getInstance();
+        if (oa != null) {
+            oa.clearToken();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        }
     }
 
     @Override
