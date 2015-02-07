@@ -1,7 +1,6 @@
 package me.tgmerge.such98;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -131,6 +130,8 @@ public class OAuthUtil {
                 postLoad += "&refresh_token=" + getRefreshToken();
                 postLoad += "&client_id=" + mClientID;
                 postLoad += "&client_secret=" + mClientSecret;
+                logDebug("refreshToken: postLoad:" + postLoad);
+                logDebug("refreshToken: encoded postload: "+ new String(EncodingUtils.getBytes(postLoad, "UTF-8")));
                 webView.postUrl(mTokenURL, EncodingUtils.getBytes(postLoad, "UTF-8"));
             }
         });
@@ -179,6 +180,7 @@ public class OAuthUtil {
         @Override
         public void onPageFinished(WebView view, String url) {
             if (this.mState == STATE_AFTER_RECV2 && url.startsWith(mTokenURL) || this.mState == STATE_REFRESH) {
+                logDebug("OAuthWebViewClient: " + "page finished, loading js");
                 view.loadUrl("javascript:" + JSINTERFACE + ".processHTML(document.documentElement.outerHTML);");
             }
         }
@@ -265,13 +267,16 @@ public class OAuthUtil {
 
     private final void setToken(String accessToken, String refreshToken) {
         logDebug("setToken: access = " + (accessToken.length() > 10 ? accessToken.substring(0, 10) : accessToken));
+        logDebug("setToken: refresh = " + (refreshToken.length() > 10 ? refreshToken.substring(0, 10) : refreshToken));
         SharedPreferences.Editor editor = mSharedPref.edit();
+        //if (accessToken != "") accessToken += "xxx";// todo debug usage!!!!!
         editor.putString(this.mKey_accessToken, accessToken);
         editor.putString(this.mKey_refreshToken, refreshToken);
         editor.commit();
     }
 
     private final String getRefreshToken() {
+        logDebug("getRefreshToken: " +  mSharedPref.getString(this.mKey_refreshToken, ""));
         return mSharedPref.getString(this.mKey_refreshToken, "");
     }
 

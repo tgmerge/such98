@@ -27,7 +27,7 @@ public class LoginActivity extends ActionBarActivity {
                     this,
                     "https://login.cc98.org/OAuth/Authorize",
                     "https://login.cc98.org/OAuth/Token",
-                    "all*",
+                    "getuserinfo* getpost* setpost* getmessage* setmessage*",
                     "17bd1fe0-39e7-488f-ac6a-071c86e1f083",
                     "fdf5b427-918e-4237-9897-838eefe478f8");
         }

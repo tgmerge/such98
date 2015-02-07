@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
@@ -25,5 +26,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onReloginButtonClicked"/>
+    <Button android:id="@+id/button_RefreshToken"
+        android:text="refreshToken"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onRefreshTokenButtonClicked"/>
+    <Button android:id="@+id/button_CheckMe"
+        android:text="me"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onCheckMeClicked"/>
+    <Button android:id="@+id/button_RunAct"
+        android:text="Activity test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onRunActClicked"/>
 
 </LinearLayout>

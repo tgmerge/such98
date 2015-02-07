@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,11 +18,11 @@ import java.util.Vector;
 
 public class DisplayActivity extends ActionBarActivity {
 
-    private Activity that;
-    private EditText text;
-
-    Vector<APIUtil.APIRequest> tests = new Vector<>();
+    Vector<APIUtil.APIRequest> tests;
     int testNo = 0;
+    EditText text;
+    EditText textToken;
+    Activity that;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +30,106 @@ public class DisplayActivity extends ActionBarActivity {
         setContentView(R.layout.activity_display);
 
         text = (EditText) findViewById(R.id.editText);
+        textToken = (EditText) findViewById(R.id.editText_token);
         that = this;
+    }
 
+
+    public void onTestButtonClicked(View view) {
+
+        if (tests == null) {
+
+            tests = new Vector<>();
+
+            class MyCallback extends APIUtil.APICallback {
+                @Override
+                public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                    if (body != null) {
+                        text.setText(new String(body));
+                    } else {
+                        text.setText("Empty response, statcode=" + statCode);
+                    }
+                }
+                @Override
+                public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                    text.setText("ERROR " + statCode + ", " + error.toString());
+                }
+            }
+
+            // topic
+            tests.add(new APIUtil.GetNewTopic(this, 0, null, 10, new MyCallback()));
+            tests.add(new APIUtil.GetBoardTopic(this, 100, 0, null, 10, new MyCallback()));
+            tests.add(new APIUtil.GetHotTopic(this, 0, null, 10, new MyCallback()));
+            // untested: PostBoardTopic
+            tests.add(new APIUtil.GetTopic(this, 4473926, new MyCallback()));
+            // post
+            // untested: tests.add(new APIUtil.PostTopicPost(this, 2803718, "title", "content", new MyCallback()));
+            tests.add(new APIUtil.GetTopicPost(this, 2803718, 0, null, 10, new MyCallback()));
+            tests.add(new APIUtil.GetPost(this, 786144012, new MyCallback()));
+            // untested: tests.add(new APIUtil.PutPost();
+            // user
+            tests.add(new APIUtil.GetNameUser(this, "tgmerge", new MyCallback()));
+            tests.add(new APIUtil.GetIdUser(this, 389794, new MyCallback()));
+            // board
+            tests.add(new APIUtil.GetRootBoard(this, 0, null, 10, new MyCallback()));
+            tests.add(new APIUtil.GetSubBoards(this, 6, 0, null, 5, new MyCallback()));
+            tests.add(new APIUtil.GetBoard(this, 6, new MyCallback()));
+            int [] a = {6, 100};
+            tests.add(new APIUtil.GetMultiBoards(this, a, 0, null, 10, new MyCallback()));
+            // me
+            tests.add(new APIUtil.GetMe(this, new MyCallback()));
+            tests.add(new APIUtil.GetBasicMe(this, new MyCallback()));
+            tests.add(new APIUtil.GetCustomBoardsMe(this, new MyCallback()));
+            // untested: put me
+            // System config
+            tests.add(new APIUtil.GetSystemSetting(this, new MyCallback()));
+            // message
+            tests.add(new APIUtil.GetMessage(this, 23878541, new MyCallback()));
+            tests.add(new APIUtil.GetUserMessage(this, "tgmerge", APIUtil.GetUserMessage.FILTER_SEND, 0, null, 10, new MyCallback()));
+            tests.add(new APIUtil.DeleteMessage(this, 23880005, new MyCallback()));
+            // untested: put message
+            tests.add(new APIUtil.PostMessage(this, "tgmerge", "testTitle", "testContent", new MyCallback()));
+        }
+
+        textToken.setText(OAuthUtil.getInstance().getAccessToken());
+
+        if(testNo < tests.size()) {
+            Toast.makeText(that, "Test #" + testNo + ", " + tests.get(testNo).getClass().getName(), Toast.LENGTH_LONG).show();
+            tests.get(testNo).execute();
+            testNo ++;
+        } else {
+            Toast.makeText(that, "Test all done", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void onReloginButtonClicked(View view) {
+        OAuthUtil oa = OAuthUtil.getInstance();
+        if (oa != null) {
+            oa.clearToken();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        }
+    }
+
+    public void onRefreshTokenButtonClicked(View view) {
+        final OAuthUtil oa = OAuthUtil.getInstance();
+        if (oa != null) {
+            Toast.makeText(this, "Old token:" + oa.getAccessToken(), Toast.LENGTH_LONG).show();
+            oa.refreshToken(this, new OAuthUtil.OAuthCallback() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(that, "New token:" + oa.getAccessToken(), Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(that, "refresh token failed", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    public void onCheckMeClicked(View view) {
         class MyCallback extends APIUtil.APICallback {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
@@ -45,64 +144,11 @@ public class DisplayActivity extends ActionBarActivity {
                 text.setText("ERROR " + statCode + ", " + error.toString());
             }
         }
-
-        // topic
-        tests.add(new APIUtil.GetNewTopic(this, 0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.GetBoardTopic(this, 100, 0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.GetHotTopic(this, 0, null, 10, new MyCallback()));
-        // untested: PostBoardTopic
-        tests.add(new APIUtil.GetTopic(this, 4473926, new MyCallback()));
-        // post
-        // untested: tests.add(new APIUtil.PostTopicPost(this, 2803718, "title", "content", new MyCallback()));
-        tests.add(new APIUtil.GetTopicPost(this, 2803718, 0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.GetPost(this, 786144012, new MyCallback()));
-        // untested: tests.add(new APIUtil.PutPost();
-        // user
-        tests.add(new APIUtil.GetNameUser(this, "tgmerge", new MyCallback()));
-        tests.add(new APIUtil.GetIdUser(this, 389794, new MyCallback()));
-        // board
-        tests.add(new APIUtil.GetRootBoard(this, 0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.GetSubBoards(this, 6, 0, null, 5, new MyCallback()));
-        tests.add(new APIUtil.GetBoard(this, 6, new MyCallback()));
-        int [] a = {6, 100};
-        tests.add(new APIUtil.GetMultiBoards(this, a, 0, null, 10, new MyCallback()));
-        // me
-
-        tests.add(new APIUtil.GetMe(this, new MyCallback()));
-        tests.add(new APIUtil.GetBasicMe(this, new MyCallback()));
-        tests.add(new APIUtil.GetCustomBoardsMe(this, new MyCallback()));
-        // untested: put me
-        // System config
-        tests.add(new APIUtil.GetSystemSetting(this, new MyCallback()));
-        // message
-        tests.add(new APIUtil.GetMessage(this, 23878541, new MyCallback()));
-        tests.add(new APIUtil.GetUserMessage(this, "tgmerge", APIUtil.GetUserMessage.FILTER_SEND, 0, null, 10, new MyCallback()));
-        tests.add(new APIUtil.DeleteMessage(this, 23880005, new MyCallback()));
-        // untested: put message
-        tests.add(new APIUtil.PostMessage(this, "tgmerge", "testTitle", "testContent", new MyCallback()));
+        new APIUtil.GetMe(this, new MyCallback()).execute();
     }
 
-    public void test() {
-        if(testNo < tests.size()) {
-            Toast.makeText(that, "Test #" + testNo + ", " + tests.get(testNo).getClass().getName(), Toast.LENGTH_LONG).show();
-            tests.get(testNo).execute();
-            testNo ++;
-        } else {
-            Toast.makeText(that, "Test all done", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public void onTestButtonClicked(View view) {
-        test();
-    }
-
-    public void onReloginButtonClicked(View view) {
-        OAuthUtil oa = OAuthUtil.getInstance();
-        if (oa != null) {
-            oa.clearToken();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        }
+    public void onRunActClicked(View view) {
+        startActivity(new Intent(this, ShowBoardActivity.class));
     }
 
     @Override
@@ -126,4 +172,6 @@ public class DisplayActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
