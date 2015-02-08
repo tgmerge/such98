@@ -4,11 +4,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.apache.http.Header;
@@ -54,16 +56,18 @@ public class ShowBoardActivity extends ActionBarActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(new MyAdapter(data));
 
+        final EditText edit = (EditText) findViewById(R.id.Edit);
+
         new APIUtil.GetRootBoard(this, 0, null, 10, new APIUtil.APICallback() {
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                //... ...
+                Log.d("onsuccess", "getrootboard success" + new String(body));
+                edit.setText(new String(body));
             }
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                //... ...
+                Log.e("onfailure", "getrootboard");
             }
         }).execute();
-
     }
 
     private static class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {

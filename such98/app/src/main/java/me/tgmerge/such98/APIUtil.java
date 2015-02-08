@@ -1,6 +1,7 @@
 package me.tgmerge.such98;
 
 import android.app.Activity;
+import android.os.Looper;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -78,7 +79,7 @@ public class APIUtil {
         }
 
         protected void fire(int type) {
-            logDebug("APIRequest: firing a request, method=" + type + " URL=" + mURL);
+            logDebug("APIRequest: firing, method=" + type + " URL=" + mURL);
 
             class MyAPIHandler extends AsyncHttpResponseHandler {
                 @Override
@@ -88,36 +89,35 @@ public class APIUtil {
 
                 @Override
                 public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                    logDebug("MyAPIHandler: callback: onSuccess");
+                    logDebug("MyAPIHandler: onSuccess, code=" + statCode);
                     mCallback.onSuccess(statCode, headers, body);
                     removeHeaders();
                 }
 
                 @Override
                 public void onFailure(final int statCode, final Header[] headers, final byte[] body, final Throwable error) {
-                    logError("MyAPIHandler: callback: onError");
+                    logError("MyAPIHandler: onFailure, code=" + statCode);
                     if (statCode == 401) {
                         OAuthUtil oa = OAuthUtil.getInstance();
                         if (oa == null) {
-                            logError("MyAPIHandler: callback: tried to refresh token, but OAuthUtil returned null");
+                            logError("MyAPIHandler: onFailure: tried to refresh token, but OAuthUtil returned null");
                             mCallback.onFailure(statCode, headers, body, error);
                         } else {
-                            logDebug("MyAPIHandler: callback: trying to refresh token");
+                            logDebug("MyAPIHandler: onFailure: trying to refresh token");
                             oa.refreshToken(mAct, new OAuthUtil.OAuthCallback() {
                                 @Override
                                 public void onSuccess() {
-                                    logDebug("MyAPIHandler: refreshToken: success");
+                                    logDebug("MyAPIHandler: onFailure: oa.refreshToken: onSuccess");
                                     execute();
                                 }
 
                                 @Override
                                 public void onFailure() {
+                                    logError("MyAPIHandler: onFailure: oa.refreshToken: onFailure, here's a runOnUIThread?");
+                                    logError("    code=" + statCode + ", error=" + error.toString() + ", body=" + (body!=null ? new String(body) : null));
                                     mAct.runOnUiThread(new Runnable() {
                                         public void run() {
-                                            logError("MyAPIHandler: refreshToken: failed");
-                                            logError("...code=" + statCode);
-                                            if (body != null) logError("...body=" + new String(body));
-                                            logError("...error=" + error.toString());
+                                            logError("    so i'm calling mCallback.onFailure");
                                             mCallback.onFailure(statCode, headers, body, error);
                                         }
                                     });
@@ -125,6 +125,7 @@ public class APIUtil {
                             });
                         }
                     } else {
+                        logError("    calling mCallback.onFailure");
                         mCallback.onFailure(statCode, headers, body, error);
                     }
                     removeHeaders();
@@ -135,7 +136,7 @@ public class APIUtil {
             if (mHasAuthHead) {
                 OAuthUtil oa = OAuthUtil.getInstance();
                 if (oa == null) {
-                    logError("APIRequest: addAuthorization: OAuthUtil.getInstance() returns null");
+                    logError("APIRequest: OAuthUtil.getInstance() returns null");
                 } else {
                     addHeader("Authorization", "Bearer " + oa.getAccessToken());
                 }
@@ -159,11 +160,11 @@ public class APIUtil {
     // API调用后的回调，使用时覆盖onSuccess和onFailure两个方法
     protected static class APICallback {
         public void onSuccess(int statCode, Header[] headers, byte[] body) {
-            Log.d("onsuccess", "success");
+            logDebug("APICallback: default onSuccess");
         }
 
         public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-            Log.d("onfailure", "failure");
+            logError("APICallback: default onFailure");
         }
     }
 
@@ -514,10 +515,12 @@ public class APIUtil {
 
     private static final void logDebug(String msg) {
         Log.d("APIUtil", msg);
+        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.myLooper() == Looper.getMainLooper()));
     }
 
     private static final void logError(String msg) {
         Log.e("APIUtil", msg);
+        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.myLooper() == Looper.getMainLooper()));
     }
 
 }

@@ -3,6 +3,7 @@ package me.tgmerge.such98;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.Looper;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -155,16 +156,19 @@ public class OAuthUtil {
             mWebView = webView;
         }
 
+        // 注意：由于是JS线程调用这个方法的，所以将不在UI线程上
+        //      processTokenHTML将调用两个回调方法，它们在UI线程上比较好
+        //      所以用urnOnUiThread调用processTokenHTML
         @JavascriptInterface
         @SuppressWarnings("unused")
-        public void processHTML(String html) {
+        public void processHTML(final String html) {
             logDebug("processHTML: " + (html == null ? html : html));
-            processTokenHTML(html, mCallback);
 
             // 处理access token结束后，删除webview
             mCtx.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    processTokenHTML(html, mCallback);
                     logDebug("processHTML: destroying webview");
                     mWebView.destroy();
                 }
@@ -269,7 +273,6 @@ public class OAuthUtil {
         logDebug("setToken: access = " + (accessToken.length() > 10 ? accessToken.substring(0, 10) : accessToken));
         logDebug("setToken: refresh = " + (refreshToken.length() > 10 ? refreshToken.substring(0, 10) : refreshToken));
         SharedPreferences.Editor editor = mSharedPref.edit();
-        //if (accessToken != "") accessToken += "xxx";// todo debug usage!!!!!
         editor.putString(this.mKey_accessToken, accessToken);
         editor.putString(this.mKey_refreshToken, refreshToken);
         editor.commit();
@@ -282,9 +285,11 @@ public class OAuthUtil {
 
     private static final void logDebug(String info) {
         Log.d("OAuthUtil", info);
+        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.myLooper() == Looper.getMainLooper()));
     }
 
     private static final void logError(String info) {
-        Log.d("OAuthUtil", info);
+        Log.e("OAuthUtil", info);
+        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.myLooper() == Looper.getMainLooper()));
     }
 }

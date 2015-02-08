@@ -6,6 +6,10 @@
     android:orientation="vertical"
     tools:context="me.tgmerge.such98.ShowBoardActivity">
 
+    <EditText android:id = "@+id/Edit"
+        android:layout_width="match_parent"
+        android:layout_height="100dp" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/RecyclerView"
         android:layout_width="match_parent"
