@@ -140,9 +140,9 @@ public class OAuthUtil {
 
     // 在使用refreshToken()、使用fire()时传递此对象，覆盖onSuccess和onFail方法
     // 它们会在获取/刷新token成功或失败时被调用
-    protected static class OAuthCallback {
-        public void onSuccess() {}
-        public void onFailure() {}
+    protected static interface OAuthCallback {
+        public void onSuccess();
+        public void onFailure();
     }
 
     // - 私有类 -
@@ -285,11 +285,11 @@ public class OAuthUtil {
 
     private static final void logDebug(String info) {
         Log.d("OAuthUtil", info);
-        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.myLooper() == Looper.getMainLooper()));
+        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
     }
 
     private static final void logError(String info) {
         Log.e("OAuthUtil", info);
-        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.myLooper() == Looper.getMainLooper()));
+        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
     }
 }

@@ -41,7 +41,7 @@ public class DisplayActivity extends ActionBarActivity {
 
             tests = new Vector<>();
 
-            class MyCallback extends APIUtil.APICallback {
+            class MyCallback implements APIUtil.APICallback {
                 @Override
                 public void onSuccess(int statCode, Header[] headers, byte[] body) {
                     if (body != null) {
@@ -130,7 +130,7 @@ public class DisplayActivity extends ActionBarActivity {
     }
 
     public void onCheckMeClicked(View view) {
-        class MyCallback extends APIUtil.APICallback {
+        class MyCallback implements APIUtil.APICallback {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
                 if (body != null) {
@@ -148,7 +148,7 @@ public class DisplayActivity extends ActionBarActivity {
     }
 
     public void onRunActClicked(View view) {
-        startActivity(new Intent(this, ShowBoardActivity.class));
+        startActivity(new Intent(this, ShowBoardsActivity.class));
     }
 
     @Override

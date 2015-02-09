@@ -15,5 +15,6 @@
     <string name="appConfig_valueKey_settings_accessToken">me.tgmerge.such98.VALUE_KEY.SETTINGS.ACCESS_TOKEN</string>
     <string name="title_activity_display">DisplayActivity</string>
     <string name="title_activity_show_board">ShowBoardActivity</string>
+    <string name="title_activity_show_boards">ShowBoardsActivity</string>
 
 </resources>

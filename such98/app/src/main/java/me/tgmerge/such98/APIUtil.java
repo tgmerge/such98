@@ -113,14 +113,10 @@ public class APIUtil {
 
                                 @Override
                                 public void onFailure() {
-                                    logError("MyAPIHandler: onFailure: oa.refreshToken: onFailure, here's a runOnUIThread?");
+                                    logError("MyAPIHandler: onFailure: oa.refreshToken: onFailure");
                                     logError("    code=" + statCode + ", error=" + error.toString() + ", body=" + (body!=null ? new String(body) : null));
-                                    mAct.runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            logError("    so i'm calling mCallback.onFailure");
-                                            mCallback.onFailure(statCode, headers, body, error);
-                                        }
-                                    });
+                                    logError("    so i'm calling mCallback.onFailure");
+                                    mCallback.onFailure(statCode, headers, body, error);
                                 }
                             });
                         }
@@ -158,14 +154,10 @@ public class APIUtil {
     }
 
     // API调用后的回调，使用时覆盖onSuccess和onFailure两个方法
-    protected static class APICallback {
-        public void onSuccess(int statCode, Header[] headers, byte[] body) {
-            logDebug("APICallback: default onSuccess");
-        }
+    protected static interface APICallback {
+        public void onSuccess(int statCode, Header[] headers, byte[] body);
 
-        public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-            logError("APICallback: default onFailure");
-        }
+        public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error);
     }
 
     // API: Topic
@@ -515,12 +507,12 @@ public class APIUtil {
 
     private static final void logDebug(String msg) {
         Log.d("APIUtil", msg);
-        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.myLooper() == Looper.getMainLooper()));
+        Log.d("APIUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
     }
 
     private static final void logError(String msg) {
         Log.e("APIUtil", msg);
-        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.myLooper() == Looper.getMainLooper()));
+        Log.d("APIUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
     }
 
 }
