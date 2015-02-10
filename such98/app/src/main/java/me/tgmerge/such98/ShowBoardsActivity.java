@@ -1,36 +1,27 @@
 package me.tgmerge.such98;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.Xml;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.Header;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 
 
 public class ShowBoardsActivity extends ActionBarActivity {
@@ -40,19 +31,28 @@ public class ShowBoardsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_boards);
 
-        try {
-            test();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // get RecyclerView
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
 
         final Activity that = this;
         // todo SetUILoading();
-        /*
+
         new APIUtil.GetRootBoard(this, 0, null, 10, new APIUtil.APICallback() {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                // todo boardObj = parseBoardXML();
+                StringReader reader = null;
+                XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = null;
+                try {
+                    reader = new StringReader(new String(body));
+                    boardInfoArr = new XMLUtil.ArrayOf<>(reader, "ArrayOfBoardInfo", XMLUtil.BoardInfo.class, "BoardInfo");
+                    recyclerView.setAdapter(new BoardsAdapter(boardInfoArr));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 // todo updateUi(boardObj);
             }
 
@@ -60,8 +60,56 @@ public class ShowBoardsActivity extends ActionBarActivity {
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 Toast.makeText(that, "Error: get root board failure", Toast.LENGTH_LONG).show();
             }
-        }).execute();*/
+        }).execute();
     }
+
+
+    private static class BoardsAdapter extends RecyclerView.Adapter<BoardsAdapter.ViewHolder> {
+
+        private XMLUtil.ArrayOf<XMLUtil.BoardInfo> data;
+
+        public BoardsAdapter(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
+            this.data = data;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_board_card, viewGroup, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder viewHolder, int i) {
+            viewHolder.text.setText(data.get(i).Name);
+        }
+
+        @Override
+        public int getItemCount() {
+            return data.size();
+        }
+
+        static class ViewHolder extends RecyclerView.ViewHolder {
+            TextView text;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                text = (TextView) itemView.findViewById(R.id.text_boardName);
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     protected void test() throws Exception {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

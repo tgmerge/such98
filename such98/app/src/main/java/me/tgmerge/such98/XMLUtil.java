@@ -251,6 +251,17 @@ public class XMLUtil {
                 }
             }
         }
+
+
+        public T get(int i) {
+            return mObjs.get(i);
+        }
+
+
+        public int size() {
+            return mObjs.size();
+        }
+
     }
 
 
