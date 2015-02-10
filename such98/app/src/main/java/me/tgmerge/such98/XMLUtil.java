@@ -2,222 +2,348 @@ package me.tgmerge.such98;
 
 import android.os.Looper;
 import android.util.Log;
-import android.util.Xml;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 /**
  * Created by tgmerge on 2/8.
- * 其实可以用反射来写……但好像有点麻烦，先这样放着了
- */
+ * 扩展一个新的xml的方法：
+ *
+ * <ObjectA>
+ *     <TagA1>some</TagA1>
+ *     <ObjectB>
+ *                              <- 解析子对象的时候，reader的起始位置会在这里
+ *         <TagB1>some</TagB1>
+ *         <TagB2>some</TagB2>
+ *     </ObjectB>               <- 于是会在这里抛异常No open tag
+ * </ObjectA>
+ *
+ *
+ * e.g.
+
+protected static final class BoardInfo {
+
+    // 可以用setDefaultField()直接设置值的，设置为public
+    public int Id;
+    public String Name;
+
+    // 需要特殊处理的，设置为protected
+    protected Vector<String> Masters;
+    protected BoardLastPostInfo LastPostInfo;
+
+    // 可以直接设置值的变量名字
+    private static HashSet<String> mDefaults = newHashSet("Id", "Name");
+
+    public BoardInfo(Reader in, String openTag) throws Exception {
+
+        Masters = new Vector<>();
+        // 必须保存Reader的原始位置，以供parseSubXmlObj使用
+        // 因为xpp的缓冲区会让reader一下读到后面的位置，而xpp的position只存储其自身缓冲区内的位置
+        // parseSubXmlObj必须将xpp的position和reader在“输入xpp之前的原始位置”相加，
+        // 以获取reader内XML子元素的位置
+        int oldReaderPos = getReaderPos(in);
+        XmlPullParser xpp = sFactory.newPullParser();
+        xpp.setInput(in);
+
+        try {
+            int e = xpp.getEventType();
+            while (e != XmlPullParser.END_DOCUMENT) {
+
+                // 仅处理START_TAG事件
+                if (e != XmlPullParser.START_TAG) {
+                    e = xpp.next();
+                    continue;
+                }
+
+                // 尝试用setDefaultField直接设置，如果tag名字不在mDefaults中，会返回false
+                if (!setDefaultField(xpp, BoardInfo.class, this, mDefaults)) {
+
+                    // 需要特殊处理
+                    String tagName = xpp.getName();
+                    if (tagName.equals("d3p1:string")) {
+                        // 处理 <Masters>
+                        Masters.add(xpp.getText());
+                    } else if (tagName.equals("LastPostInfo")) {
+                        // 处理 <LastPostInfo>: 是一个子对象
+                        LastPostInfo = (BoardLastPostInfo) parseSubXmlObj(xpp, in, "LastPostInfo", BoardLastPostInfo.class);
+                    }
+                }
+
+                // 下一个事件
+                e = xpp.next();
+            }
+        } catch (XmlPullParserException e) {
+
+            // 如果捕获了XmlPullParserException且当前tag和文档开始相同，说明this是在解析一个子对象，直接正常返回
+            //     (xmlpullparser的解析无法回溯，遇到子对象解析时一定会少一个open tag)
+            //     (也是因此，解析的时候需要传递Open tag的名字给构造方法)
+            if (!xpp.getName().equals(openTag)) {
+                throw e;
+            }
+        }
+    }
+}
+
+*/
 public class XMLUtil {
 
-    private static XPath mXP = XPathFactory.newInstance().newXPath();
-    private static HashMap<String, XPathExpression> mKnownXPEs = new HashMap<>();
+    static XmlPullParserFactory sFactory;
 
-    // 根据XPath字符串返回编译后的XPathExpression
-    // 曾经编译过的XPath会直接返回，无需再次编译
-    // 解析XML时就不用费力static了……
-    private static XPathExpression getXPE(String expStr) throws XPathExpressionException {
-        XPathExpression exp = mKnownXPEs.get(expStr);
-        if (exp == null) {
-            exp = mXP.compile(expStr);
-            mKnownXPEs.put(expStr, exp);
-        }
-        return exp;
-    }
 
-    // 直接返回XPath形如./name在e上执行后的结果，为一个Node
-    private static Node xElemNode(String name, Node e) throws XPathExpressionException {
-        return (Node) getXPE("./" + name).evaluate(e, XPathConstants.NODE);
-    }
-
-    // 直接返回XPath形如./name/text()在e上执行后的结果，类型为String
-    private static String xElemString(String name, Node e) throws XPathExpressionException {
-        return getXPE("./" + name + "/text()").evaluate(e);
-    }
-
-    // 直接返回XPath形如/root/name/text()在e上执行后的结果，类型为int
-    private static int xElemInt(String name, Node e) throws XPathExpressionException {
-        return Integer.parseInt(xElemString(name, e));
-    }
-
-    // 直接返回XPath形如/root/name/text()在e上执行后的结果，类型为Boolean
-    private static boolean xElemBoolean(String name, Node e) throws XPathExpressionException {
-        return Boolean.parseBoolean(xElemString(name, e));
-    }
-
-    // 提供获取XML内容的基本工具方法
-    // 可用于获取XPath形如./{name}/text()的内容
-    protected static class XMLObj {
-        private Node mElem;
-
-        public XMLObj(Node e) {
-            this.mElem = e;
-        }
-
-        protected final Node xNode(String name) throws XPathExpressionException {
-            return xElemNode(name, mElem);
-        }
-
-        protected final String xString(String name) throws XPathExpressionException {
-            return xElemString(name, mElem);
-        }
-
-        protected final int xInt(String name) throws XPathExpressionException {
-            return xElemInt(name, mElem);
-        }
-
-        protected final Boolean xBoolean(String name) throws XPathExpressionException {
-            return xElemBoolean(name, mElem);
-        }
-
-        protected final void clearElem() {
-            this.mElem = null;
-        }
-    }
-
-    protected static class ArrayOf<T extends XMLObj> extends XMLObj {
-        private Vector<T> mObjs;
-
-        public ArrayOf(Class c, Node e) throws Exception {
-            super(e);
-            mObjs = new Vector<>();
-            Constructor con = c.getDeclaredConstructor(Node.class);
-
-            NodeList nodes = e.getChildNodes();
-            for (int i = 0; i < nodes.getLength(); i ++) {
-                Node node = nodes.item(i);
-                if ( ! node.getNodeName().equals("")) {
-                    mObjs.add((T) con.newInstance(node));
-                }
-            }
-            clearElem();
-        }
-
-        protected T get(int i) {
-            return mObjs.get(i);
-        }
-
-        protected int size(int i) {
-            return mObjs.size();
+    static {
+        try {
+            sFactory = XmlPullParserFactory.newInstance();
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
         }
     }
 
 
-    // - - - util
+    //- - -
+
+    protected static abstract class XMLObj {
+
+    }
 
     protected static final class BoardLastPostInfo extends XMLObj {
-        int BoardId;
-        int TopicId;
-        int PostId;
-        String DateTime;  // todo type is date time
-        String UserName;
-        int UserId;
-        String TopicTitle;
+        public int BoardId;
+        public int TopicId;
+        public int PostId;
+        public String DateTime;  // todo type is date time
+        public String UserName;
+        public int UserId;
+        public String TopicTitle;
 
-        // 由于没有推断xml类型的方法，
-        // 默认根元素已经是BoardLastPostInfo类型了
-        public BoardLastPostInfo(Node e) throws XPathExpressionException {
-            super(e);
-            BoardId = xInt("BoardId");
-            TopicId = xInt("TopicId");
-            PostId = xInt("PostId");
-            DateTime = xString("DateTime");
-            UserName = xString("UserName");
-            UserId = xInt("UserId");
-            TopicTitle = xString("TopicTitle");
-            clearElem();
-        }
-    }
+        private static HashSet<String> mDefaults =
+                newHashSet("BoardId", "TopicId", "PostId", "DateTime", "UserName", "UserId", "TopicTitle");
 
-    protected static final class BoardInfo extends XMLObj {
-        int Id;
-        String Name;
-        String Description;
-        int ChildBoardCount;
-        int ParentId;
-        int RootId;
-        int TotalPostCount;
-        int TotalTopicCount;
-        int TodayPostCount;
-        boolean IsHidden;
-        boolean IsCategory;
-        boolean IsEncrypted;
-        boolean IsAnomynous;  // todo typo in xml defination
-        boolean IsLocked;
-        Vector<String> Masters;
-        BoardLastPostInfo LastPostInfo;
-        String PostTimeLimit; // todo type is timespan
 
-        public BoardInfo(Node e) throws XPathExpressionException {
-            super(e);
-            Id = xInt("Id");
-            Name = xString("Name");
-            Description = xString("Description");
-            ChildBoardCount = xInt("ChildBoardCount");
-            ParentId = xInt("ParentId");
-            RootId = xInt("RootId");
-            TotalPostCount = xInt("TotalPostCount");
-            TotalTopicCount = xInt("TotalTopicCount");
-            TodayPostCount = xInt("TodayPostCount");
-            IsHidden = xBoolean("IsHidden");
-            IsCategory = xBoolean("IsCategory");
-            IsEncrypted = xBoolean("IsEncrypted");
-            IsAnomynous = xBoolean("IsAnomynous"); // todo typo in xml
-            IsLocked = xBoolean("IsLocked");
+        public BoardLastPostInfo(Reader in, String openTag) throws Exception {
+            XmlPullParser xpp = sFactory.newPullParser();
+            xpp.setInput(in);
 
-            Masters = new Vector<>();
-            NodeList mNodes = xNode("Masters").getChildNodes();
-            for (int i = 0; i < mNodes.getLength(); i ++) {
-                Node mNode = mNodes.item(i);
-                if (mNode.getNodeName().equals("d3p1:string")) {
-                    Masters.add(mNode.getTextContent());
+            try {
+                int e = xpp.getEventType();
+                while (e != XmlPullParser.END_DOCUMENT) {
+
+                    if (e != XmlPullParser.START_TAG) {
+                        e = xpp.next();
+                        continue;
+                    }
+
+                    if (!setDefaultField(xpp, getClass(), this, mDefaults)) {
+                        logError("BoardLastPostInfo: unknown tag=" + xpp.getName());
+                    }
+
+                    e = xpp.next();
+                }
+            } catch (XmlPullParserException e) {
+                if (!xpp.getName().equals(openTag)) {
+                    throw e;
                 }
             }
-
-            LastPostInfo = new BoardLastPostInfo(xNode("LastPostInfo"));
-
-            PostTimeLimit = xString("PostTimeLimit");
-
-            clearElem();
         }
     }
+
+
+    protected static final class BoardInfo extends XMLObj {
+        public int Id;
+        public String Name;
+        public String Description;
+        public int ChildBoardCount;
+        public int ParentId;
+        public int RootId;
+        public int TotalPostCount;
+        public int TotalTopicCount;
+        public int TodayPostCount;
+        public boolean IsHidden;
+        public boolean IsCategory;
+        public boolean IsEncrypted;
+        public boolean IsAnomynous;  // todo typo in xml defination
+        public boolean IsLocked;
+        protected Vector<String> Masters;
+        protected BoardLastPostInfo LastPostInfo;
+        public String PostTimeLimit; // todo type is timespan
+
+        private static HashSet<String> mDefaults =
+                newHashSet("Id", "Name", "Description", "ChildBoardCount", "ParentId", "RootId", "TotalPostCount",
+                           "TotalTopicCount", "TodayPostCount", "IsHidden", "IsCategory", "IsEncrypted",
+                           "IsAnomynous", "IsLocked", "PostTimeLimit");
+
+
+        public BoardInfo(Reader in, String openTag) throws Exception {
+
+            Masters = new Vector<>();
+
+            int oldReaderPos = getReaderPos(in);
+            XmlPullParser xpp = sFactory.newPullParser();
+            xpp.setInput(in);
+
+            try {
+                int e = xpp.getEventType();
+                while (e != XmlPullParser.END_DOCUMENT) {
+
+                    if (e != XmlPullParser.START_TAG) {
+                        e = xpp.next();
+                        continue;
+                    }
+
+                    if (!setDefaultField(xpp, BoardInfo.class, this, mDefaults)) {
+                        // 需要特殊处理的tag
+                        String tagName = xpp.getName();
+                        if (tagName.equals("d3p1:string")) {
+                            // "Masters": <Masters><d3p1:string>...</d3p1:string></Masters>
+                            Masters.add(xpp.getText());
+                        } else if (tagName.equals("LastPostInfo")) {
+                            // "LastPostInfo"
+                            LastPostInfo = (BoardLastPostInfo) parseSubXmlObj(xpp, in, oldReaderPos, "LastPostInfo", BoardLastPostInfo.class);
+                        }
+                    }
+
+                    e = xpp.next();
+                }
+            } catch (XmlPullParserException e) {
+                if (!xpp.getName().equals(openTag)) {
+                    throw e;
+                }
+            }
+        }
+    }
+
+
+    protected static final class ArrayOf<T extends XMLObj> extends XMLObj {
+        private Vector<T> mObjs;
+
+        public ArrayOf(Reader in, String openTag, Class c, String itemOpenTag) throws Exception {
+
+            mObjs = new Vector<>();
+
+            int oldReaderPos = getReaderPos(in);
+            XmlPullParser xpp = sFactory.newPullParser();
+            xpp.setInput(in);
+
+            try {
+                int e = xpp.getEventType();
+                while (e != XmlPullParser.END_DOCUMENT) {
+
+                    if (e != XmlPullParser.START_TAG) {
+                        e = xpp.next();
+                        continue;
+                    }
+
+                    String tagName = xpp.getName();
+                    if (tagName.equals(itemOpenTag)) {
+                        T obj = (T) parseSubXmlObj(xpp, in, oldReaderPos, itemOpenTag, c);
+                        mObjs.add(obj);
+                    }
+
+                    e = xpp.next();
+                }
+            } catch (XmlPullParserException e) {
+                if (!xpp.getName().equals(openTag)) {
+                    throw e;
+                }
+            }
+        }
+    }
+
+
+
 
 
 
     // - - - util method - - -
-
-    private static final XmlPullParser getXmlPullParser() throws XmlPullParserException {
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-        factory.setNamespaceAware(false);
-        return factory.newPullParser();
+    private static HashSet<String> newHashSet(String... strings) {
+        HashSet<String> set = new HashSet<String>();
+        for (String s : strings) {
+            set.add(s);
+        }
+        return set;
     }
+
+
+    // 如果当前的tag name在defaults中，设置o的对应值
+    // 如果成功设置，返回True
+    // 否则返回False
+    private static boolean setDefaultField(XmlPullParser parser, Class c, XMLObj o, Set<String> defaults) throws Exception {
+        String tagName = parser.getName();
+        if (defaults.contains(tagName)) {
+            // tag name在defaults中
+            String value = parser.nextText();
+            Field field = c.getField(tagName);
+            Class<?> type = field.getType();
+            if (type == int.class) {
+                field.set(o, Integer.parseInt(value));
+            } else if (type == boolean.class) {
+                field.set(o, Boolean.parseBoolean(value));
+            } else {
+                field.set(o, value);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 获取一个reader的pos位置，如果没有会抛出异常
+    private static int getReaderPos(Reader reader) throws Exception{
+        Field f = reader.getClass().getDeclaredField("pos");
+        if (!f.isAccessible()) {
+            f.setAccessible(true);
+        }
+        return (int) f.get(reader);
+    }
+
+
+    // 获取一个XmlPullParser的position值(private)，并将reader的位置设置为那个值
+    // hell yeah
+    // 保存reader的位置，新建一个类型是c的XML对象，再恢复reader的位置
+    // 最后返回新建的对象
+    private static XMLObj parseSubXmlObj(XmlPullParser xpp, Reader reader, int parentStartPos, String openTag, Class<? extends XMLObj> c) throws Exception {
+
+        Field xppPosField = xpp.getClass().getDeclaredField("position");
+        if (!xppPosField.isAccessible()) {
+            xppPosField.setAccessible(true);
+        }
+        int xppPos = (int) xppPosField.get(xpp);
+
+        // 可以用任意支持pos的reader替换
+        Field f = reader.getClass().getDeclaredField("pos");
+        if (!f.isAccessible()) {
+            f.setAccessible(true);
+        }
+        int readerPos = (int) f.get(reader);
+
+
+        // 将reader设置在xpp读到的位置上
+        reader.reset();
+        reader.skip(parentStartPos + xppPos);
+
+        // 创建对象
+        XMLObj obj = c.getConstructor(Reader.class, String.class).newInstance(reader, openTag);
+
+        // 恢复reader的位置
+        reader.reset();
+        reader.skip(readerPos);
+
+        return obj;
+    }
+
+
+    // - - - util method - - -
+
 
     private static final void logDebug(String msg) {
         Log.d("XMLUtil", msg);
         Log.d("XMLUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
     }
+
 
     private static final void logError(String msg) {
         Log.e("XMLUtil", msg);
