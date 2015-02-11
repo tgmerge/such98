@@ -5,8 +5,12 @@ import android.util.Log;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -111,6 +115,52 @@ public class XMLUtil {
 
     }
 
+
+    protected static final class ArrayOfint extends XMLObj {
+        public Vector<Integer> Ints;
+
+        public ArrayOfint(Reader in, String openTag) throws Exception {
+            logDebug("ArrayOfint: begin");
+            Ints = new Vector<>();
+            XmlPullParser xpp = sFactory.newPullParser();
+            xpp.setInput(in);
+
+            try {
+                int e = xpp.getEventType();
+                while (e != XmlPullParser.END_DOCUMENT) {
+
+                    if (e != XmlPullParser.START_TAG) {
+                        e = xpp.next();
+                        continue;
+                    }
+
+                    if (xpp.getName().equals("int")) {
+                        Ints.add(Integer.parseInt(xpp.nextText()));
+                    }
+
+                    e = xpp.next();
+                }
+            } catch (XmlPullParserException e) {
+                if (xpp.getName() == null || !xpp.getName().equals(openTag)) {
+                    throw e;
+                }
+            }
+            logDebug("ArrayOfint: finish");
+        }
+
+
+        public Integer get(int i) {
+            return Ints.get(i);
+        }
+
+
+        public int size() {
+            return Ints.size();
+        }
+
+    }
+
+
     protected static final class BoardLastPostInfo extends XMLObj {
         public int BoardId;
         public int TopicId;
@@ -125,6 +175,7 @@ public class XMLUtil {
 
 
         public BoardLastPostInfo(Reader in, String openTag) throws Exception {
+            logDebug("BoardLastPostInfo: begin");
             XmlPullParser xpp = sFactory.newPullParser();
             xpp.setInput(in);
 
@@ -144,10 +195,11 @@ public class XMLUtil {
                     e = xpp.next();
                 }
             } catch (XmlPullParserException e) {
-                if (!xpp.getName().equals(openTag)) {
+                if (xpp.getName() == null || !xpp.getName().equals(openTag)) {
                     throw e;
                 }
             }
+            logDebug("BoardLastPostInfo: finish");
         }
     }
 
@@ -178,7 +230,7 @@ public class XMLUtil {
 
 
         public BoardInfo(Reader in, String openTag) throws Exception {
-
+            logDebug("BoardInfo: begin");
             Masters = new Vector<>();
 
             int oldReaderPos = getReaderPos(in);
@@ -209,19 +261,37 @@ public class XMLUtil {
                     e = xpp.next();
                 }
             } catch (XmlPullParserException e) {
-                if (!xpp.getName().equals(openTag)) {
+                if (xpp.getName() == null || !xpp.getName().equals(openTag)) {
                     throw e;
                 }
             }
+            logDebug("BoardInfo: finish");
         }
     }
 
 
+    // 有两种初始化ArrayOf<T>的方法：
+    // 1. 解析<ArrayOfT><T></T><T></T></ArrayOfT>的对象
+    //    使用(Reader in, String openTag, Class c, String itemOpenTag)构造方法
+    // 2. 传入类型为T的数组或Vector，使用(T[] objs)或(Vector<T> objs)构造方法
     protected static final class ArrayOf<T extends XMLObj> extends XMLObj {
         private Vector<T> mObjs;
 
-        public ArrayOf(Reader in, String openTag, Class c, String itemOpenTag) throws Exception {
 
+        public ArrayOf(T[] objs) {
+
+            mObjs = new Vector<>(Arrays.asList(objs));
+        }
+
+
+        public ArrayOf(Vector<T> objs) {
+
+            mObjs = objs;
+        }
+
+
+        public ArrayOf(Reader in, String openTag, Class c, String itemOpenTag) throws Exception {
+            logDebug("ArrayOf: begin");
             mObjs = new Vector<>();
 
             int oldReaderPos = getReaderPos(in);
@@ -246,10 +316,11 @@ public class XMLUtil {
                     e = xpp.next();
                 }
             } catch (XmlPullParserException e) {
-                if (!xpp.getName().equals(openTag)) {
+                if (xpp.getName() == null || !xpp.getName().equals(openTag)) {
                     throw e;
                 }
             }
+            logDebug("ArrayOf: finish");
         }
 
 
@@ -302,6 +373,7 @@ public class XMLUtil {
         }
     }
 
+
     // 获取一个reader的pos位置，如果没有会抛出异常
     private static int getReaderPos(Reader reader) throws Exception{
         Field f = reader.getClass().getDeclaredField("pos");
@@ -316,7 +388,7 @@ public class XMLUtil {
     // hell yeah
     // 保存reader的位置，新建一个类型是c的XML对象，再恢复reader的位置
     // 最后返回新建的对象
-    private static XMLObj parseSubXmlObj(XmlPullParser xpp, Reader reader, int parentStartPos, String openTag, Class<? extends XMLObj> c) throws Exception {
+    private static XMLObj parseSubXmlObj(XmlPullParser xpp, Reader reader, int parentStartPos, String openTag, Class<? extends XMLObj> c) throws NoSuchFieldException, IllegalAccessException, IOException, NoSuchMethodException, InstantiationException {
 
         Field xppPosField = xpp.getClass().getDeclaredField("position");
         if (!xppPosField.isAccessible()) {
@@ -334,10 +406,18 @@ public class XMLUtil {
 
         // 将reader设置在xpp读到的位置上
         reader.reset();
+        logDebug("Reader Position is set to " + parentStartPos + " + " + xppPos);
         reader.skip(parentStartPos + xppPos);
 
         // 创建对象
-        XMLObj obj = c.getConstructor(Reader.class, String.class).newInstance(reader, openTag);
+        XMLObj obj = null;
+        try {
+            obj = c.getConstructor(Reader.class, String.class).newInstance(reader, openTag);
+        }
+        catch (InvocationTargetException e) {
+            logError("This is the cause:");
+            e.getTargetException().printStackTrace();
+        }
 
         // 恢复reader的位置
         reader.reset();
@@ -351,13 +431,10 @@ public class XMLUtil {
 
 
     private static final void logDebug(String msg) {
-        Log.d("XMLUtil", msg);
-        Log.d("XMLUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
+        Log.d("XMLUtil", ((Looper.getMainLooper().equals(Looper.myLooper())) ? "[UI]" : "[notUI]") + msg);
     }
 
-
     private static final void logError(String msg) {
-        Log.e("XMLUtil", msg);
-        Log.d("XMLUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
+        Log.e("XMLUtil", ((Looper.getMainLooper().equals(Looper.myLooper())) ? "[UI]" : "[notUI]") + msg);
     }
 }

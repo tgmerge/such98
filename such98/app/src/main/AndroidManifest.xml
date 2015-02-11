@@ -33,6 +33,10 @@
             android:name=".ShowBoardsActivity"
             android:label="@string/title_activity_show_boards" >
         </activity>
+        <activity
+            android:name=".ShowPostsActivity"
+            android:label="@string/title_activity_show_posts" >
+        </activity>
     </application>
 
 </manifest>

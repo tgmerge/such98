@@ -56,6 +56,7 @@ public class DisplayActivity extends ActionBarActivity {
                 }
             }
 
+            tests.add(new APIUtil.GetRootBoard(this, 0, null, 20, new MyCallback()));
             // topic
             tests.add(new APIUtil.GetNewTopic(this, 0, null, 10, new MyCallback()));
             tests.add(new APIUtil.GetBoardTopic(this, 100, 0, null, 10, new MyCallback()));

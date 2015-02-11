@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="text_text" type="color">#212121</item>
+    <item name="text_secondary" type="color">#727272</item>
+    <item name="text_dividers" type="color">#DADADA</item>
+    <item name="text_background" type="color">#FFFFFF</item>
+
+
+
+
+
+
+</resources>

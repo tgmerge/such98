@@ -16,5 +16,6 @@
     <string name="title_activity_display">DisplayActivity</string>
     <string name="title_activity_show_board">ShowBoardActivity</string>
     <string name="title_activity_show_boards">ShowBoardsActivity</string>
+    <string name="title_activity_show_posts">ShowPostsActivity</string>
 
 </resources>
