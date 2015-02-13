@@ -72,6 +72,7 @@ public class APIUtil {
 
         protected void removeHeaders() {
             sClient.removeAllHeaders();
+            addHeader("Accept", "application/xml"); // todo monkey patch - ShowBoardsActivity中获取定制版面时会返回json
         }
 
         protected void addAuthorization() {
@@ -506,13 +507,10 @@ public class APIUtil {
     }
 
     private static final void logDebug(String msg) {
-        Log.d("APIUtil", msg);
-        Log.d("APIUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
+        HelperUtil.generalDebug("APIUtil", msg);
     }
 
     private static final void logError(String msg) {
-        Log.e("APIUtil", msg);
-        Log.d("APIUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
+        HelperUtil.generalError("APIUtil", msg);
     }
-
 }

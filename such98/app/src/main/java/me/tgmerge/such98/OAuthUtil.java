@@ -283,13 +283,14 @@ public class OAuthUtil {
         return mSharedPref.getString(this.mKey_refreshToken, "");
     }
 
-    private static final void logDebug(String info) {
-        Log.d("OAuthUtil", info);
-        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
+
+    private static final void logDebug(String msg) {
+        HelperUtil.generalDebug("OAuthUtil", msg);
     }
 
-    private static final void logError(String info) {
-        Log.e("OAuthUtil", info);
-        Log.d("OAuthUtil", "Thread: on UI? " + (Looper.getMainLooper().equals(Looper.myLooper())));
+
+    private static final void logError(String msg) {
+        HelperUtil.generalError("OAuthUtil", msg);
     }
+
 }

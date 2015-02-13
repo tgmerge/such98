@@ -45,6 +45,8 @@ public class ShowBoardsActivity extends ActionBarActivity {
         int intentId = intent.getIntExtra(INTENT_ID, 0);
         final Activity that = this;
 
+        intentId = 2;
+
         if (intentId == ID_ROOT) {
 
             // Show root board
@@ -52,11 +54,12 @@ public class ShowBoardsActivity extends ActionBarActivity {
             new APIUtil.GetRootBoard(this, 0, null, 20, new APIUtil.APICallback() { // todo: hardcoded pagesize
                 @Override
                 public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                    StringReader reader = new StringReader(new String(body));
-                    XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = null;
+                    String s = new String(body);
+                    XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.BoardInfo.class);
                     try {
-                        boardInfoArr = new XMLUtil.ArrayOf<>(reader, "ArrayOfBoardInfo", XMLUtil.BoardInfo.class, "BoardInfo");
+                        boardInfoArr.parse(s);
                     } catch (Exception e) {
+                        HelperUtil.errorToast(that, "GetRootBoard parse exception:" + e.toString());
                         e.printStackTrace();
                     }
                     recyclerView.setAdapter(new ShowBoardsAdapter(boardInfoArr));
@@ -64,7 +67,7 @@ public class ShowBoardsActivity extends ActionBarActivity {
 
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    Toast.makeText(that, "Error: code=" + statCode + ", info=" + new String(body), Toast.LENGTH_LONG).show();
+                    HelperUtil.errorToast(that, "GetRootBoard failed, code=" + statCode + ", info=" + new String(body));
                 }
             }).execute();
 
@@ -75,27 +78,29 @@ public class ShowBoardsActivity extends ActionBarActivity {
             new APIUtil.GetCustomBoardsMe(this, new APIUtil.APICallback() {
                 @Override
                 public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                    StringReader reader = new StringReader(new String(body));;
-                    XMLUtil.ArrayOfint boardIdVec = null;
+                    String s = new String(body);
+                    XMLUtil.ArrayOfint boardIdVec = new XMLUtil.ArrayOfint();
                     try {
-                        boardIdVec = new XMLUtil.ArrayOfint(reader, "ArrayOfint");
+                        boardIdVec.parse(s);
                     } catch (Exception e) {
+                        HelperUtil.errorToast(that, "GetCustomBoardsMe parse exception:" + e.toString());
                         e.printStackTrace();
                     }
 
-                    int[] ids = new int[boardIdVec.size()];
-                    for (int i = 0; i < boardIdVec.size(); i ++) {
-                        ids[i] = boardIdVec.get(i);
+                    int[] ids = new int[boardIdVec.values.size()];
+                    for (int i = 0; i < boardIdVec.values.size(); i ++) {
+                        ids[i] = boardIdVec.values.get(i);
                     }
 
                     new APIUtil.GetMultiBoards(that, ids, 0, null, 20, new APIUtil.APICallback() { // todo: hardcoded pagesize
                         @Override
                         public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                            StringReader r = new StringReader(new String(body));
-                            XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = null;
+                            String ss = new String(body);
+                            XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.BoardInfo.class);
                             try {
-                                boardInfoArr = new XMLUtil.ArrayOf<>(r, "ArrayOfBoardInfo", XMLUtil.BoardInfo.class, "BoardInfo");
+                                boardInfoArr.parse(ss);
                             } catch (Exception e) {
+                                HelperUtil.errorToast(that, "GetMultiBoards parse exception:" + e.toString());
                                 e.printStackTrace();
                             }
                             recyclerView.setAdapter(new ShowBoardsAdapter(boardInfoArr));
@@ -103,14 +108,14 @@ public class ShowBoardsActivity extends ActionBarActivity {
 
                         @Override
                         public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-
+                            HelperUtil.errorToast(that, "GetMultiBoards failed, code=" + statCode + ", info=" + new String(body));
                         }
                     }).execute();
                 }
 
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    Toast.makeText(that, "Error: code=" + statCode + ", info=" + new String(body), Toast.LENGTH_LONG).show();
+                    HelperUtil.errorToast(that, "GetCustomBoardsMe failed, code=" + statCode + ", info=" + new String(body));
                 }
             }).execute();
 
@@ -118,14 +123,15 @@ public class ShowBoardsActivity extends ActionBarActivity {
 
             // Show board by id
             setTitle("ShowBoardsActivity: Board ID=" + intentId);
-            new APIUtil.GetSubBoards(this, intentId, 0, null, 50, new APIUtil.APICallback() {
+            new APIUtil.GetSubBoards(this, intentId, 0, null, 20, new APIUtil.APICallback() {
                 @Override
                 public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                    StringReader reader = new StringReader(new String(body));
-                    XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = null;
+                    String s = new String(body);
+                    XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.BoardInfo.class);
                     try {
-                        boardInfoArr = new XMLUtil.ArrayOf<>(reader, "ArrayOfBoardInfo", XMLUtil.BoardInfo.class, "BoardInfo");
+                        boardInfoArr.parse(s);
                     } catch (Exception e) {
+                        HelperUtil.errorToast(that, "GetSubBoards parse exception:" + e.toString());
                         e.printStackTrace();
                     }
                     recyclerView.setAdapter(new ShowBoardsAdapter(boardInfoArr));
@@ -133,13 +139,13 @@ public class ShowBoardsActivity extends ActionBarActivity {
 
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    Toast.makeText(that, "Error: code=" + statCode + ", info=" + new String(body), Toast.LENGTH_LONG).show();
+                    HelperUtil.errorToast(that, "GetSubBoards failed, code=" + statCode + ", info=" + new String(body));
                 }
             }).execute();
-
         }
 
     }
+
 
 
     private static class ShowBoardsAdapter extends RecyclerView.Adapter<ShowBoardsAdapter.ViewHolder> {
@@ -169,7 +175,6 @@ public class ShowBoardsActivity extends ActionBarActivity {
             viewHolder.name.setText(dataItem.Name);
             viewHolder.isCategory.setText(dataItem.IsCategory ? "分类" : "");
             viewHolder.description.setText(dataItem.Description);
-            viewHolder.lastPost.setText(dataItem.LastPostInfo.TopicTitle + " @ " + dataItem.LastPostInfo.DateTime);
         }
 
 
@@ -186,7 +191,6 @@ public class ShowBoardsActivity extends ActionBarActivity {
             public TextView name;
             public TextView isCategory;
             public TextView description;
-            public TextView lastPost;
 
             public ViewHolder(View itemLayoutView) {
                 super(itemLayoutView);
@@ -196,7 +200,6 @@ public class ShowBoardsActivity extends ActionBarActivity {
             }
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
