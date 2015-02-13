@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -170,6 +171,14 @@ public class XMLUtil {
 
         public int size() {
             return mObjs.size();
+        }
+
+        public void append(ArrayOf<T> obj) {
+            mObjs.addAll(obj.mObjs);
+        }
+
+        public void append(Collection<T> obj) {
+            mObjs.addAll(obj);
         }
     }
 

@@ -13,33 +13,47 @@
         android:maxHeight="100dp"/>
     <EditText android:id="@+id/editText"
         android:hint="response"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="0dp" />
-    <Button android:id="@+id/button_Retry"
-        android:text="Test"
+        android:maxHeight="100dp" />
+
+    <Button android:id="@+id/button_Test"
+        android:text="Next test"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onTestButtonClicked"/>
     <Button android:id="@+id/button_Relogin"
-        android:text="relogin"
+        android:text="Re-login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onReloginButtonClicked"/>
     <Button android:id="@+id/button_RefreshToken"
-        android:text="refreshToken"
+        android:text="Refresh token"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onRefreshTokenButtonClicked"/>
     <Button android:id="@+id/button_CheckMe"
-        android:text="me"
+        android:text="Send 'GET /Me'"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onCheckMeClicked"/>
-    <Button android:id="@+id/button_RunAct"
-        android:text="Activity test"
+
+    <Button android:id="@+id/button_Act1"
+        android:text="ShowBoards"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onRunActClicked"/>
+        android:onClick="act1Clicked"/>
+
+    <Button android:id="@+id/button_Act2"
+        android:text="ShowBoards TYPE=-1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="act2Clicked"/>
+
+    <Button android:id="@+id/button_Act3"
+        android:text="ShowBoards TYPE=2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="act3Clicked"/>
 
 </LinearLayout>

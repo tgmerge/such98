@@ -56,7 +56,6 @@ public class DisplayActivity extends ActionBarActivity {
                 }
             }
 
-            tests.add(new APIUtil.GetRootBoard(this, 0, null, 20, new MyCallback()));
             // topic
             tests.add(new APIUtil.GetNewTopic(this, 0, null, 10, new MyCallback()));
             tests.add(new APIUtil.GetBoardTopic(this, 100, 0, null, 10, new MyCallback()));
@@ -148,8 +147,20 @@ public class DisplayActivity extends ActionBarActivity {
         new APIUtil.GetMe(this, new MyCallback()).execute();
     }
 
-    public void onRunActClicked(View view) {
+    public void act1Clicked(View view) {
         startActivity(new Intent(this, ShowBoardsActivity.class));
+    }
+
+    public void act2Clicked(View view) {
+        Intent intent = new Intent(this, ShowBoardsActivity.class);
+        intent.putExtra(ShowBoardsActivity.INTENT_ID, ShowBoardsActivity.ID_CUSTOM);
+        startActivity(intent);
+    }
+
+    public void act3Clicked(View view) {
+        Intent intent = new Intent(this, ShowBoardsActivity.class);
+        intent.putExtra(ShowBoardsActivity.INTENT_ID, 2);
+        startActivity(intent);
     }
 
     @Override

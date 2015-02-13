@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import org.apache.http.Header;
 import java.io.StringReader;
-
+import java.util.Arrays;
 
 
 /* Intent params:
@@ -27,179 +27,6 @@ import java.io.StringReader;
  *          others(id)    - show specified board
  */
 public class ShowBoardsActivity extends ActionBarActivity {
-
-    public final static String INTENT_ID = "id";
-    public final static int ID_ROOT = 0;
-    public final static int ID_CUSTOM = -1;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_boards);
-
-        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        Intent intent = getIntent();
-        int intentId = intent.getIntExtra(INTENT_ID, 0);
-        final Activity that = this;
-
-        intentId = 2;
-
-        if (intentId == ID_ROOT) {
-
-            // Show root board
-            setTitle("ShowBoardsActivity: Root Board");
-            new APIUtil.GetRootBoard(this, 0, null, 20, new APIUtil.APICallback() { // todo: hardcoded pagesize
-                @Override
-                public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                    String s = new String(body);
-                    XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.BoardInfo.class);
-                    try {
-                        boardInfoArr.parse(s);
-                    } catch (Exception e) {
-                        HelperUtil.errorToast(that, "GetRootBoard parse exception:" + e.toString());
-                        e.printStackTrace();
-                    }
-                    recyclerView.setAdapter(new ShowBoardsAdapter(boardInfoArr));
-                }
-
-                @Override
-                public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    HelperUtil.errorToast(that, "GetRootBoard failed, code=" + statCode + ", info=" + new String(body));
-                }
-            }).execute();
-
-        } else if (intentId == ID_CUSTOM) {
-
-            // Show custom boards
-            setTitle("ShowBoardsActivity: Custom Boards");
-            new APIUtil.GetCustomBoardsMe(this, new APIUtil.APICallback() {
-                @Override
-                public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                    String s = new String(body);
-                    XMLUtil.ArrayOfint boardIdVec = new XMLUtil.ArrayOfint();
-                    try {
-                        boardIdVec.parse(s);
-                    } catch (Exception e) {
-                        HelperUtil.errorToast(that, "GetCustomBoardsMe parse exception:" + e.toString());
-                        e.printStackTrace();
-                    }
-
-                    int[] ids = new int[boardIdVec.values.size()];
-                    for (int i = 0; i < boardIdVec.values.size(); i ++) {
-                        ids[i] = boardIdVec.values.get(i);
-                    }
-
-                    new APIUtil.GetMultiBoards(that, ids, 0, null, 20, new APIUtil.APICallback() { // todo: hardcoded pagesize
-                        @Override
-                        public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                            String ss = new String(body);
-                            XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.BoardInfo.class);
-                            try {
-                                boardInfoArr.parse(ss);
-                            } catch (Exception e) {
-                                HelperUtil.errorToast(that, "GetMultiBoards parse exception:" + e.toString());
-                                e.printStackTrace();
-                            }
-                            recyclerView.setAdapter(new ShowBoardsAdapter(boardInfoArr));
-                        }
-
-                        @Override
-                        public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                            HelperUtil.errorToast(that, "GetMultiBoards failed, code=" + statCode + ", info=" + new String(body));
-                        }
-                    }).execute();
-                }
-
-                @Override
-                public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    HelperUtil.errorToast(that, "GetCustomBoardsMe failed, code=" + statCode + ", info=" + new String(body));
-                }
-            }).execute();
-
-        } else {
-
-            // Show board by id
-            setTitle("ShowBoardsActivity: Board ID=" + intentId);
-            new APIUtil.GetSubBoards(this, intentId, 0, null, 20, new APIUtil.APICallback() {
-                @Override
-                public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                    String s = new String(body);
-                    XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.BoardInfo.class);
-                    try {
-                        boardInfoArr.parse(s);
-                    } catch (Exception e) {
-                        HelperUtil.errorToast(that, "GetSubBoards parse exception:" + e.toString());
-                        e.printStackTrace();
-                    }
-                    recyclerView.setAdapter(new ShowBoardsAdapter(boardInfoArr));
-                }
-
-                @Override
-                public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    HelperUtil.errorToast(that, "GetSubBoards failed, code=" + statCode + ", info=" + new String(body));
-                }
-            }).execute();
-        }
-
-    }
-
-
-
-    private static class ShowBoardsAdapter extends RecyclerView.Adapter<ShowBoardsAdapter.ViewHolder> {
-
-        private XMLUtil.ArrayOf<XMLUtil.BoardInfo> mData;
-
-
-        public ShowBoardsAdapter(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
-            mData = data;
-        }
-
-
-        // Create new views, invoked by the layout manager
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-            // create a new view
-            View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_board_card, parent, false);
-            return new ViewHolder(itemLayoutView);
-        }
-
-
-        // Replace the contents of a view, invoked by the layout manager
-        @Override
-        public void onBindViewHolder(ViewHolder viewHolder, int position) {
-            XMLUtil.BoardInfo dataItem = mData.get(position);
-            viewHolder.name.setText(dataItem.Name);
-            viewHolder.isCategory.setText(dataItem.IsCategory ? "分类" : "");
-            viewHolder.description.setText(dataItem.Description);
-        }
-
-
-        // Return the size of items data, invoked by the layout manager
-        @Override
-        public int getItemCount() {
-            return mData.size();
-        }
-
-
-        // inner class to hold a reference to each item of RecyclerView
-        public static class ViewHolder extends RecyclerView.ViewHolder {
-
-            public TextView name;
-            public TextView isCategory;
-            public TextView description;
-
-            public ViewHolder(View itemLayoutView) {
-                super(itemLayoutView);
-                name = (TextView) itemLayoutView.findViewById(R.id.text_name);
-                isCategory = (TextView) itemLayoutView.findViewById(R.id.text_isCategory);
-                description = (TextView) itemLayoutView.findViewById(R.id.text_description);
-            }
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -224,4 +51,229 @@ public class ShowBoardsActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    public final static String INTENT_ID = "id";
+    public final static int ID_ROOT = 0;
+    public final static int ID_CUSTOM = -1;
+
+    public final static String INTENT_STARTPOS = "startpos";
+    public final static int ITEM_PER_PAGE = 10;
+
+    private boolean isLoading = false;
+    private boolean isNoMoreItem = false;
+
+    private int lastLoadStartPos = -1;
+
+    private RecyclerView recyclerView = null;
+    private LinearLayoutManager layoutManager = null;
+    private ShowBoardsAdapter adapter = null;
+
+    final Activity that = this;
+
+    private final void setProgressLoading() {
+        isLoading = true;
+        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+    }
+
+    private final void setProgressFinished() {
+        findViewById(R.id.progressBar).setVisibility(View.GONE);
+        isLoading = false;
+    }
+
+    private final void loadAPage() {
+
+        setProgressLoading();
+
+        Intent intent = getIntent();
+        int intentType = intent.getIntExtra(INTENT_ID, 0);
+
+        int intentStartPos = intent.getIntExtra(INTENT_STARTPOS, 0);
+        final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
+        final int pageSize = ITEM_PER_PAGE;
+
+        final Activity that = this;
+
+        class Callback implements APIUtil.APICallback {
+            @Override
+            public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                String s = new String(body);
+                XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.BoardInfo.class);
+                try {
+                    boardInfoArr.parse(s);
+                } catch (Exception e) {
+                    HelperUtil.errorToast(that, "Parse exception:" + e.toString());
+                    e.printStackTrace();
+                }
+                if (boardInfoArr.size() == 0) {
+                    // no more loading!
+                    isNoMoreItem = true;
+                    HelperUtil.debugToast(that, "Already at last page");
+                } else {
+                    // append data
+                    adapter.appendData(boardInfoArr);
+                }
+                lastLoadStartPos = pageStart;
+                setProgressFinished();
+            }
+
+            @Override
+            public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                HelperUtil.errorToast(that, "Network failed, code=" + statCode + ", info=" + (body == null ? "null" : new String(body)));
+            }
+        }
+
+        if (intentType == ID_ROOT) {
+
+            // Show root board
+            setTitle("Root Board @" + pageStart);
+            new APIUtil.GetRootBoard(this, pageStart, null, pageSize, new Callback()).execute();
+
+        } else if (intentType == ID_CUSTOM) {
+
+            // Show custom boards
+            setTitle("Custom Boards @" + pageStart);
+            new APIUtil.GetCustomBoardsMe(this, new APIUtil.APICallback() {
+                @Override
+                public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                    String s = new String(body);
+                    XMLUtil.ArrayOfint boardIdVec = new XMLUtil.ArrayOfint();
+                    try {
+                        boardIdVec.parse(s);
+                    } catch (Exception e) {
+                        HelperUtil.errorToast(that, "GetCustomBoardsMe parse exception:" + e.toString());
+                        e.printStackTrace();
+                    }
+
+                    int[] ids = new int[boardIdVec.values.size()];
+                    for (int i = 0; i < boardIdVec.values.size(); i ++) {
+                        ids[i] = boardIdVec.values.get(i);
+                    }
+
+                    int[] rangedIds = Arrays.copyOfRange(ids, pageStart, pageStart + pageSize);
+
+                    new APIUtil.GetMultiBoards(that, rangedIds, pageStart, null, pageSize, new Callback()).execute();
+                }
+
+                @Override
+                public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                    HelperUtil.errorToast(that, "GetCustomBoardsMe failed, code=" + statCode + ", info=" + new String(body));
+                }
+            }).execute();
+
+        } else {
+
+            // Show board by id
+            setTitle("Board #" + intentType + " @" + pageStart);
+            new APIUtil.GetSubBoards(this, intentType, pageStart, null, pageSize, new Callback()).execute();
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_show_boards);
+
+        // config RecyclerView
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+
+        // config RecyclerView's LayoutManager
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        // config RecyclerView's Adapter
+        adapter = new ShowBoardsAdapter(null);
+        recyclerView.setAdapter(adapter);
+
+        // config RecyclerView's OnScrollListener
+        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy) {
+
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+
+                if ((visibleItemCount+pastVisibleItems) >= totalItemCount && !isLoading && !isNoMoreItem) {
+                    // scroll to bottom, has more item, not loading - we're going to load another page
+                    HelperUtil.debugToast(that, "Loading...");
+                    loadAPage();
+                }
+            }
+
+        });
+
+        // config RecyclerView's ItemAnimator
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        loadAPage();
+    }
+
+
+    private static class ShowBoardsAdapter extends RecyclerView.Adapter<ShowBoardsAdapter.ViewHolder> {
+
+        private XMLUtil.ArrayOf<XMLUtil.BoardInfo> mData;
+
+        public final void setData(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
+            mData = data;
+            notifyDataSetChanged();
+        }
+
+        public final void appendData(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
+            if (mData == null) {
+                mData = data;
+            } else {
+                mData.append(data);
+            }
+            notifyDataSetChanged();
+        }
+
+        public ShowBoardsAdapter(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
+            mData = data;
+        }
+
+
+        // Create new views, invoked by the layout manager
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+            // create a new view
+            View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_board_card, parent, false);
+            return new ViewHolder(itemLayoutView);
+        }
+
+
+        // Replace the contents of a view, invoked by the layout manager
+        @Override
+        public void onBindViewHolder(ViewHolder viewHolder, int position) {
+
+            XMLUtil.BoardInfo dataItem = mData.get(position);
+            viewHolder.name.setText(dataItem.Name);
+            viewHolder.isCategory.setText(dataItem.IsCategory ? "分类" : "");
+            viewHolder.description.setText(dataItem.Description);
+        }
+
+
+        // Return the size of items data, invoked by the layout manager
+        @Override
+        public int getItemCount() {
+            return (mData == null) ? 0 : mData.size();
+        }
+
+
+        // inner class to hold a reference to each item of RecyclerView
+        public static class ViewHolder extends RecyclerView.ViewHolder {
+
+            public TextView name;
+            public TextView isCategory;
+            public TextView description;
+
+            public ViewHolder(View itemLayoutView) {
+                super(itemLayoutView);
+                name = (TextView) itemLayoutView.findViewById(R.id.text_name);
+                isCategory = (TextView) itemLayoutView.findViewById(R.id.text_isCategory);
+                description = (TextView) itemLayoutView.findViewById(R.id.text_description);
+            }
+        }
+    }
 }
