@@ -1,9 +1,12 @@
 package me.tgmerge.such98;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.apache.http.Header;
@@ -251,9 +255,14 @@ public class ShowBoardsActivity extends ActionBarActivity {
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
 
             XMLUtil.BoardInfo dataItem = mData.get(position);
+
             viewHolder.name.setText(dataItem.Name);
             viewHolder.isCategory.setText(dataItem.IsCategory ? "分类" : "");
             viewHolder.description.setText(dataItem.Description);
+
+            viewHolder.data_boardId = dataItem.Id;
+            viewHolder.data_isCat = dataItem.IsCategory;
+            viewHolder.data_boardName = dataItem.Name;
         }
 
 
@@ -265,17 +274,45 @@ public class ShowBoardsActivity extends ActionBarActivity {
 
 
         // inner class to hold a reference to each item of RecyclerView
-        public static class ViewHolder extends RecyclerView.ViewHolder {
+        public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
             public TextView name;
             public TextView isCategory;
             public TextView description;
+            public int data_boardId;
+            public boolean data_isCat;
+            public String data_boardName;
 
             public ViewHolder(View itemLayoutView) {
                 super(itemLayoutView);
                 name = (TextView) itemLayoutView.findViewById(R.id.text_name);
                 isCategory = (TextView) itemLayoutView.findViewById(R.id.text_isCategory);
                 description = (TextView) itemLayoutView.findViewById(R.id.text_description);
+
+                itemLayoutView.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+                if (v instanceof RelativeLayout) {
+                    HelperUtil.generalDebug("ShowBoardsActivity", "Clicked: " + data_boardId + ", " + data_isCat + ", " + data_boardName);
+
+                    Context ctx = v.getContext();
+                    Intent intent;
+
+                    // click on whole item, starting new activity!
+                    if (data_isCat) {
+                        // clicked board is a category, start ShowBoardsActivity
+                        intent = new Intent(ctx, ShowBoardsActivity.class);
+                        intent.putExtra(ShowBoardsActivity.INTENT_ID, data_boardId);
+                    } else {
+                        // clicked board has no sub-boards, start ShowTopicsActivity
+                        intent = new Intent(ctx, ShowTopicsActivity.class);
+                        intent.putExtra(ShowTopicsActivity.INTENT_ID, data_boardId);
+                    }
+
+                    ctx.startActivity(intent);
+                }
             }
         }
     }
