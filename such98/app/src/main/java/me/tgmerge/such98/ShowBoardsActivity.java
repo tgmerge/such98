@@ -1,7 +1,6 @@
 package me.tgmerge.such98;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -16,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import org.apache.http.Header;
+
 import java.util.Arrays;
 
 
@@ -62,6 +62,8 @@ public class ShowBoardsActivity extends ActionBarActivity {
     public final static String INTENT_STARTPOS = "startPos";
     public final static int ITEM_PER_PAGE = 10;
 
+    public final static String INTENT_TITLE = "title";
+
     private boolean isLoading = false;
     private boolean isNoMoreItem = false;
 
@@ -93,6 +95,12 @@ public class ShowBoardsActivity extends ActionBarActivity {
         int intentStartPos = intent.getIntExtra(INTENT_STARTPOS, 0);
         final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
         final int pageSize = ITEM_PER_PAGE;
+
+        String title = intent.getStringExtra(INTENT_TITLE);
+        if (title == null) {
+            title = "Board id=" + intentType;
+        }
+        setTitle(title);
 
         final Activity that = this;
 
@@ -128,13 +136,11 @@ public class ShowBoardsActivity extends ActionBarActivity {
         if (intentType == ID_ROOT) {
 
             // Show root board
-            setTitle("Root Board @" + pageStart);
             new APIUtil.GetRootBoard(this, pageStart, null, pageSize, new Callback()).execute();
 
         } else if (intentType == ID_CUSTOM) {
 
             // Show custom boards
-            setTitle("Custom Boards @" + pageStart);
             new APIUtil.GetCustomBoardsMe(this, new APIUtil.APICallback() {
                 @Override
                 public void onSuccess(int statCode, Header[] headers, byte[] body) {
@@ -166,7 +172,6 @@ public class ShowBoardsActivity extends ActionBarActivity {
         } else {
 
             // Show board by id
-            setTitle("Board #" + intentType + " @" + pageStart);
             new APIUtil.GetSubBoards(this, intentType, pageStart, null, pageSize, new Callback()).execute();
         }
     }
@@ -259,6 +264,8 @@ public class ShowBoardsActivity extends ActionBarActivity {
             viewHolder.data_boardId = dataItem.Id;
             viewHolder.data_isCat = dataItem.IsCategory;
             viewHolder.data_boardName = dataItem.Name;
+
+            viewHolder.openAsNotCat.setVisibility(dataItem.IsCategory ? View.VISIBLE : View.GONE);
         }
 
 
@@ -275,6 +282,7 @@ public class ShowBoardsActivity extends ActionBarActivity {
             public TextView name;
             public TextView isCategory;
             public TextView description;
+            public TextView openAsNotCat;
             public int data_boardId;
             public boolean data_isCat;
             public String data_boardName;
@@ -285,31 +293,34 @@ public class ShowBoardsActivity extends ActionBarActivity {
                 isCategory = (TextView) itemLayoutView.findViewById(R.id.text_isCategory);
                 description = (TextView) itemLayoutView.findViewById(R.id.text_description);
 
+                openAsNotCat = (TextView) itemLayoutView.findViewById(R.id.text_openAsNotCat);
+
                 itemLayoutView.setOnClickListener(this);
+                openAsNotCat.setOnClickListener(this);
             }
 
             @Override
             public void onClick(View v) {
-                if (v instanceof RelativeLayout) {
+                HelperUtil.generalDebug("ShowBoardsActivity", "onClick! " + v.toString());
+                if (v instanceof TextView) {
+                    // click on the text view, force show topics
+                    HelperUtil.generalDebug("ShowBoardsActivity", "Force open as board: " + data_boardId + ", " + data_isCat + ", " + data_boardName);
+                    ActivityUtil.openShowTopicsActivity(v.getContext(), data_boardId, 0, data_boardName);
+                } else if (v instanceof RelativeLayout) {
+                    // click on whole item, starting new activity
                     HelperUtil.generalDebug("ShowBoardsActivity", "Clicked: " + data_boardId + ", " + data_isCat + ", " + data_boardName);
 
-                    Context ctx = v.getContext();
-                    Intent intent;
-
-                    // click on whole item, starting new activity!
                     if (data_isCat) {
                         // clicked board is a category, start ShowBoardsActivity
-                        intent = new Intent(ctx, ShowBoardsActivity.class);
-                        intent.putExtra(ShowBoardsActivity.INTENT_ID, data_boardId);
+                        ActivityUtil.openShowBoardsActivity(v.getContext(), data_boardId, 0, "分类: " + data_boardName);
                     } else {
                         // clicked board has no sub-boards, start ShowTopicsActivity
-                        intent = new Intent(ctx, ShowTopicsActivity.class);
-                        intent.putExtra(ShowTopicsActivity.INTENT_ID, data_boardId);
+                        ActivityUtil.openShowTopicsActivity(v.getContext(), data_boardId, 0, data_boardName);
                     }
-
-                    ctx.startActivity(intent);
                 }
             }
+
+
         }
     }
 }

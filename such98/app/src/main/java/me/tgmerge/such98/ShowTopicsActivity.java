@@ -59,6 +59,8 @@ public class ShowTopicsActivity extends ActionBarActivity {
     public final static String INTENT_STARTPOS = "startPos";
     public final static int ITEM_PER_PAGE = 10;
 
+    public final static String INTENT_TITLE = "title";
+
     private boolean isLoading = false;
     private boolean isNoMoreItem = false;
 
@@ -91,6 +93,12 @@ public class ShowTopicsActivity extends ActionBarActivity {
         final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos: this.lastLoadStartPos + ITEM_PER_PAGE;
         final int pageSize = ITEM_PER_PAGE;
 
+        String title = intent.getStringExtra(INTENT_TITLE);
+        if (title == null) {
+            title = "Topics id=" + intentType;
+        }
+        setTitle(title);
+
         final Activity that = this;
 
         class Callback implements APIUtil.APICallback {
@@ -118,7 +126,6 @@ public class ShowTopicsActivity extends ActionBarActivity {
                     // no more loading - -
                     isNoMoreItem = true;
                     HelperUtil.debugToast(that, "Already at last page");
-                    setTitle(getTitle() + " - end");
                 } else {
                     // append data
                     adapter.appendData(topicInfoArr);
@@ -136,19 +143,16 @@ public class ShowTopicsActivity extends ActionBarActivity {
         if (intentType == ID_NEW) {
 
             // Show new topics
-            setTitle("New topic @" + pageStart);
             new APIUtil.GetNewTopic(this, pageStart, null, pageSize, new Callback()).execute();
 
         } else if (intentType == ID_HOT) {
 
             // show hot topics
-            setTitle("Hot topic @" + pageStart);
             new APIUtil.GetHotTopic(this, pageStart, null, pageSize, new Callback()).execute();
 
         } else {
 
             // show topics by board id
-            setTitle("Topics from board #" + intentType + " @" + pageStart);
             new APIUtil.GetBoardTopic(this, intentType, pageStart, null, pageSize, new Callback()).execute();
         }
     }

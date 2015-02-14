@@ -3,8 +3,6 @@ package me.tgmerge.such98;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.Looper;
-import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;

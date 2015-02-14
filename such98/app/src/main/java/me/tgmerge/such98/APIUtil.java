@@ -1,9 +1,6 @@
 package me.tgmerge.such98;
 
 import android.app.Activity;
-import android.os.Looper;
-import android.util.Log;
-
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
