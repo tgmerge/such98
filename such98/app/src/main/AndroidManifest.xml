@@ -34,10 +34,6 @@
             android:label="@string/title_activity_show_boards" >
         </activity>
         <activity
-            android:name=".ShowPostsActivity"
-            android:label="@string/title_activity_show_posts" >
-        </activity>
-        <activity
             android:name=".ShowTopicsActivity"
             android:label="@string/title_activity_show_topics" >
         </activity>
