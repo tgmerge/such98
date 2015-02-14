@@ -163,6 +163,24 @@ public class DisplayActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
+    public void act4Clicked(View view) {
+        Intent intent = new Intent(this, ShowTopicsActivity.class);
+        intent.putExtra(ShowTopicsActivity.INTENT_ID, 100);
+        startActivity(intent);
+    }
+
+    public void act5Clicked(View view) {
+        Intent intent = new Intent(this, ShowTopicsActivity.class);
+        intent.putExtra(ShowTopicsActivity.INTENT_ID, ShowTopicsActivity.ID_NEW);
+        startActivity(intent);
+    }
+
+    public void act6Clicked(View view) {
+        Intent intent = new Intent(this, ShowTopicsActivity.class);
+        intent.putExtra(ShowTopicsActivity.INTENT_ID, ShowTopicsActivity.ID_HOT);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

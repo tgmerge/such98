@@ -1,8 +1,6 @@
 package me.tgmerge.such98;
 
-import android.os.Looper;
-import android.test.suitebuilder.annotation.Suppress;
-import android.util.Log;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -59,11 +57,15 @@ public class XMLUtil {
     }
 
 
+
+
     // - - - XMLObj - - -
+
+
+
 
     @SuppressWarnings("unused")
     public static final class BoardLastPostInfo extends XMLObj {
-
         public int BoardId;
         public int TopicId;
         public int PostId;
@@ -85,9 +87,11 @@ public class XMLUtil {
         }
     }
 
+
+
+
     @SuppressWarnings("unused")
     public static final class BoardInfo extends XMLObj {
-
         public int Id;
         public String Name;
         public String Description;
@@ -102,8 +106,8 @@ public class XMLUtil {
         public boolean IsEncrypted;
         public boolean IsAnomynous;  // todo typo in xml defination
         public boolean IsLocked;
-        protected Vector<String> Masters = new Vector<>();
-        protected BoardLastPostInfo LastPostInfo;
+        public Vector<String> Masters = new Vector<>();
+        public BoardLastPostInfo LastPostInfo;
         public String PostTimeLimit; // todo type is timespan
 
         private static final HashSet<String> mDefaults =
@@ -129,6 +133,107 @@ public class XMLUtil {
     }
 
 
+
+    @SuppressWarnings("unused")
+    public static final class TopicInfo extends XMLObj {
+        public String Title;
+        public int HitCount;
+        public int Id;
+        public int BoardId;
+        public String BestState;
+        public static final int BESTSTATE_NORMAL = 0;
+        public static final int BESTSTATE_RESERVED = 1;
+        public static final int BESTSTATE_BEST = 2;
+        public String TopState;
+        public static final int TOPSTATE_NONE = 0;
+        public static final int TOPSTATE_TEMPORARYTOP = 1;
+        public static final int TOPSTATE_BOARDTOP = 2;
+        public static final int TOPSTATE_AREATOP = 3;
+        public static final int TOPSTATE_SITETOP = 4;
+        public int ReplyCount;
+        public boolean IsVote;
+        public boolean IsAnonymous;
+        public String AuthorName;
+        public int AuthorId;
+        public boolean IsLocked;
+        public String CreateTime;
+        public TopicLastPostInfo LastPostInfo;
+
+        private static final HashSet<String> mDefaults =
+                newHashSet("Title", "HitCount", "Id", "BoardId", "BestState", "TopState", "ReplyCount",
+                           "IsVote", "IsAnonymous", "AuthorName", "AuthorId", "IsLocked", "CreateTime");
+
+
+        @Override
+        public Set<String> getDefaultFields() {
+            return mDefaults;
+        }
+
+        @Override
+        public void processSpecialTags(XmlPullParser xpp) throws Exception {
+            String tag = xpp.getName();
+            if (tag.equals("LastPostInfo")) {
+                LastPostInfo = new TopicLastPostInfo();
+                LastPostInfo.parse(xpp);
+            }
+        }
+    }
+
+
+
+    @SuppressWarnings("unused")
+    public static final class TopicLastPostInfo extends XMLObj {
+        public String UserName;
+        public String ContentSummary;
+        public String Time;
+
+        private static final HashSet<String> mDefaults =
+                newHashSet("UserName", "ContentSummary", "Time");
+
+        @Override
+        public Set<String> getDefaultFields() {
+            return mDefaults;
+        }
+
+        @Override
+        public void processSpecialTags(XmlPullParser xpp) throws Exception {
+        }
+    }
+
+
+
+
+    @SuppressWarnings("unused")
+    public static final class HotTopicInfo extends XMLObj {
+        public String Title;
+        public int HitCount;
+        public int Id;
+        public int BoardId;
+        public String BoardName;
+        public int ReplyCount;
+        public int ParticipantCount;
+        public String AuthorName;
+        public String CreateTime;
+
+        private static final HashSet<String> mDefaults =
+                newHashSet("Title", "HitCount", "Id", "BoardId", "BoardName", "ReplyCount", "ParticipantCount",
+                           "AuthorName", "CreateTime");
+
+
+        @Override
+        public Set<String> getDefaultFields() {
+            return mDefaults;
+        }
+
+        @Override
+        public void processSpecialTags(XmlPullParser xpp) throws Exception {
+        }
+    }
+
+
+
+
+
     // 有两种初始化ArrayOf<T>的方法：
     // 1. 解析<ArrayOfT><T></T><T></T></ArrayOfT>的对象
     // 2. 传入类型为T的数组或Vector，使用(T[] objs)或(Vector<T> objs)构造方法
@@ -136,7 +241,6 @@ public class XMLUtil {
     //       o.parse(string);
     @SuppressWarnings("unused")
     public static final class ArrayOf<T extends XMLObj> extends XMLObj {
-
         private Vector<T> mObjs = new Vector<>();
         private Class<T> mObjClass;
 
@@ -165,6 +269,10 @@ public class XMLUtil {
             mObjs.add(obj);
         }
 
+        public Class<? extends XMLObj> getItemClass() {
+            return mObjClass;
+        }
+
         public T get(int i) {
             return mObjs.get(i);
         }
@@ -183,10 +291,11 @@ public class XMLUtil {
     }
 
 
+
+
     @SuppressWarnings("unused")
     public static final class ArrayOfint extends XMLObj {
-
-        Vector<Integer> values = new Vector<>();
+        public Vector<Integer> values = new Vector<>();
 
         @Override
         public Set<String> getDefaultFields() {
@@ -201,6 +310,8 @@ public class XMLUtil {
             }
         }
     }
+
+
 
 
     // - - - util method - - -

@@ -4,9 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="72dp"
-    android:paddingTop="17dp"
-    android:paddingBottom="15dp"
+    android:minHeight="88dp"
+    android:paddingTop="13dp"
+    android:paddingBottom="17dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:layout_marginBottom="1dp"
@@ -16,13 +16,13 @@
         android:id="@+id/image_icon"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginTop="3dp"
         android:layout_alignParentLeft="true"
-        android:src="@drawable/ic_launcher"
-        android:layout_centerInParent="true"/>
+        android:src="@drawable/ic_launcher"/>
 
     <TextView
-        android:id="@+id/text_name"
-        android:text="Two-line item"
+        android:id="@+id/text_title"
+        android:text="Three-line item"
         android:textSize="16sp"
         android:textColor="@color/text_text"
         android:paddingBottom="3dp"
@@ -32,23 +32,27 @@
         android:layout_marginLeft="56dp"/>
 
     <TextView
-        android:id="@+id/text_isCategory"
-        android:text="isCat"
+        android:id="@+id/text_authorInfo"
+        android:text="Secondary text lorem ipsum"
         android:textSize="14sp"
         android:textColor="@color/text_secondary"
+        android:textStyle="italic"
+        android:paddingBottom="3dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="56dp"
+        android:layout_below="@id/text_title"/>
 
     <TextView
-        android:id="@+id/text_description"
-        android:text="Secondary text"
+        android:id="@+id/text_lastPostInfo"
+        android:text="amet, consectetur adipiscing"
         android:textSize="14sp"
         android:textColor="@color/text_secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="56dp"
-        android:layout_below="@id/text_name"/>
+        android:layout_below="@id/text_authorInfo"/>
 
 </RelativeLayout>

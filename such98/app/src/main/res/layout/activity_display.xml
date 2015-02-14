@@ -1,10 +1,16 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="me.tgmerge.such98.DisplayActivity">
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
-    tools:context="me.tgmerge.such98.DisplayActivity">
+    >
 
     <EditText android:id="@+id/editText_token"
         android:hint="token"
@@ -22,6 +28,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onTestButtonClicked"/>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:background="?android:attr/listDivider"/>
+
     <Button android:id="@+id/button_Relogin"
         android:text="Re-login"
         android:layout_width="match_parent"
@@ -38,22 +52,55 @@
         android:layout_height="wrap_content"
         android:onClick="onCheckMeClicked"/>
 
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:background="?android:attr/listDivider"/>
+
     <Button android:id="@+id/button_Act1"
-        android:text="ShowBoards"
+        android:text="ShowBoards(Root board)"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="act1Clicked"/>
 
     <Button android:id="@+id/button_Act2"
-        android:text="ShowBoards TYPE=-1"
+        android:text="ShowBoards(Custom boards)"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="act2Clicked"/>
 
     <Button android:id="@+id/button_Act3"
-        android:text="ShowBoards TYPE=2"
+        android:text="ShowBoards(Board #2)"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="act3Clicked"/>
 
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:background="?android:attr/listDivider"/>
+
+    <Button android:id="@+id/button_Act4"
+        android:text="ShowTopics(Board #100)"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="act4Clicked"/>
+
+    <Button android:id="@+id/button_Act5"
+        android:text="ShowTopics(New topics)"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="act5Clicked"/>
+
+    <Button android:id="@+id/button_Act6"
+        android:text="ShowTopics(Hot topics)"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="act6Clicked"/>
+
 </LinearLayout>
+</ScrollView>
