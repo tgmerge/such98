@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="authorize_url">https://login.cc98.org/OAuth/Authorize</string>
+    <string name="token_url">https://login.cc98.org/OAuth/Token</string>
+    <string name="scope">getuserinfo* getpost* setpost* getmessage* setmessage*</string>
+    <string name="client_id">17bd1fe0-39e7-488f-ac6a-071c86e1f083</string>
+    <string name="client_secret">fdf5b427-918e-4237-9897-838eefe478f8</string>
+
+</resources>

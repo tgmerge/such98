@@ -96,31 +96,31 @@ public final class APIUtil {
                 @Override
                 public void onFailure(final int statCode, final Header[] headers, final byte[] body, final Throwable error) {
                     logError("MyAPIHandler: onFailure, code=" + statCode);
-                    if (statCode == 401) {
-                        OAuthUtil oa = OAuthUtil.getInstance();
-                        if (oa == null) {
-                            logError("MyAPIHandler: onFailure: tried to refresh token, but OAuthUtil returned null");
+                    if (statCode == 401) { // todo Stronger test, maybe body == Unauthorized
+                        OAuthUtil.OAuthManager oam = OAuthUtil.newOAuthManager(mAct);
+                        if (oam == null) {
+                            logError("MyAPIHandler: onFailure: tried to refresh token, but failed to get OAuthManager, calling callback.onFailure");
                             mCallback.onFailure(statCode, headers, body, error);
                         } else {
                             logDebug("MyAPIHandler: onFailure: trying to refresh token");
-                            oa.refreshToken(mAct, new OAuthUtil.OAuthCallback() {
+                            oam.refreshToken(new OAuthUtil.OAuthManager.OAuthCallback() {
                                 @Override
                                 public void onSuccess() {
-                                    logDebug("MyAPIHandler: onFailure: oa.refreshToken: onSuccess");
-                                    execute();
+                                    logDebug("MyAPIHandler: onFailure: oam.refreshToken: onSuccess, re-executing API request");
+                                    execute(); // todo Could cause infinite loop call, if refreshToken succeed but API still returns 401
                                 }
 
                                 @Override
                                 public void onFailure() {
-                                    logError("MyAPIHandler: onFailure: oa.refreshToken: onFailure");
+                                    logError("MyAPIHandler: onFailure: oam.refreshToken: onFailure");
                                     logError("    code=" + statCode + ", error=" + error.toString() + ", body=" + (body != null ? new String(body) : null));
-                                    logError("    so i'm calling mCallback.onFailure");
+                                    logError("    so calling onFailure of API");
                                     mCallback.onFailure(statCode, headers, body, error);
                                 }
                             });
                         }
                     } else {
-                        logError("    calling mCallback.onFailure");
+                        logError("    calling onFailure of API");
                         mCallback.onFailure(statCode, headers, body, error);
                     }
                     removeHeaders();
@@ -129,11 +129,11 @@ public final class APIUtil {
 
             addHeader("Accept", "application/xml");
             if (mHasAuthHead) {
-                OAuthUtil oa = OAuthUtil.getInstance();
-                if (oa == null) {
-                    logError("APIRequest: OAuthUtil.getInstance() returns null");
+                String accessToken = OAuthUtil.getAccessToken(mAct);
+                if (accessToken == null || accessToken.equals("")) {
+                    logError("APIRequest: OAuthUtil.accessToken() returns empty string");
                 } else {
-                    addHeader("Authorization", "Bearer " + oa.getAccessToken());
+                    addHeader("Authorization", "Bearer " + accessToken);
                 }
             }
 
@@ -152,12 +152,17 @@ public final class APIUtil {
         public abstract void execute();
     }
 
+
     // API调用后的回调，使用时覆盖onSuccess和onFailure两个方法
     public static interface APICallback {
         public void onSuccess(int statCode, Header[] headers, byte[] body);
 
         public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error);
     }
+
+
+    // - - - API - - -
+
 
     // API: Topic
     // GET Topic/New	获取论坛的最新主题。
@@ -540,6 +545,7 @@ public final class APIUtil {
 
     // - utility methods -
 
+
     // Similar to javascript encodeURIComponent
     private static final String encodeURIComponent(final String s) {
         String result;
@@ -559,6 +565,7 @@ public final class APIUtil {
         return result;
     }
 
+
     // Add a parameter to passed-in URL.
     // if the "value" arg is null, no modification is done to URL.
     private static final String addURIParamIfExists(String url, String key, String value) {
@@ -575,13 +582,16 @@ public final class APIUtil {
         return url;
     }
 
+
     private static final String addURIParamIfExists(String url, String key, Integer value) {
         return (value == null) ? url : addURIParamIfExists(url, key, String.valueOf(value));
     }
 
+
     private static final void logDebug(String msg) {
         HelperUtil.generalDebug("APIUtil", msg);
     }
+
 
     private static final void logError(String msg) {
         HelperUtil.generalError("APIUtil", msg);

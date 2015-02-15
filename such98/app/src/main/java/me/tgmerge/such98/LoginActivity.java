@@ -6,30 +6,18 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
+import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.OAuthUtil;
 
 
 public class LoginActivity extends ActionBarActivity {
 
-    private OAuthUtil oa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        oa = OAuthUtil.getInstance();
-        if (oa == null) {
-            oa = new OAuthUtil(
-                    this,
-                    "https://login.cc98.org/OAuth/Authorize",
-                    "https://login.cc98.org/OAuth/Token",
-                    "getuserinfo* getpost* setpost* getmessage* setmessage*",
-                    "17bd1fe0-39e7-488f-ac6a-071c86e1f083",
-                    "fdf5b427-918e-4237-9897-838eefe478f8");
-        }
     }
 
 
@@ -56,11 +44,11 @@ public class LoginActivity extends ActionBarActivity {
     }
 
     public void onLoginButtonClicked(View view) {
-        if (oa.getAccessToken().equals("")) {
-            Toast.makeText(this, "LoginActivity: token not exists", Toast.LENGTH_LONG).show();
+        if (OAuthUtil.getAccessToken(this).equals("")) {
+            HelperUtil.debugToast(this, "LoginActivity: no token");
             startActivity(new Intent(this, LoginPageActivity.class));
         } else {
-            Toast.makeText(this, "LoginActivity: token exists", Toast.LENGTH_LONG).show();
+            HelperUtil.debugToast(this, "LoginActivity: token exists");
             startActivity(new Intent(this, DisplayActivity.class));
         }
     }

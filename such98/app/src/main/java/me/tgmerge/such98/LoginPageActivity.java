@@ -7,8 +7,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
-import android.widget.Toast;
 
+import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.OAuthUtil;
 
 
@@ -19,20 +19,21 @@ public class LoginPageActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_page);
 
-        final OAuthUtil oa = OAuthUtil.getInstance();
+        final OAuthUtil.OAuthManager oam = OAuthUtil.newOAuthManager(this);
         final Context that = this;
 
         WebView webView = (WebView) findViewById(R.id.webView_login);
-        oa.fire(this, webView, new OAuthUtil.OAuthCallback() {
+        oam.fire(webView, new OAuthUtil.OAuthManager.OAuthCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(that, "Login success" + oa.getAccessToken(), Toast.LENGTH_LONG).show();
+                String token = OAuthUtil.getAccessToken(that);
+                HelperUtil.debugToast(that, "Login success, token=" + (token.length() > 10 ? token.substring(0, 10) : token));
                 startActivity(new Intent(that, DisplayActivity.class));
             }
 
             @Override
             public void onFailure() {
-                Toast.makeText(that, "Login failed", Toast.LENGTH_LONG).show();
+                HelperUtil.errorToast(that, "Login failed");
                 startActivity(new Intent(that, LoginActivity.class));
             }
         });
@@ -60,5 +61,4 @@ public class LoginPageActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 }

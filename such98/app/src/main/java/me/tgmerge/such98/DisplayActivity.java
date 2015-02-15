@@ -8,13 +8,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.apache.http.Header;
 
 import java.util.Vector;
 
 import me.tgmerge.such98.Util.APIUtil;
+import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.OAuthUtil;
 
 
@@ -94,46 +94,43 @@ public class DisplayActivity extends ActionBarActivity {
             tests.add(new APIUtil.PostMessage(this, "tgmerge", "testTitle", "testContent", new MyCallback()));
         }
 
-        textToken.setText(OAuthUtil.getInstance().getAccessToken());
+        textToken.setText(OAuthUtil.getAccessToken(that));
 
         if (testNo < tests.size()) {
-            Toast.makeText(that, "Test #" + testNo + ", " + tests.get(testNo).getClass().getName(), Toast.LENGTH_LONG).show();
+            HelperUtil.debugToast(that, "Test #" + testNo + ", " + tests.get(testNo).getClass().getName());
             tests.get(testNo).execute();
             testNo++;
         } else {
-            Toast.makeText(that, "Test all done", Toast.LENGTH_LONG).show();
+            HelperUtil.debugToast(that, "Test all done");
         }
     }
 
     public void onReloginButtonClicked(View view) {
-        OAuthUtil oa = OAuthUtil.getInstance();
-        if (oa != null) {
-            oa.clearToken();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        }
+        OAuthUtil.clearToken(this);
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 
     public void onRefreshTokenButtonClicked(View view) {
-        final OAuthUtil oa = OAuthUtil.getInstance();
-        if (oa != null) {
-            Toast.makeText(this, "Old token:" + oa.getAccessToken(), Toast.LENGTH_LONG).show();
-            oa.refreshToken(this, new OAuthUtil.OAuthCallback() {
-                @Override
-                public void onSuccess() {
-                    Toast.makeText(that, "New token:" + oa.getAccessToken(), Toast.LENGTH_LONG).show();
-                }
+        final OAuthUtil.OAuthManager oam = OAuthUtil.newOAuthManager(this);
+        String token = OAuthUtil.getAccessToken(this);
+        HelperUtil.debugToast(this, "Old token: " + (token.length() > 10 ? token.substring(0, 10) : token));
+        oam.refreshToken(new OAuthUtil.OAuthManager.OAuthCallback() {
+            @Override
+            public void onSuccess() {
+                String newToken = OAuthUtil.getAccessToken(that);
+                HelperUtil.debugToast(that, "New token:" + (newToken.length() > 10 ? newToken.substring(0, 10) : newToken));
+            }
 
-                @Override
-                public void onFailure() {
-                    Toast.makeText(that, "refresh token failed", Toast.LENGTH_LONG).show();
-                }
-            });
-        }
+            @Override
+            public void onFailure() {
+                HelperUtil.errorToast(that, "refresh token failed");
+            }
+        });
     }
 
     public void onCheckMeClicked(View view) {
-        class MyCallback implements APIUtil.APICallback {
+        new APIUtil.GetMe(this, new APIUtil.APICallback() {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
                 if (body != null) {
@@ -142,13 +139,11 @@ public class DisplayActivity extends ActionBarActivity {
                     text.setText("Empty response, statcode=" + statCode);
                 }
             }
-
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 text.setText("ERROR " + statCode + ", " + error.toString());
             }
-        }
-        new APIUtil.GetMe(this, new MyCallback()).execute();
+        }).execute();
     }
 
     public void act1Clicked(View view) {
