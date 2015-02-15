@@ -16,19 +16,19 @@ import java.util.regex.Pattern;
  * Created by tgmerge on 2/5.
  * handle cc98 OAuth login process.
  * 使用:
- *     用OAuthutil(Activity ctx, OAuth参数)初始化实例
- *
- *     其后，用getInstance()返回实例，如果没有初始化过，该方法返回null
- *
- *     用fire(活动上下文ctx, webview, OAuthCallback)在webView中打开oauth过程
- *         其中，覆盖OAuthCallback的两个方法onSuccess和onFailure，刷新/获取token之后，根据情况会调用它们
- *
- *     用getAccessToken()获取access token
- *
- *     用clearToken()清除token
- *
- *     用refreshToken(Activity, OAuthCallback)刷新token
- *
+ * 用OAuthutil(Activity ctx, OAuth参数)初始化实例
+ * <p/>
+ * 其后，用getInstance()返回实例，如果没有初始化过，该方法返回null
+ * <p/>
+ * 用fire(活动上下文ctx, webview, OAuthCallback)在webView中打开oauth过程
+ * 其中，覆盖OAuthCallback的两个方法onSuccess和onFailure，刷新/获取token之后，根据情况会调用它们
+ * <p/>
+ * 用getAccessToken()获取access token
+ * <p/>
+ * 用clearToken()清除token
+ * <p/>
+ * 用refreshToken(Activity, OAuthCallback)刷新token
+ * <p/>
  * 算是能用了
  */
 public class OAuthUtil {
@@ -130,7 +130,7 @@ public class OAuthUtil {
                 postLoad += "&client_id=" + mClientID;
                 postLoad += "&client_secret=" + mClientSecret;
                 logDebug("refreshToken: postLoad:" + postLoad);
-                logDebug("refreshToken: encoded postload: "+ new String(EncodingUtils.getBytes(postLoad, "UTF-8")));
+                logDebug("refreshToken: encoded postload: " + new String(EncodingUtils.getBytes(postLoad, "UTF-8")));
                 webView.postUrl(mTokenURL, EncodingUtils.getBytes(postLoad, "UTF-8"));
             }
         });
@@ -140,6 +140,7 @@ public class OAuthUtil {
     // 它们会在获取/刷新token成功或失败时被调用
     protected static interface OAuthCallback {
         public void onSuccess();
+
         public void onFailure();
     }
 
@@ -176,7 +177,7 @@ public class OAuthUtil {
 
     private final class OAuthWebViewClient extends WebViewClient {
         private static final int STATE_INIT = 0, STATE_SEND1 = 1, STATE_RECV1 = 2, STATE_SEND2 = 3,
-                                 STATE_RECV2 = 4, STATE_AFTER_RECV2 = 5, STATE_REFRESH = 6;
+                STATE_RECV2 = 4, STATE_AFTER_RECV2 = 5, STATE_REFRESH = 6;
         private int mState = STATE_INIT;
 
         @Override
@@ -277,7 +278,7 @@ public class OAuthUtil {
     }
 
     private final String getRefreshToken() {
-        logDebug("getRefreshToken: " +  mSharedPref.getString(this.mKey_refreshToken, ""));
+        logDebug("getRefreshToken: " + mSharedPref.getString(this.mKey_refreshToken, ""));
         return mSharedPref.getString(this.mKey_refreshToken, "");
     }
 

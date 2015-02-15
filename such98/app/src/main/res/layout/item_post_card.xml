@@ -1,58 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="88dp"
-    android:paddingTop="13dp"
-    android:paddingBottom="17dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:layout_marginBottom="1dp"
-    android:background="@color/text_background">
+    card_view:cardCornerRadius="2dp"
+    card_view:contentPadding="16dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp">
 
-    <ImageView
-        android:id="@+id/image_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="3dp"
-        android:layout_alignParentLeft="true"
-        android:src="@drawable/ic_launcher"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/text_title"
-        android:text="Three-line item"
-        android:textSize="16sp"
-        android:textColor="@color/text_text"
-        android:paddingBottom="3dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="56dp"/>
+        <RelativeLayout
+            android:id="@+id/relativeLayout_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/text_authorInfo"
-        android:text="Secondary text lorem ipsum"
-        android:textSize="14sp"
-        android:textColor="@color/text_secondary"
-        android:textStyle="italic"
-        android:paddingBottom="3dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="56dp"
-        android:layout_below="@id/text_title"/>
+            <ImageView
+                android:id="@+id/imageView_avatar"
+                android:src="@drawable/ic_launcher"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
 
-    <TextView
-        android:id="@+id/text_lastPostInfo"
-        android:text="amet, consectetur adipiscing"
-        android:textSize="14sp"
-        android:textColor="@color/text_secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="56dp"
-        android:layout_below="@id/text_authorInfo"/>
+            <TextView
+                android:id="@+id/text_title"
+                android:text="Nunc vehicula dapibus ipsum. Duis venenatis risus"
+                android:textSize="16sp"
+                android:textColor="@color/text_text"
+                android:paddingBottom="3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="52dp"/>
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/text_authorInfo"
+                android:text="Authorname @ 2015-04-12 12:04"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:paddingBottom="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_title"
+                android:layout_marginLeft="52dp"/>
+
+            <TextView
+                android:id="@+id/text_replyInfo"
+                android:text="34 Clicked, 12 Replies"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:paddingBottom="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_authorInfo"
+                android:layout_marginLeft="52dp"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/view_divider_header"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/text_dividers"
+            android:layout_below="@id/relativeLayout_header"/>
+
+        <TextView
+            android:id="@+id/text_content"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/view_divider_header"/>
+
+        <View
+            android:id="@+id/view_divider_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/text_dividers"
+            android:layout_below="@id/relativeLayout_header"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="right"
+            android:layout_below="@id/view_divider_content">
+
+            <ImageButton
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="24dp"
+                android:src="@drawable/ic_launcher"/>
+
+            <ImageButton
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="24dp"
+                android:src="@drawable/ic_launcher"/>
+
+            <ImageButton
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="24dp"
+                android:src="@drawable/ic_launcher"/>
+
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

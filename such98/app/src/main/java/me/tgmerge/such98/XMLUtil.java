@@ -4,6 +4,7 @@ package me.tgmerge.such98;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Field;
@@ -17,7 +18,7 @@ import java.util.Vector;
 /**
  * Created by tgmerge on 2/8.
  * 扩展一个新的xml的方法：参考BoardLastPostInfo和BoardInfo
-*/
+ */
 public class XMLUtil {
 
 
@@ -57,11 +58,7 @@ public class XMLUtil {
     }
 
 
-
-
     // - - - XMLObj - - -
-
-
 
 
     @SuppressWarnings("unused")
@@ -86,8 +83,6 @@ public class XMLUtil {
         public void processSpecialTags(XmlPullParser xpp) throws Exception {
         }
     }
-
-
 
 
     @SuppressWarnings("unused")
@@ -133,7 +128,6 @@ public class XMLUtil {
     }
 
 
-
     @SuppressWarnings("unused")
     public static final class TopicInfo extends XMLObj {
         public String Title;
@@ -161,7 +155,7 @@ public class XMLUtil {
 
         private static final HashSet<String> mDefaults =
                 newHashSet("Title", "HitCount", "Id", "BoardId", "BestState", "TopState", "ReplyCount",
-                           "IsVote", "IsAnonymous", "AuthorName", "AuthorId", "IsLocked", "CreateTime");
+                        "IsVote", "IsAnonymous", "AuthorName", "AuthorId", "IsLocked", "CreateTime");
 
 
         @Override
@@ -178,7 +172,6 @@ public class XMLUtil {
             }
         }
     }
-
 
 
     @SuppressWarnings("unused")
@@ -201,8 +194,6 @@ public class XMLUtil {
     }
 
 
-
-
     @SuppressWarnings("unused")
     public static final class HotTopicInfo extends XMLObj {
         public String Title;
@@ -217,7 +208,7 @@ public class XMLUtil {
 
         private static final HashSet<String> mDefaults =
                 newHashSet("Title", "HitCount", "Id", "BoardId", "BoardName", "ReplyCount", "ParticipantCount",
-                           "AuthorName", "CreateTime");
+                        "AuthorName", "CreateTime");
 
 
         @Override
@@ -231,7 +222,31 @@ public class XMLUtil {
     }
 
 
+    @SuppressWarnings("unused")
+    public static final class PostInfo extends XMLObj {
+        public int Id;
+        public String Title;
+        public String Content;
+        public String Time;
+        public boolean IsDeleted;
+        public int Floor;
+        public String UserName;
+        public int UserId;
+        public boolean IsAnomynous; // todo typo
 
+        private static final HashSet<String> mDefaults =
+                newHashSet("Id", "Title", "Content", "Time", "IsDeleted", "Floor", "UserName", "UserId",
+                           "IsAnomynous");
+
+        @Override
+        public Set<String> getDefaultFields() {
+            return mDefaults;
+        }
+
+        @Override
+        public void processSpecialTags(XmlPullParser xpp) throws Exception {
+        }
+    }
 
 
     // 有两种初始化ArrayOf<T>的方法：
@@ -291,8 +306,6 @@ public class XMLUtil {
     }
 
 
-
-
     @SuppressWarnings("unused")
     public static final class ArrayOfint extends XMLObj {
         public Vector<Integer> values = new Vector<>();
@@ -310,8 +323,6 @@ public class XMLUtil {
             }
         }
     }
-
-
 
 
     // - - - util method - - -

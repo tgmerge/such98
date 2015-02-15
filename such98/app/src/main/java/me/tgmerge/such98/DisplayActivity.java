@@ -2,8 +2,8 @@ package me.tgmerge.such98;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,6 +49,7 @@ public class DisplayActivity extends ActionBarActivity {
                         text.setText("Empty response, statcode=" + statCode);
                     }
                 }
+
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                     text.setText("ERROR " + statCode + ", " + error.toString());
@@ -73,7 +74,7 @@ public class DisplayActivity extends ActionBarActivity {
             tests.add(new APIUtil.GetRootBoard(this, 0, null, 10, new MyCallback()));
             tests.add(new APIUtil.GetSubBoards(this, 6, 0, null, 5, new MyCallback()));
             tests.add(new APIUtil.GetBoard(this, 6, new MyCallback()));
-            int [] a = {6, 100};
+            int[] a = {6, 100};
             tests.add(new APIUtil.GetMultiBoards(this, a, 0, null, 10, new MyCallback()));
             // me
             tests.add(new APIUtil.GetMe(this, new MyCallback()));
@@ -92,10 +93,10 @@ public class DisplayActivity extends ActionBarActivity {
 
         textToken.setText(OAuthUtil.getInstance().getAccessToken());
 
-        if(testNo < tests.size()) {
+        if (testNo < tests.size()) {
             Toast.makeText(that, "Test #" + testNo + ", " + tests.get(testNo).getClass().getName(), Toast.LENGTH_LONG).show();
             tests.get(testNo).execute();
-            testNo ++;
+            testNo++;
         } else {
             Toast.makeText(that, "Test all done", Toast.LENGTH_LONG).show();
         }
@@ -138,6 +139,7 @@ public class DisplayActivity extends ActionBarActivity {
                     text.setText("Empty response, statcode=" + statCode);
                 }
             }
+
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 text.setText("ERROR " + statCode + ", " + error.toString());
@@ -152,31 +154,31 @@ public class DisplayActivity extends ActionBarActivity {
 
     public void act2Clicked(View view) {
         Intent intent = new Intent(this, ShowBoardsActivity.class);
-        intent.putExtra(ShowBoardsActivity.INTENT_ID, ShowBoardsActivity.ID_CUSTOM);
+        intent.putExtra(ShowBoardsActivity.INTENT_KEY_ID, ShowBoardsActivity.ID_CUSTOM);
         startActivity(intent);
     }
 
     public void act3Clicked(View view) {
         Intent intent = new Intent(this, ShowBoardsActivity.class);
-        intent.putExtra(ShowBoardsActivity.INTENT_ID, 2);
+        intent.putExtra(ShowBoardsActivity.INTENT_KEY_ID, 2);
         startActivity(intent);
     }
 
     public void act4Clicked(View view) {
         Intent intent = new Intent(this, ShowTopicsActivity.class);
-        intent.putExtra(ShowTopicsActivity.INTENT_ID, 100);
+        intent.putExtra(ShowTopicsActivity.INTENT_KEY_ID, 100);
         startActivity(intent);
     }
 
     public void act5Clicked(View view) {
         Intent intent = new Intent(this, ShowTopicsActivity.class);
-        intent.putExtra(ShowTopicsActivity.INTENT_ID, ShowTopicsActivity.ID_NEW);
+        intent.putExtra(ShowTopicsActivity.INTENT_KEY_ID, ShowTopicsActivity.ID_NEW);
         startActivity(intent);
     }
 
     public void act6Clicked(View view) {
         Intent intent = new Intent(this, ShowTopicsActivity.class);
-        intent.putExtra(ShowTopicsActivity.INTENT_ID, ShowTopicsActivity.ID_HOT);
+        intent.putExtra(ShowTopicsActivity.INTENT_KEY_ID, ShowTopicsActivity.ID_HOT);
         startActivity(intent);
     }
 

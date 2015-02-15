@@ -1,6 +1,7 @@
 package me.tgmerge.such98;
 
 import android.app.Activity;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -28,9 +29,9 @@ public class APIUtil {
 
     private static final AsyncHttpClient sClient = new AsyncHttpClient();
     private static final String URL_CC98API = "http://api.cc98.org/";
-    private static final int METHOD_GET    = 0;
-    private static final int METHOD_POST   = 1;
-    private static final int METHOD_PUT    = 2;
+    private static final int METHOD_GET = 0;
+    private static final int METHOD_POST = 1;
+    private static final int METHOD_PUT = 2;
     private static final int METHOD_DELETE = 3;
 
     protected abstract static class APIRequest {
@@ -112,7 +113,7 @@ public class APIUtil {
                                 @Override
                                 public void onFailure() {
                                     logError("MyAPIHandler: onFailure: oa.refreshToken: onFailure");
-                                    logError("    code=" + statCode + ", error=" + error.toString() + ", body=" + (body!=null ? new String(body) : null));
+                                    logError("    code=" + statCode + ", error=" + error.toString() + ", body=" + (body != null ? new String(body) : null));
                                     logError("    so i'm calling mCallback.onFailure");
                                     mCallback.onFailure(statCode, headers, body, error);
                                 }
@@ -166,7 +167,10 @@ public class APIUtil {
             super(act, callback);
             this.setURL(URL_CC98API + "Topic/New", pageFrom, pageTo, pageSize);
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     // GET Topic/Board/{boardId}	获取特定版面的主题。主题按照最后发言顺序排序。
@@ -177,7 +181,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Topic/Board/" + boardId, pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     // GET Topic/Hot	获取论坛的热门主题。
@@ -187,7 +194,10 @@ public class APIUtil {
             super(act, callback);
             this.setURL(URL_CC98API + "Topic/Hot", pageFrom, pageTo, pageSize);
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //POST Topic/Board/{boardId}	向服务器创建一个新的主题。
@@ -201,7 +211,10 @@ public class APIUtil {
             this.addParam("Content", content);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_POST); }
+
+        protected void execute() {
+            this.fire(METHOD_POST);
+        }
     }
 
     //GET Topic/{id}	获取给定 ID 的主题的信息。
@@ -212,7 +225,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Topic/" + topicId);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     // API: Post
@@ -224,7 +240,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Post/Topic/" + topicId, pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //GET Post/{id}	获取一个特定的发言。
@@ -235,7 +254,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Post/" + postId);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //POST Post/Topic/{topicId}	为特定的主题追加新的发言。
@@ -248,7 +270,10 @@ public class APIUtil {
             this.addParam("Content", content);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_POST); }
+
+        protected void execute() {
+            this.fire(METHOD_POST);
+        }
     }
 
     // PUT Post/{id}	修改一个现有发言。
@@ -262,7 +287,10 @@ public class APIUtil {
             this.addParam("Content", content);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_PUT); }
+
+        protected void execute() {
+            this.fire(METHOD_PUT);
+        }
     }
 
     // API: User
@@ -274,7 +302,10 @@ public class APIUtil {
             super(act, callback);
             this.setURL(URL_CC98API + "User/Name/" + userName);
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //GET User/{id}	获取具有指定标识的用户的信息。
@@ -284,7 +315,10 @@ public class APIUtil {
             super(act, callback);
             this.setURL(URL_CC98API + "User/" + userId);
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     // API: Board
@@ -296,7 +330,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Board/Root", pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //GET Board/{boardId}/Subs	获取某个版面的直接子版面。
@@ -308,7 +345,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Board/" + boardId + "/Subs", pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //GET Board/{id}	获取给定版面的信息。
@@ -319,7 +359,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Board/" + boardId);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //GET Board?id[0]={id[0]}&id[1]={id[1]}	一次性获取多个版面的的信息。
@@ -328,12 +371,13 @@ public class APIUtil {
         public GetMultiBoards(Activity act, int[] boardIds, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
             super(act, callback);
             String idPart = "";
-            for (int i = 0; i < boardIds.length; i ++) {
+            for (int i = 0; i < boardIds.length; i++) {
                 idPart += "id[" + i + "]=" + boardIds[i] + "&";
             }
             this.setURL(URL_CC98API + "Board?" + idPart, pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
+
         protected void execute() {
             this.fire(METHOD_GET);
         }
@@ -348,7 +392,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Me/Basic");
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //GET Me/CustomBoards	获取当前用户的自定义版面。
@@ -359,7 +406,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Me/CustomBoards");
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //GET Me	获取当前用户的信息。
@@ -370,7 +420,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Me");
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     //PUT Me	设置当前用户的信息。
@@ -383,7 +436,10 @@ public class APIUtil {
             this.addParam("todo what the key is this", data);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_PUT); }
+
+        protected void execute() {
+            this.fire(METHOD_PUT);
+        }
     }
 
     // API: SystemSetting
@@ -395,7 +451,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "SystemSetting");
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     // API: Message
@@ -407,7 +466,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Message/" + messageId);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     // GET Message?userName={userName}&filter={filter}	获取当前用户的短消息。
@@ -415,12 +477,16 @@ public class APIUtil {
     @SuppressWarnings("unused")
     protected static final class GetUserMessage extends APIRequest {
         public static final int FILTER_NONE = 0, FILTER_SEND = 1, FILTER_RECEIVE = 2, FILTER_BOTH = 3;
+
         public GetUserMessage(Activity act, String userName, int filter, Integer pageFrom, Integer pageTo, Integer pageSize, APICallback callback) {
             super(act, callback);
             this.setURL(URL_CC98API + "Message?userName=" + userName + "&filter=" + filter, pageFrom, pageTo, pageSize);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_GET); }
+
+        protected void execute() {
+            this.fire(METHOD_GET);
+        }
     }
 
     // DELETE Message/{id}	删除当前用户的特定短消息。
@@ -431,7 +497,10 @@ public class APIUtil {
             this.setURL(URL_CC98API + "Message/" + messageId);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_DELETE); }
+
+        protected void execute() {
+            this.fire(METHOD_DELETE);
+        }
     }
 
     // PUT Message/{id}	修改现有短消息的内容。
@@ -446,7 +515,10 @@ public class APIUtil {
             this.addParam("Content", content);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_PUT); }
+
+        protected void execute() {
+            this.fire(METHOD_PUT);
+        }
     }
 
     //POST Message	创建一条新的短消息。
@@ -460,7 +532,10 @@ public class APIUtil {
             this.addParam("Content", content);
             this.addAuthorization();
         }
-        protected void execute() { this.fire(METHOD_POST); }
+
+        protected void execute() {
+            this.fire(METHOD_POST);
+        }
     }
 
     // - utility methods -
@@ -499,6 +574,7 @@ public class APIUtil {
         url += key + "=" + encodeURIComponent(value);
         return url;
     }
+
     private static final String addURIParamIfExists(String url, String key, Integer value) {
         return (value == null) ? url : addURIParamIfExists(url, key, String.valueOf(value));
     }

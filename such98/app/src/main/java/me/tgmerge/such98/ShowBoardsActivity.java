@@ -2,8 +2,8 @@ package me.tgmerge.such98;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import org.apache.http.Header;
 
 import java.util.Arrays;
@@ -28,8 +29,10 @@ import java.util.Arrays;
  * startPos - initial position for paging, default=0
  *      value:
  *          int           - start position
+ * title - activity title
  */
 public class ShowBoardsActivity extends ActionBarActivity {
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -55,14 +58,11 @@ public class ShowBoardsActivity extends ActionBarActivity {
     }
 
 
-    public final static String INTENT_ID = "id";
-    public final static int ID_ROOT = 0;
-    public final static int ID_CUSTOM = -1;
-
-    public final static String INTENT_STARTPOS = "startPos";
+    public final static String INTENT_KEY_ID = "id";
+    public final static int ID_ROOT = 0, ID_CUSTOM = -1;
+    public final static String INTENT_KEY_STARTPOS = "startPos";
     public final static int ITEM_PER_PAGE = 10;
-
-    public final static String INTENT_TITLE = "title";
+    public final static String INTENT_KEY_TITLE = "title";
 
     private boolean isLoading = false;
     private boolean isNoMoreItem = false;
@@ -73,7 +73,7 @@ public class ShowBoardsActivity extends ActionBarActivity {
     private LinearLayoutManager layoutManager = null;
     private ShowBoardsAdapter adapter = null;
 
-    final Activity that = this;
+    private final Activity that = this;
 
     private final void setProgressLoading() {
         isLoading = true;
@@ -86,93 +86,95 @@ public class ShowBoardsActivity extends ActionBarActivity {
     }
 
     private final void loadAPage() {
-
+        // show "loading" circle
         setProgressLoading();
 
+        // page params from intent
         Intent intent = getIntent();
-        int intentType = intent.getIntExtra(INTENT_ID, 0);
+        int intentId = intent.getIntExtra(INTENT_KEY_ID, 0);
+        int intentStartPos = intent.getIntExtra(INTENT_KEY_STARTPOS, 0);
 
-        int intentStartPos = intent.getIntExtra(INTENT_STARTPOS, 0);
+        // "pageStart" and "pageSize" params for APIUtil
         final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
-        final int pageSize = ITEM_PER_PAGE;
 
-        String title = intent.getStringExtra(INTENT_TITLE);
+        // title from intent
+        String title = intent.getStringExtra(INTENT_KEY_TITLE);
         if (title == null) {
-            title = "Board id=" + intentType;
+            title = "Boards, BoardId=" + intentId;
         }
         setTitle(title);
 
+        // such js
         final Activity that = this;
 
+        // callback class for APIUtil
         class Callback implements APIUtil.APICallback {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                String s = new String(body);
                 XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.BoardInfo.class);
+
                 try {
-                    boardInfoArr.parse(s);
+                    boardInfoArr.parse(new String(body));
                 } catch (Exception e) {
                     HelperUtil.errorToast(that, "Parse exception:" + e.toString());
                     e.printStackTrace();
                 }
+
                 if (boardInfoArr.size() == 0) {
-                    // no more loading!
+                    // no more item...
                     isNoMoreItem = true;
                     HelperUtil.debugToast(that, "Already at last page");
                 } else {
-                    // append data
+                    // some item arrived
                     adapter.appendData(boardInfoArr);
+                    lastLoadStartPos = pageStart;
                 }
-                lastLoadStartPos = pageStart;
                 setProgressFinished();
             }
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                setProgressFinished();
                 HelperUtil.errorToast(that, "Network failed, code=" + statCode + ", info=" + (body == null ? "null" : new String(body)));
             }
         }
 
-        if (intentType == ID_ROOT) {
-
+        if (intentId == ID_ROOT) {
             // Show root board
-            new APIUtil.GetRootBoard(this, pageStart, null, pageSize, new Callback()).execute();
+            new APIUtil.GetRootBoard(this, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
 
-        } else if (intentType == ID_CUSTOM) {
-
+        } else if (intentId == ID_CUSTOM) {
             // Show custom boards
             new APIUtil.GetCustomBoardsMe(this, new APIUtil.APICallback() {
                 @Override
                 public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                    String s = new String(body);
                     XMLUtil.ArrayOfint boardIdVec = new XMLUtil.ArrayOfint();
                     try {
-                        boardIdVec.parse(s);
+                        boardIdVec.parse(new String(body));
                     } catch (Exception e) {
                         HelperUtil.errorToast(that, "GetCustomBoardsMe parse exception:" + e.toString());
                         e.printStackTrace();
                     }
 
                     int[] ids = new int[boardIdVec.values.size()];
-                    for (int i = 0; i < boardIdVec.values.size(); i ++) {
+                    for (int i = 0; i < boardIdVec.values.size(); i++) {
                         ids[i] = boardIdVec.values.get(i);
                     }
+                    int[] rangedIds = Arrays.copyOfRange(ids, pageStart, pageStart + ITEM_PER_PAGE);
 
-                    int[] rangedIds = Arrays.copyOfRange(ids, pageStart, pageStart + pageSize);
-
-                    new APIUtil.GetMultiBoards(that, rangedIds, pageStart, null, pageSize, new Callback()).execute();
+                    new APIUtil.GetMultiBoards(that, rangedIds, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
                 }
 
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                    setProgressFinished();
                     HelperUtil.errorToast(that, "GetCustomBoardsMe failed, code=" + statCode + ", info=" + new String(body));
                 }
             }).execute();
 
         } else {
-
             // Show board by id
-            new APIUtil.GetSubBoards(this, intentType, pageStart, null, pageSize, new Callback()).execute();
+            new APIUtil.GetSubBoards(this, intentId, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
         }
     }
 
@@ -181,39 +183,38 @@ public class ShowBoardsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_boards);
 
-        // config RecyclerView
+        // RecyclerView
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        // config RecyclerView's LayoutManager
+        // RecyclerView's LayoutManager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        // config RecyclerView's Adapter
+        // RecyclerView's Adapter
         adapter = new ShowBoardsAdapter(null);
         recyclerView.setAdapter(adapter);
 
-        // config RecyclerView's OnScrollListener
+        // RecyclerView's OnScrollListener
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
             @Override
             public void onScrolled(RecyclerView view, int dx, int dy) {
-
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
-
-                if ((visibleItemCount+pastVisibleItems) >= totalItemCount && !isLoading && !isNoMoreItem) {
-                    // scroll to bottom, has more item, not loading - we're going to load another page
-                    HelperUtil.debugToast(that, "Loading...");
-                    loadAPage();
+                if (!isLoading && !isNoMoreItem) {
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                        // scroll to bottom, has more item, not loading - we're going to load another page
+                        HelperUtil.debugToast(that, "Loading more...");
+                        loadAPage();
+                    }
                 }
             }
-
         });
 
-        // config RecyclerView's ItemAnimator
+        // RecyclerView's ItemAnimator
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        // load first page
         loadAPage();
     }
 
@@ -222,10 +223,6 @@ public class ShowBoardsActivity extends ActionBarActivity {
 
         private XMLUtil.ArrayOf<XMLUtil.BoardInfo> mData;
 
-        public final void setData(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
-            mData = data;
-            notifyDataSetChanged();
-        }
 
         public final void appendData(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
             if (mData == null) {
@@ -236,25 +233,21 @@ public class ShowBoardsActivity extends ActionBarActivity {
             notifyDataSetChanged();
         }
 
+
         public ShowBoardsAdapter(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
             mData = data;
         }
 
 
-        // Create new views, invoked by the layout manager
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-            // create a new view
             View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_board_card, parent, false);
             return new ViewHolder(itemLayoutView);
         }
 
 
-        // Replace the contents of a view, invoked by the layout manager
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
-
             XMLUtil.BoardInfo dataItem = mData.get(position);
 
             viewHolder.name.setText(dataItem.Name);
@@ -265,11 +258,11 @@ public class ShowBoardsActivity extends ActionBarActivity {
             viewHolder.data_isCat = dataItem.IsCategory;
             viewHolder.data_boardName = dataItem.Name;
 
+            // API有问题，于是在所有“分类”版面下显示一个“强制按帖子版面打开”的选项……
             viewHolder.openAsNotCat.setVisibility(dataItem.IsCategory ? View.VISIBLE : View.GONE);
         }
 
 
-        // Return the size of items data, invoked by the layout manager
         @Override
         public int getItemCount() {
             return (mData == null) ? 0 : mData.size();
@@ -282,7 +275,9 @@ public class ShowBoardsActivity extends ActionBarActivity {
             public TextView name;
             public TextView isCategory;
             public TextView description;
+
             public TextView openAsNotCat;
+
             public int data_boardId;
             public boolean data_isCat;
             public String data_boardName;
@@ -295,6 +290,7 @@ public class ShowBoardsActivity extends ActionBarActivity {
 
                 openAsNotCat = (TextView) itemLayoutView.findViewById(R.id.text_openAsNotCat);
 
+                // set item & inner view click listener
                 itemLayoutView.setOnClickListener(this);
                 openAsNotCat.setOnClickListener(this);
             }
@@ -309,7 +305,6 @@ public class ShowBoardsActivity extends ActionBarActivity {
                 } else if (v instanceof RelativeLayout) {
                     // click on whole item, starting new activity
                     HelperUtil.generalDebug("ShowBoardsActivity", "Clicked: " + data_boardId + ", " + data_isCat + ", " + data_boardName);
-
                     if (data_isCat) {
                         // clicked board is a category, start ShowBoardsActivity
                         ActivityUtil.openShowBoardsActivity(v.getContext(), data_boardId, 0, "分类: " + data_boardName);
@@ -319,8 +314,6 @@ public class ShowBoardsActivity extends ActionBarActivity {
                     }
                 }
             }
-
-
         }
     }
 }

@@ -2,8 +2,8 @@ package me.tgmerge.such98;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.apache.http.Header;
@@ -26,6 +27,7 @@ import org.apache.http.Header;
  * startPos - initial position for paging, default=0
  *      value:
  *          int           - start position
+ * title - activity title
  */
 public class ShowTopicsActivity extends ActionBarActivity {
 
@@ -52,14 +54,11 @@ public class ShowTopicsActivity extends ActionBarActivity {
     }
 
 
-    public final static String INTENT_ID = "id";
-    public final static int ID_NEW = -1;
-    public final static int ID_HOT = -2;
-
-    public final static String INTENT_STARTPOS = "startPos";
+    public final static String INTENT_KEY_ID = "id";
+    public final static int ID_NEW = -1, ID_HOT = -2;
+    public final static String INTENT_KEY_STARTPOS = "startPos";
     public final static int ITEM_PER_PAGE = 10;
-
-    public final static String INTENT_TITLE = "title";
+    public final static String INTENT_KEY_TITLE = "title";
 
     private boolean isLoading = false;
     private boolean isNoMoreItem = false;
@@ -70,7 +69,7 @@ public class ShowTopicsActivity extends ActionBarActivity {
     private LinearLayoutManager layoutManager = null;
     private ShowTopicsAdapter adapter = null;
 
-    final Activity that = this;
+    private final Activity that = this;
 
     private final void setProgressLoading() {
         isLoading = true;
@@ -83,32 +82,26 @@ public class ShowTopicsActivity extends ActionBarActivity {
     }
 
     private final void loadAPage() {
-
         setProgressLoading();
 
         Intent intent = getIntent();
-        final int intentType = intent.getIntExtra(INTENT_ID, 0);
+        final int intentId = intent.getIntExtra(INTENT_KEY_ID, 0);
+        int intentStartPos = intent.getIntExtra(INTENT_KEY_STARTPOS, 0);
 
-        int intentStartPos = intent.getIntExtra(INTENT_STARTPOS, 0);
-        final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos: this.lastLoadStartPos + ITEM_PER_PAGE;
-        final int pageSize = ITEM_PER_PAGE;
+        final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
 
-        String title = intent.getStringExtra(INTENT_TITLE);
+        String title = intent.getStringExtra(INTENT_KEY_TITLE);
         if (title == null) {
-            title = "Topics id=" + intentType;
+            title = "Topics, BoardId=" + intentId;
         }
         setTitle(title);
-
-        final Activity that = this;
 
         class Callback implements APIUtil.APICallback {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                String s = new String(body);
-
                 XMLUtil.ArrayOf<?> topicInfoArr;
 
-                if (intentType == ID_HOT) {
+                if (intentId == ID_HOT) {
                     // Hot topics
                     topicInfoArr = new XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>(XMLUtil.HotTopicInfo.class);
                 } else {
@@ -117,43 +110,40 @@ public class ShowTopicsActivity extends ActionBarActivity {
                 }
 
                 try {
-                    topicInfoArr.parse(s);
+                    topicInfoArr.parse(new String(body));
                 } catch (Exception e) {
                     HelperUtil.errorToast(that, "Parse exception:" + e.toString());
                     e.printStackTrace();
                 }
+
                 if (topicInfoArr.size() == 0) {
-                    // no more loading - -
                     isNoMoreItem = true;
                     HelperUtil.debugToast(that, "Already at last page");
                 } else {
-                    // append data
                     adapter.appendData(topicInfoArr);
+                    lastLoadStartPos = pageStart;
                 }
-                lastLoadStartPos = pageStart;
                 setProgressFinished();
             }
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                setProgressFinished();
                 HelperUtil.errorToast(that, "Network failed, code=" + statCode + ", info=" + (body == null ? "null" : new String(body)));
             }
         }
 
-        if (intentType == ID_NEW) {
-
+        if (intentId == ID_NEW) {
             // Show new topics
-            new APIUtil.GetNewTopic(this, pageStart, null, pageSize, new Callback()).execute();
+            new APIUtil.GetNewTopic(this, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
 
-        } else if (intentType == ID_HOT) {
-
+        } else if (intentId == ID_HOT) {
             // show hot topics
-            new APIUtil.GetHotTopic(this, pageStart, null, pageSize, new Callback()).execute();
+            new APIUtil.GetHotTopic(this, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
 
         } else {
-
             // show topics by board id
-            new APIUtil.GetBoardTopic(this, intentType, pageStart, null, pageSize, new Callback()).execute();
+            new APIUtil.GetBoardTopic(this, intentId, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
         }
     }
 
@@ -162,37 +152,29 @@ public class ShowTopicsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_topics);
 
-        // config RecyclerView
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        // config RV's LayoutManager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        // config RecyclerView's Adapter
         adapter = new ShowTopicsAdapter(null);
         recyclerView.setAdapter(adapter);
 
-        // config RecyclerView's OnScrollListener
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
             @Override
             public void onScrolled(RecyclerView view, int dx, int dy) {
-
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
-
-                if ((visibleItemCount+pastVisibleItems) >= totalItemCount && !isLoading && !isNoMoreItem) {
-                    // scroll to bottom, has more item, not loading - we're going to load another page
-                    HelperUtil.debugToast(that, "Loading...");
-                    loadAPage();
+                if (!isLoading && !isNoMoreItem) {
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                        HelperUtil.debugToast(that, "Loading...");
+                        loadAPage();
+                    }
                 }
             }
-
         });
 
-        // config RecyclerView's ItemAnimator
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         loadAPage();
@@ -205,15 +187,8 @@ public class ShowTopicsActivity extends ActionBarActivity {
         private Class mDataItemClass;
 
         public final void setData(XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> data) {
-            if (data == null) {
-                mDataItemClass = null;
-                mData = data;
-                notifyDataSetChanged();
-                return;
-            }
-
-            Class itemClass = data.getItemClass();
-            if (itemClass != XMLUtil.HotTopicInfo.class && itemClass != XMLUtil.TopicInfo.class) {
+            Class itemClass = (data == null) ? null : data.getItemClass();
+            if (itemClass != null && itemClass != XMLUtil.HotTopicInfo.class && itemClass != XMLUtil.TopicInfo.class) {
                 return;
             }
             mDataItemClass = itemClass;
@@ -241,12 +216,8 @@ public class ShowTopicsActivity extends ActionBarActivity {
         }
 
         public ShowTopicsAdapter(XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> data) {
-            if (data == null) {
-                return;
-            }
-
-            Class itemClass = data.getItemClass();
-            if (itemClass != XMLUtil.HotTopicInfo.class && itemClass != XMLUtil.TopicInfo.class) {
+            Class itemClass = (data == null) ? null : data.getItemClass();
+            if (itemClass != null && itemClass != XMLUtil.HotTopicInfo.class && itemClass != XMLUtil.TopicInfo.class) {
                 return;
             }
             mDataItemClass = itemClass;
@@ -256,7 +227,6 @@ public class ShowTopicsActivity extends ActionBarActivity {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
             View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_topic_card, parent, false);
             return new ViewHolder(itemLayoutView);
         }
@@ -264,20 +234,31 @@ public class ShowTopicsActivity extends ActionBarActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
+
             if (mDataItemClass == XMLUtil.TopicInfo.class) {
                 XMLUtil.ArrayOf<XMLUtil.TopicInfo> thisData = (XMLUtil.ArrayOf<XMLUtil.TopicInfo>) mData;
                 XMLUtil.TopicInfo dataItem = thisData.get(position);
+
                 viewHolder.title.setText(dataItem.Title);
                 viewHolder.authorInfo.setText(dataItem.AuthorName);
                 viewHolder.lastPostInfo.setText(dataItem.LastPostInfo.UserName);
+
+                viewHolder.data_topicId = dataItem.Id;
+                viewHolder.data_topicTitle = dataItem.Title;
+
             } else {
                 XMLUtil.ArrayOf<XMLUtil.HotTopicInfo> thisData = (XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) mData;
                 XMLUtil.HotTopicInfo dataItem = thisData.get(position);
+
                 viewHolder.title.setText(dataItem.Title);
                 viewHolder.authorInfo.setText(dataItem.AuthorName);
                 viewHolder.lastPostInfo.setText(dataItem.BoardName + ", " + dataItem.ParticipantCount + "人参与");
+
+                viewHolder.data_topicId = dataItem.Id;
+                viewHolder.data_topicTitle = dataItem.Title;
             }
         }
+
 
         @Override
         public int getItemCount() {
@@ -285,17 +266,32 @@ public class ShowTopicsActivity extends ActionBarActivity {
         }
 
 
-        public static class ViewHolder extends RecyclerView.ViewHolder {
+        public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
             public TextView title;
             public TextView authorInfo;
             public TextView lastPostInfo;
+
+            public int data_topicId;
+            public String data_topicTitle;
 
             public ViewHolder(View itemLayoutView) {
                 super(itemLayoutView);
                 title = (TextView) itemLayoutView.findViewById(R.id.text_title);
                 authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
                 lastPostInfo = (TextView) itemLayoutView.findViewById(R.id.text_lastPostInfo);
+
+                itemLayoutView.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+                HelperUtil.generalDebug("ShowTopicsActivity", "onClick! " + v.toString());
+                if (v instanceof RelativeLayout) {
+                    // click on whole item
+                    HelperUtil.generalDebug("ShowTopicsActivity", "Clicked: " + data_topicId + ", " + data_topicTitle);
+                    ActivityUtil.openShowPostsActivity(v.getContext(), data_topicId, 0, data_topicTitle);
+                }
             }
         }
     }
