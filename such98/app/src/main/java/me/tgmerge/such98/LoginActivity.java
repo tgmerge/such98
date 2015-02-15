@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import me.tgmerge.such98.Util.OAuthUtil;
+
 
 public class LoginActivity extends ActionBarActivity {
 

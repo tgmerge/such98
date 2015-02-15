@@ -14,6 +14,9 @@ import org.apache.http.Header;
 
 import java.util.Vector;
 
+import me.tgmerge.such98.Util.APIUtil;
+import me.tgmerge.such98.Util.OAuthUtil;
+
 
 public class DisplayActivity extends ActionBarActivity {
 

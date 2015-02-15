@@ -1,6 +1,7 @@
-package me.tgmerge.such98;
+package me.tgmerge.such98.Util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.webkit.JavascriptInterface;
@@ -17,18 +18,12 @@ import java.util.regex.Pattern;
  * handle cc98 OAuth login process.
  * 使用:
  * 用OAuthutil(Activity ctx, OAuth参数)初始化实例
- * <p/>
  * 其后，用getInstance()返回实例，如果没有初始化过，该方法返回null
- * <p/>
  * 用fire(活动上下文ctx, webview, OAuthCallback)在webView中打开oauth过程
  * 其中，覆盖OAuthCallback的两个方法onSuccess和onFailure，刷新/获取token之后，根据情况会调用它们
- * <p/>
  * 用getAccessToken()获取access token
- * <p/>
  * 用clearToken()清除token
- * <p/>
  * 用refreshToken(Activity, OAuthCallback)刷新token
- * <p/>
  * 算是能用了
  */
 public class OAuthUtil {
@@ -37,15 +32,15 @@ public class OAuthUtil {
     // 上下文，存储，OAuth参数
 
     static private OAuthUtil mInstance = null;
-    private Activity mCtx;
+    private Activity mCtx; // todo may be a static reference of Activity!
 
     private String mAuthorizeURL;
     private String mTokenURL;
     private String mClientID;
     private String mClientSecret;
     private String mScope;
-    public String mWebViewInitURL = "http://localhost/start";
-    private String mWebViewRedirURL = "http://localhost/redir";
+    private final String mWebViewInitURL = "http://localhost/start";
+    private final String mWebViewRedirURL = "http://localhost/redir";
 
     private SharedPreferences mSharedPref;
     private String mFileKey;
@@ -57,7 +52,7 @@ public class OAuthUtil {
     // - 类方法 -
 
     // ctx
-    protected OAuthUtil(Activity ctx, String authorizeURL, String tokenURL, String scope,
+    public OAuthUtil(Activity ctx, String authorizeURL, String tokenURL, String scope,
                         String clientID, String clientSecret) {
         logDebug("OAuthUtil: initializing, authURL = " + authorizeURL);
         mInstance = this;
@@ -68,12 +63,12 @@ public class OAuthUtil {
         this.mClientID = clientID;
         this.mClientSecret = clientSecret;
         this.mFileKey = this.getClass().getPackage().getName() + "." + this.getClass().getName();
-        this.mSharedPref = mCtx.getSharedPreferences(this.mFileKey, mCtx.MODE_PRIVATE);
+        this.mSharedPref = mCtx.getSharedPreferences(this.mFileKey, Context.MODE_PRIVATE);
     }
 
     // 如果类没有用OAuthUtil()初始化过,
     // getInstance()将返回null, 需要在使用时判断
-    protected static final OAuthUtil getInstance() {
+    public static final OAuthUtil getInstance() {
         logDebug("getInstance: returning " + mInstance);
         return mInstance;
     }
@@ -84,7 +79,7 @@ public class OAuthUtil {
     // 如果成功，将存储access token和refresh token，并开启succActivity
     // 如果失败，将开启failActivity
     @SuppressWarnings("unused")
-    protected final void fire(Activity ctx, WebView webView, OAuthCallback callback) {
+    public final void fire(Activity ctx, WebView webView, OAuthCallback callback) {
         logDebug("fire: firing on " + webView.toString());
         this.mCtx = ctx;
         webView.getSettings().setJavaScriptEnabled(true);
@@ -94,13 +89,13 @@ public class OAuthUtil {
     }
 
     @SuppressWarnings("unused")
-    protected final String getAccessToken() {
+    public final String getAccessToken() {
         logDebug("getAccessToken: returning");
         return mSharedPref.getString(this.mKey_accessToken, "");
     }
 
     @SuppressWarnings("unused")
-    protected final void clearToken() {
+    public final void clearToken() {
         logDebug("clearToken: clearing");
         setToken("", "");
     }
@@ -109,7 +104,7 @@ public class OAuthUtil {
     // 如果成功，将更新access token
     // 如果失败， todo
     @SuppressWarnings("unused")
-    protected final void refreshToken(final Activity ctx, final OAuthCallback callback) {
+    public final void refreshToken(final Activity ctx, final OAuthCallback callback) {
         // todo I'm out... javax.net.ssl.SSLPeerUnverifiedException: No peer certificate
         // todo I'll use an invisible webview to handle this
 
@@ -138,7 +133,7 @@ public class OAuthUtil {
 
     // 在使用refreshToken()、使用fire()时传递此对象，覆盖onSuccess和onFail方法
     // 它们会在获取/刷新token成功或失败时被调用
-    protected static interface OAuthCallback {
+    public static interface OAuthCallback {
         public void onSuccess();
 
         public void onFailure();
@@ -161,7 +156,7 @@ public class OAuthUtil {
         @JavascriptInterface
         @SuppressWarnings("unused")
         public void processHTML(final String html) {
-            logDebug("processHTML: " + (html == null ? html : html));
+            logDebug("processHTML: " + (html == null ? "" : "..."));
 
             // 处理access token结束后，删除webview
             mCtx.runOnUiThread(new Runnable() {
@@ -170,6 +165,7 @@ public class OAuthUtil {
                     processTokenHTML(html, mCallback);
                     logDebug("processHTML: destroying webview");
                     mWebView.destroy();
+                    mCtx = null; // TODO prevent from holding a static reference of Activity?
                 }
             });
         }
@@ -274,7 +270,7 @@ public class OAuthUtil {
         SharedPreferences.Editor editor = mSharedPref.edit();
         editor.putString(this.mKey_accessToken, accessToken);
         editor.putString(this.mKey_refreshToken, refreshToken);
-        editor.commit();
+        editor.apply();
     }
 
     private final String getRefreshToken() {

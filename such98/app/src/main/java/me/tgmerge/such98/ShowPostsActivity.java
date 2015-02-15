@@ -16,6 +16,10 @@ import android.widget.TextView;
 
 import org.apache.http.Header;
 
+import me.tgmerge.such98.Util.APIUtil;
+import me.tgmerge.such98.Util.HelperUtil;
+import me.tgmerge.such98.Util.XMLUtil;
+
 
 public class ShowPostsActivity extends ActionBarActivity {
 

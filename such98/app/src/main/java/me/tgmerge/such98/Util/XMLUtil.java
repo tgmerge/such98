@@ -1,4 +1,4 @@
-package me.tgmerge.such98;
+package me.tgmerge.such98.Util;
 
 
 import org.xmlpull.v1.XmlPullParser;
@@ -14,6 +14,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
+
+import me.tgmerge.such98.Util.HelperUtil;
 
 /**
  * Created by tgmerge on 2/8.
@@ -66,7 +68,7 @@ public class XMLUtil {
         public int BoardId;
         public int TopicId;
         public int PostId;
-        public String DateTime;  // todo type is date time
+        public String DateTime;
         public String UserName;
         public int UserId;
         public String TopicTitle;
@@ -99,11 +101,11 @@ public class XMLUtil {
         public boolean IsHidden;
         public boolean IsCategory;
         public boolean IsEncrypted;
-        public boolean IsAnomynous;  // todo typo in xml defination
+        public boolean IsAnomynous;  // todo typo in xml definition
         public boolean IsLocked;
         public Vector<String> Masters = new Vector<>();
         public BoardLastPostInfo LastPostInfo;
-        public String PostTimeLimit; // todo type is timespan
+        public String PostTimeLimit;
 
         private static final HashSet<String> mDefaults =
                 newHashSet("Id", "Name", "Description", "ChildBoardCount", "ParentId", "RootId", "TotalPostCount",
@@ -210,7 +212,6 @@ public class XMLUtil {
                 newHashSet("Title", "HitCount", "Id", "BoardId", "BoardName", "ReplyCount", "ParticipantCount",
                         "AuthorName", "CreateTime");
 
-
         @Override
         public Set<String> getDefaultFields() {
             return mDefaults;
@@ -237,6 +238,68 @@ public class XMLUtil {
         private static final HashSet<String> mDefaults =
                 newHashSet("Id", "Title", "Content", "Time", "IsDeleted", "Floor", "UserName", "UserId",
                            "IsAnomynous");
+
+        @Override
+        public Set<String> getDefaultFields() {
+            return mDefaults;
+        }
+
+        @Override
+        public void processSpecialTags(XmlPullParser xpp) throws Exception {
+        }
+    }
+
+
+    @SuppressWarnings("unused")
+    public static final class UserInfo extends XMLObj {
+        public int Id;
+        public String Name;
+        public String Title;
+        public int PostCount;
+        public int Prestige;
+        public String Fraction;
+        public String GroupName;
+        public String RegisterTime;
+        public String LastLogOnTime;
+        public Boolean IsOnline;
+        public String PortraitUrl;
+        public int PortraitHeight;
+        public int PortraitWidth;
+        public String PhotoUrl;
+        public String SignatureCode;
+        public String Gender;
+        public String Level;
+        public String EmailAddress;
+        public String HomePageUrl;
+        public String Birthday;
+        public String QQ;
+        public String Msn;
+
+        private static final HashSet<String> mDefaults =
+                newHashSet("Id", "Name", "Title", "PostCount", "Prestige", "Faction", "GroupName", "RegisterTime",
+                           "LastLogOnTime", "IsOnline", "PortraitUrl", "PortraitHeight", "PortraitWidth",
+                           "PhotoUrl", "SignatureCode", "Gender", "Level", "EmailAddress", "HomePageUrl",
+                           "Birthday", "QQ", "Msn");
+
+        @Override
+        public Set<String> getDefaultFields() {
+            return mDefaults;
+        }
+
+        @Override
+        public void processSpecialTags(XmlPullParser xpp) throws Exception {
+        }
+    }
+
+
+    @SuppressWarnings("unused")
+    public static final class UserBasicInfo extends XMLObj {
+        public int V1Id;
+        public int V2Id;
+        public String Roles;
+        public String Name;
+
+        private static final HashSet<String> mDefaults = newHashSet("V1Id", "V2Id", "Roles", "Name");
 
         @Override
         public Set<String> getDefaultFields() {
@@ -279,7 +342,7 @@ public class XMLUtil {
 
         @Override
         public void processSpecialTags(XmlPullParser xpp) throws Exception {
-            T obj = mObjClass.newInstance(); // todo Default constructor only!
+            T obj = mObjClass.newInstance();
             obj.parse(xpp);
             mObjs.add(obj);
         }

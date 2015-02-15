@@ -1,15 +1,19 @@
-package me.tgmerge.such98;
+package me.tgmerge.such98.Util;
 
 import android.content.Context;
 import android.content.Intent;
 
+import me.tgmerge.such98.ShowBoardsActivity;
+import me.tgmerge.such98.ShowPostsActivity;
+import me.tgmerge.such98.ShowTopicsActivity;
+
 /**
  * Created by tgmerge on 2/15.
  */
-public class ActivityUtil {
+public final class ActivityUtil {
 
 
-    static final void openShowBoardsActivity(Context ctx, int id, int startPos, String title) {
+    public static final void openShowBoardsActivity(Context ctx, int id, int startPos, String title) {
         logDebug("Starting ShowBoardsActivity, id=" + id + ", startPos=" + startPos + ", title=" + title);
         Intent intent = new Intent(ctx, ShowBoardsActivity.class);
         intent.putExtra(ShowBoardsActivity.INTENT_KEY_ID, id);
@@ -19,7 +23,7 @@ public class ActivityUtil {
     }
 
 
-    static final void openShowTopicsActivity(Context ctx, int id, int startPos, String title) {
+    public static final void openShowTopicsActivity(Context ctx, int id, int startPos, String title) {
         logDebug("Starting ShowTopicsActivity, id=" + id + ", startPos=" + startPos + ", title=" + title);
         Intent intent = new Intent(ctx, ShowTopicsActivity.class);
         intent.putExtra(ShowTopicsActivity.INTENT_KEY_ID, id);
@@ -29,7 +33,7 @@ public class ActivityUtil {
     }
 
 
-    static final void openShowPostsActivity(Context ctx, int id, int startPos, String title) {
+    public static final void openShowPostsActivity(Context ctx, int id, int startPos, String title) {
         logDebug("Starting ShowPostsActivity, id=" + id + ", startPos=" + startPos + ", title=" + title);
         Intent intent = new Intent(ctx, ShowPostsActivity.class);
         intent.putExtra(ShowPostsActivity.INTENT_KEY_ID, id);
