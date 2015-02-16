@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="authorize_url">value goes here</string>
+    <string name="token_url">value goes here</string>
+    <string name="scope">value goes here</string>
+    <string name="client_id">value goes here</string>
+    <string name="client_secret">value goes here</string>
+
+</resources>
