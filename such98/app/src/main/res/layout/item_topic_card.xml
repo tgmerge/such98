@@ -13,12 +13,21 @@
     android:background="@color/text_background">
 
     <ImageView
-        android:id="@+id/image_icon"
+        android:id="@+id/image_icon_circle"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="3dp"
         android:layout_alignParentLeft="true"
-        android:src="@drawable/ic_launcher"/>
+        android:src="@drawable/ic_circle_grey600_48dp"/>
+
+    <ImageView
+        android:id="@+id/image_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_comment_text_outline_white_36dp"
+        android:layout_alignLeft="@id/image_icon_circle"
+        android:layout_alignTop="@id/image_icon_circle"/>
 
     <TextView
         android:id="@+id/text_title"

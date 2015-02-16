@@ -4,12 +4,19 @@
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
-    tools:context=".LoginActivity">
+    tools:context=".LoginActivity"
+    android:gravity="center">
 
     <Button android:id="@+id/button_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login"
         android:onClick="onLoginButtonClicked"/>
+
+    <Button android:id="@+id/button_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Test List"
+        android:onClick="onTestButtonClicked"/>
 
 </LinearLayout>

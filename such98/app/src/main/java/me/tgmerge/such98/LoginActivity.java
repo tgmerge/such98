@@ -1,5 +1,6 @@
 package me.tgmerge.such98;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -7,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import me.tgmerge.such98.Util.ActivityUtil;
 import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.OAuthUtil;
 
@@ -49,7 +51,11 @@ public class LoginActivity extends ActionBarActivity {
             startActivity(new Intent(this, LoginPageActivity.class));
         } else {
             HelperUtil.debugToast(this, "LoginActivity: token exists");
-            startActivity(new Intent(this, DisplayActivity.class));
+            ActivityUtil.openShowBoardsActivity(this, ShowBoardsActivity.ID_CUSTOM, 0, "定制版面");
         }
+    }
+
+    public void onTestButtonClicked(View view) {
+        startActivity(new Intent(this, DisplayActivity.class));
     }
 }

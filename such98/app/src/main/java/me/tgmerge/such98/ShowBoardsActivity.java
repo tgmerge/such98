@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -255,6 +256,7 @@ public class ShowBoardsActivity extends ActionBarActivity {
         public void onBindViewHolder(ViewHolder viewHolder, int position) {
             XMLUtil.BoardInfo dataItem = mData.get(position);
 
+            viewHolder.icon.setImageResource(dataItem.IsCategory ? R.drawable.ic_folder_multiple_outline_white_36dp : R.drawable.ic_folder_outline_white_36dp);
             viewHolder.name.setText(dataItem.Name);
             viewHolder.isCategory.setText(dataItem.IsCategory ? "分类" : "");
             viewHolder.description.setText(dataItem.Description);
@@ -277,6 +279,7 @@ public class ShowBoardsActivity extends ActionBarActivity {
         // inner class to hold a reference to each item of RecyclerView
         public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+            public ImageView icon;
             public TextView name;
             public TextView isCategory;
             public TextView description;
@@ -289,6 +292,7 @@ public class ShowBoardsActivity extends ActionBarActivity {
 
             public ViewHolder(View itemLayoutView) {
                 super(itemLayoutView);
+                icon = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
                 name = (TextView) itemLayoutView.findViewById(R.id.text_name);
                 isCategory = (TextView) itemLayoutView.findViewById(R.id.text_isCategory);
                 description = (TextView) itemLayoutView.findViewById(R.id.text_description);

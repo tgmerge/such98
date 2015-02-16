@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
+import me.tgmerge.such98.Util.ActivityUtil;
 import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.OAuthUtil;
 
@@ -28,7 +29,7 @@ public class LoginPageActivity extends ActionBarActivity {
             public void onSuccess() {
                 String token = OAuthUtil.getAccessToken(that);
                 HelperUtil.debugToast(that, "Login success, token=" + (token.length() > 10 ? token.substring(0, 10) : token));
-                startActivity(new Intent(that, DisplayActivity.class));
+                ActivityUtil.openShowBoardsActivity(that, ShowBoardsActivity.ID_CUSTOM, 0, "定制版面");
             }
 
             @Override

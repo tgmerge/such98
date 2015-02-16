@@ -23,11 +23,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+
             <ImageView
-                android:id="@+id/imageView_avatar"
-                android:src="@drawable/ic_launcher"
+                android:id="@+id/image_icon_circle"
                 android:layout_width="40dp"
-                android:layout_height="40dp" />
+                android:layout_height="40dp"
+                android:layout_marginTop="3dp"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/ic_circle_grey600_48dp"/>
+
+            <ImageView
+                android:id="@+id/image_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_account_outline_white_36dp"
+                android:layout_alignLeft="@id/image_icon_circle"
+                android:layout_alignTop="@id/image_icon_circle"/>
 
             <TextView
                 android:id="@+id/text_title"
@@ -51,6 +63,7 @@
                 android:layout_marginLeft="52dp"/>
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/text_replyInfo"
                 android:text="34 Clicked, 12 Replies"
                 android:textSize="14sp"
@@ -95,24 +108,17 @@
             android:gravity="right"
             android:layout_below="@id/view_divider_content">
 
-            <ImageButton
+            <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginLeft="24dp"
-                android:src="@drawable/ic_launcher"/>
+                android:src="@drawable/ic_reply_grey600_24dp"/>
 
-            <ImageButton
+            <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginLeft="24dp"
-                android:src="@drawable/ic_launcher"/>
-
-            <ImageButton
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginLeft="24dp"
-                android:src="@drawable/ic_launcher"/>
-
+                android:src="@drawable/ic_quote_grey600_24dp"/>
 
         </LinearLayout>
 

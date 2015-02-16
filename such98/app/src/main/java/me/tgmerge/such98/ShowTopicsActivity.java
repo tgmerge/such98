@@ -2,6 +2,7 @@ package me.tgmerge.such98;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -76,6 +78,8 @@ public class ShowTopicsActivity extends ActionBarActivity {
 
     private final Activity that = this;
 
+    private String title;
+
     private final void setProgressLoading() {
         isLoading = true;
         findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
@@ -95,7 +99,7 @@ public class ShowTopicsActivity extends ActionBarActivity {
 
         final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
 
-        String title = intent.getStringExtra(INTENT_KEY_TITLE);
+        title = intent.getStringExtra(INTENT_KEY_TITLE);
         if (title == null) {
             title = "Topics, BoardId=" + intentId;
         }
@@ -186,7 +190,7 @@ public class ShowTopicsActivity extends ActionBarActivity {
     }
 
 
-    private static class ShowTopicsAdapter extends RecyclerView.Adapter<ShowTopicsAdapter.ViewHolder> {
+    private class ShowTopicsAdapter extends RecyclerView.Adapter<ShowTopicsAdapter.ViewHolder> {
 
         private XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> mData;
         private Class mDataItemClass;
@@ -244,10 +248,14 @@ public class ShowTopicsActivity extends ActionBarActivity {
                 XMLUtil.ArrayOf<XMLUtil.TopicInfo> thisData = (XMLUtil.ArrayOf<XMLUtil.TopicInfo>) mData;
                 XMLUtil.TopicInfo dataItem = thisData.get(position);
 
+                viewHolder.icon.setImageResource(dataItem.TopState.equals(XMLUtil.TopicInfo.TOPSTATE_NONE)
+                                                 ? R.drawable.ic_comment_text_outline_white_36dp
+                                                 : R.drawable.ic_comment_alert_outline_white_36dp);
                 viewHolder.title.setText(dataItem.Title);
                 viewHolder.authorInfo.setText(dataItem.AuthorName);
                 viewHolder.lastPostInfo.setText(dataItem.LastPostInfo.UserName);
 
+                viewHolder.data_boardName = title;
                 viewHolder.data_topicId = dataItem.Id;
                 viewHolder.data_topicTitle = dataItem.Title;
 
@@ -255,10 +263,12 @@ public class ShowTopicsActivity extends ActionBarActivity {
                 XMLUtil.ArrayOf<XMLUtil.HotTopicInfo> thisData = (XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) mData;
                 XMLUtil.HotTopicInfo dataItem = thisData.get(position);
 
+                viewHolder.icon.setImageResource(R.drawable.ic_comment_fire_outline_white_36dp);
                 viewHolder.title.setText(dataItem.Title);
                 viewHolder.authorInfo.setText(dataItem.AuthorName);
                 viewHolder.lastPostInfo.setText(dataItem.BoardName + ", " + dataItem.ParticipantCount + "人参与");
 
+                viewHolder.data_boardName = dataItem.BoardName;
                 viewHolder.data_topicId = dataItem.Id;
                 viewHolder.data_topicTitle = dataItem.Title;
             }
@@ -271,17 +281,20 @@ public class ShowTopicsActivity extends ActionBarActivity {
         }
 
 
-        public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+            public ImageView icon;
             public TextView title;
             public TextView authorInfo;
             public TextView lastPostInfo;
 
             public int data_topicId;
             public String data_topicTitle;
+            public String data_boardName;
 
             public ViewHolder(View itemLayoutView) {
                 super(itemLayoutView);
+                icon = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
                 title = (TextView) itemLayoutView.findViewById(R.id.text_title);
                 authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
                 lastPostInfo = (TextView) itemLayoutView.findViewById(R.id.text_lastPostInfo);
@@ -295,7 +308,7 @@ public class ShowTopicsActivity extends ActionBarActivity {
                 if (v instanceof RelativeLayout) {
                     // click on whole item
                     HelperUtil.generalDebug("ShowTopicsActivity", "Clicked: " + data_topicId + ", " + data_topicTitle);
-                    ActivityUtil.openShowPostsActivity(v.getContext(), data_topicId, 0, data_topicTitle);
+                    ActivityUtil.openShowPostsActivity(v.getContext(), data_topicId, 0, data_boardName);
                 }
             }
         }

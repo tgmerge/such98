@@ -61,6 +61,7 @@ public class ShowPostsActivity extends ActionBarActivity {
     private ShowPostsAdapter adapter = null;
 
     private final Activity that = this;
+    private int intentId;
 
     private final void setProgressLoading() {
         isLoading = true;
@@ -76,7 +77,7 @@ public class ShowPostsActivity extends ActionBarActivity {
         setProgressLoading();
 
         Intent intent = getIntent();
-        final int intentId = intent.getIntExtra(INTENT_KEY_ID, 0);
+        intentId = intent.getIntExtra(INTENT_KEY_ID, 0);
         int intentStartPos = intent.getIntExtra(INTENT_KEY_STARTPOS, 0);
 
         final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
@@ -154,7 +155,7 @@ public class ShowPostsActivity extends ActionBarActivity {
     }
 
 
-    private static class ShowPostsAdapter extends RecyclerView.Adapter<ShowPostsAdapter.ViewHolder> {
+    private class ShowPostsAdapter extends RecyclerView.Adapter<ShowPostsAdapter.ViewHolder> {
 
         private XMLUtil.ArrayOf<XMLUtil.PostInfo> mData;
 
@@ -181,12 +182,36 @@ public class ShowPostsActivity extends ActionBarActivity {
 
 
         @Override
-        public void onBindViewHolder(ViewHolder viewHolder, int position) {
+        public void onBindViewHolder(final ViewHolder viewHolder, int position) {
             XMLUtil.PostInfo dataItem = mData.get(position);
 
-            viewHolder.title.setText(dataItem.Title);
+            viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复" : dataItem.Title);
             viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
-            viewHolder.replyInfo.setText("unknown");
+
+            viewHolder.replyInfo.setVisibility(dataItem.Floor == 1 ? View.VISIBLE : View.GONE);
+            if (dataItem.Floor == 1) {
+                new APIUtil.GetTopic(that, intentId, new APIUtil.APICallback() {
+                    @Override
+                    public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                        try {
+                            XMLUtil.TopicInfo topicInfo = new XMLUtil.TopicInfo();
+                            topicInfo.parse(new String(body));
+                            viewHolder.replyInfo.setText(topicInfo.HitCount + "次点击，" + topicInfo.ReplyCount + "次回复");
+                        } catch (Exception e) {
+                            HelperUtil.errorToast(that, "Parse exception:" + e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                        setProgressFinished();
+                        HelperUtil.errorToast(that, "Network failed, code=" + statCode + ", info=" + (body == null ? "null" : new String(body)));
+                    }
+                }).execute();
+
+            }
+
             viewHolder.content.setText(dataItem.Content);
         }
 
@@ -197,7 +222,7 @@ public class ShowPostsActivity extends ActionBarActivity {
         }
 
 
-        public static class ViewHolder extends RecyclerView.ViewHolder {
+        public class ViewHolder extends RecyclerView.ViewHolder {
 
             public TextView title;
             public TextView authorInfo;
