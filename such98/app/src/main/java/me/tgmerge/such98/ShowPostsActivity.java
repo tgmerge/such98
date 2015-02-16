@@ -158,6 +158,8 @@ public class ShowPostsActivity extends ActionBarActivity {
     private class ShowPostsAdapter extends RecyclerView.Adapter<ShowPostsAdapter.ViewHolder> {
 
         private XMLUtil.ArrayOf<XMLUtil.PostInfo> mData;
+        private Integer data_POHitCount;
+        private Integer data_POReplyCount;
 
         public final void appendData(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
             if (mData == null) {
@@ -189,13 +191,17 @@ public class ShowPostsActivity extends ActionBarActivity {
             viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
 
             viewHolder.replyInfo.setVisibility(dataItem.Floor == 1 ? View.VISIBLE : View.GONE);
-            if (dataItem.Floor == 1) {
+            if (dataItem.Floor == 1 && data_POHitCount != null) {
+                viewHolder.replyInfo.setText(data_POHitCount + "次点击，" + data_POReplyCount + "次回复");
+            } else if (dataItem.Floor == 1 && data_POHitCount == null) {
                 new APIUtil.GetTopic(that, intentId, new APIUtil.APICallback() {
                     @Override
                     public void onSuccess(int statCode, Header[] headers, byte[] body) {
                         try {
                             XMLUtil.TopicInfo topicInfo = new XMLUtil.TopicInfo();
                             topicInfo.parse(new String(body));
+                            data_POHitCount = topicInfo.HitCount;
+                            data_POReplyCount = topicInfo.ReplyCount;
                             viewHolder.replyInfo.setText(topicInfo.HitCount + "次点击，" + topicInfo.ReplyCount + "次回复");
                         } catch (Exception e) {
                             HelperUtil.errorToast(that, "Parse exception:" + e.toString());
