@@ -257,11 +257,11 @@ public class XMLUtil {
         public String Title;
         public int PostCount;
         public int Prestige;
-        public String Fraction;
+        public String Faction;
         public String GroupName;
         public String RegisterTime;
         public String LastLogOnTime;
-        public Boolean IsOnline;
+        public boolean IsOnline;
         public String PortraitUrl;
         public int PortraitHeight;
         public int PortraitWidth;
@@ -440,14 +440,15 @@ public class XMLUtil {
         }
 
         String tagName = xpp.getName();
+        //logDebug("tagname" + tagName);
         if (defaults.contains(tagName)) {
             // tag name在defaults中
             String value = xpp.nextText();
             Field field = o.getClass().getField(tagName);
             Class<?> type = field.getType();
-            if (type == int.class) {
+            if (type == int.class || type == Integer.class) {
                 field.set(o, Integer.parseInt(value));
-            } else if (type == boolean.class) {
+            } else if (type == boolean.class || type == Boolean.class) {
                 field.set(o, Boolean.parseBoolean(value));
             } else {
                 field.set(o, value);

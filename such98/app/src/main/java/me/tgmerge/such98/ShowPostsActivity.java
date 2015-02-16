@@ -12,12 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.apache.http.Header;
 
 import me.tgmerge.such98.Util.APIUtil;
 import me.tgmerge.such98.Util.HelperUtil;
+import me.tgmerge.such98.Util.ImageUtil;
 import me.tgmerge.such98.Util.XMLUtil;
 
 
@@ -187,6 +189,33 @@ public class ShowPostsActivity extends ActionBarActivity {
         public void onBindViewHolder(final ViewHolder viewHolder, int position) {
             XMLUtil.PostInfo dataItem = mData.get(position);
 
+            if (viewHolder.data_avatarUrl == null) {
+                new APIUtil.GetIdUser(that, dataItem.UserId, new APIUtil.APICallback() {
+                    @Override
+                    public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                        XMLUtil.UserInfo info = new XMLUtil.UserInfo();
+                        try {
+                            info.parse(new String(body));
+                        } catch (Exception e) {
+                            HelperUtil.errorToast(that, "User info parsing error");
+                            e.printStackTrace();
+                        }
+                        viewHolder.data_avatarUrl = info.PortraitUrl.startsWith("http") ? info.PortraitUrl : ("http://www.cc98.org/" + info.PortraitUrl);
+                        HelperUtil.generalDebug("ShowPostsActivity", "displayImage called 1");
+                        viewHolder.avatar.setPadding(0, 0, 0, 0);
+                        ImageUtil.getImageLoader(that).displayImage(viewHolder.data_avatarUrl, viewHolder.avatar);
+                    }
+
+                    @Override
+                    public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                        viewHolder.avatar.setImageResource(R.drawable.ic_close_white_36dp);
+                    }
+                }).execute();
+            } else {
+                HelperUtil.generalDebug("ShowPostsActivity", "displayImage called 2");
+                ImageUtil.getImageLoader(that).displayImage(viewHolder.data_avatarUrl, viewHolder.avatar);
+            }
+
             viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复" : dataItem.Title);
             viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
 
@@ -230,13 +259,18 @@ public class ShowPostsActivity extends ActionBarActivity {
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
+            public ImageView avatar;
+
             public TextView title;
             public TextView authorInfo;
             public TextView replyInfo;
             public TextView content;
 
+            public String data_avatarUrl;
+
             public ViewHolder(View itemLayoutView) {
                 super(itemLayoutView);
+                avatar = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
                 title = (TextView) itemLayoutView.findViewById(R.id.text_title);
                 authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
                 replyInfo = (TextView) itemLayoutView.findViewById(R.id.text_replyInfo);
