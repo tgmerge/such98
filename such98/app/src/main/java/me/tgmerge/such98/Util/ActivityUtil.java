@@ -13,32 +13,29 @@ import me.tgmerge.such98.ShowTopicsActivity;
 public final class ActivityUtil {
 
 
-    public static final void openShowBoardsActivity(Context ctx, int id, int startPos, String title) {
-        logDebug("Starting ShowBoardsActivity, id=" + id + ", startPos=" + startPos + ", title=" + title);
+    public static final void openShowBoardsActivity(Context ctx, int id, int startPos) {
+        logDebug("Starting ShowBoardsActivity, id=" + id + ", startPos=" + startPos);
         Intent intent = new Intent(ctx, ShowBoardsActivity.class);
         intent.putExtra(ShowBoardsActivity.INTENT_KEY_ID, id);
-        intent.putExtra(ShowBoardsActivity.INTENT_KEY_STARTPOS, startPos);
-        intent.putExtra(ShowBoardsActivity.INTENT_KEY_TITLE, title);
+        intent.putExtra(ShowBoardsActivity.INTENT_KEY_START_POS, startPos);
         ctx.startActivity(intent);
     }
 
 
-    public static final void openShowTopicsActivity(Context ctx, int id, int startPos, String title) {
-        logDebug("Starting ShowTopicsActivity, id=" + id + ", startPos=" + startPos + ", title=" + title);
+    public static final void openShowTopicsActivity(Context ctx, int id, int startPos) {
+        logDebug("Starting ShowTopicsActivity, id=" + id + ", startPos=" + startPos);
         Intent intent = new Intent(ctx, ShowTopicsActivity.class);
         intent.putExtra(ShowTopicsActivity.INTENT_KEY_ID, id);
-        intent.putExtra(ShowTopicsActivity.INTENT_KEY_STARTPOS, startPos);
-        intent.putExtra(ShowTopicsActivity.INTENT_KEY_TITLE, title);
+        intent.putExtra(ShowTopicsActivity.INTENT_KEY_START_POS, startPos);
         ctx.startActivity(intent);
     }
 
 
-    public static final void openShowPostsActivity(Context ctx, int id, int startPos, String title) {
-        logDebug("Starting ShowPostsActivity, id=" + id + ", startPos=" + startPos + ", title=" + title);
+    public static final void openShowPostsActivity(Context ctx, int id, int startPos) {
+        logDebug("Starting ShowPostsActivity, id=" + id + ", startPos=" + startPos);
         Intent intent = new Intent(ctx, ShowPostsActivity.class);
         intent.putExtra(ShowPostsActivity.INTENT_KEY_ID, id);
-        intent.putExtra(ShowPostsActivity.INTENT_KEY_STARTPOS, startPos);
-        intent.putExtra(ShowPostsActivity.INTENT_KEY_TITLE, title);
+        intent.putExtra(ShowPostsActivity.INTENT_KEY_START_POS, startPos);
         ctx.startActivity(intent);
     }
 

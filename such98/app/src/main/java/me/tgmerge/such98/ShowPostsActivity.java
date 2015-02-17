@@ -2,6 +2,7 @@ package me.tgmerge.such98;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -15,9 +16,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
 import org.apache.http.Header;
 
 import me.tgmerge.such98.Util.APIUtil;
+import me.tgmerge.such98.Util.CacheUtil;
 import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.ImageUtil;
 import me.tgmerge.such98.Util.XMLUtil;
@@ -49,21 +54,19 @@ public class ShowPostsActivity extends ActionBarActivity {
 
 
     public final static String INTENT_KEY_ID = "id";
-    public final static String INTENT_KEY_STARTPOS = "startPos";
+    public final static String INTENT_KEY_START_POS = "startPos";
     public final static int ITEM_PER_PAGE = 10;
-    public final static String INTENT_KEY_TITLE = "title";
 
     private boolean isLoading = false;
     private boolean isNoMoreItem = false;
 
     private int lastLoadStartPos = -1;
 
-    private RecyclerView recyclerView = null;
-    private LinearLayoutManager layoutManager = null;
-    private ShowPostsAdapter adapter = null;
+    // Adapter 使用这两个值的时候，必然已经被设置过了
+    private int mIntentId;
+    private final XMLUtil.TopicInfo mTopicInfo = new XMLUtil.TopicInfo();
 
     private final Activity that = this;
-    private int intentId;
 
     private final void setProgressLoading() {
         isLoading = true;
@@ -75,36 +78,30 @@ public class ShowPostsActivity extends ActionBarActivity {
         isLoading = false;
     }
 
-    private final void loadAPage() {
+    private final void loadAPage(final ShowPostsAdapter adapter) {
         setProgressLoading();
 
         Intent intent = getIntent();
-        intentId = intent.getIntExtra(INTENT_KEY_ID, 0);
-        int intentStartPos = intent.getIntExtra(INTENT_KEY_STARTPOS, 0);
+        int intentId = intent.getIntExtra(INTENT_KEY_ID, 0);
+        mIntentId = intentId;
+        int intentStartPos = intent.getIntExtra(INTENT_KEY_START_POS, 0);
 
         final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
-
-        String title = intent.getStringExtra(INTENT_KEY_TITLE);
-        if (title == null) {
-            title = "Topic id=" + intentId;
-        }
-        setTitle(title);
 
         class Callback implements APIUtil.APICallback {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
                 XMLUtil.ArrayOf<XMLUtil.PostInfo> postInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.PostInfo.class);
-
                 try {
                     postInfoArr.parse(new String(body));
                 } catch (Exception e) {
-                    HelperUtil.errorToast(that, "Parse exception:" + e.toString());
                     e.printStackTrace();
+                    onFailure(-1, headers, body, e);
                 }
 
                 if (postInfoArr.size() == 0) {
                     isNoMoreItem = true;
-                    HelperUtil.debugToast(that, "Already at last page");
+                    HelperUtil.debugToast(that, "End of list");
                 } else {
                     adapter.appendData(postInfoArr);
                     lastLoadStartPos = pageStart;
@@ -115,25 +112,23 @@ public class ShowPostsActivity extends ActionBarActivity {
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 setProgressFinished();
-                HelperUtil.errorToast(that, "Network failed, code=" + statCode + ", info=" + (body == null ? "null" : new String(body)));
-            }
+                HelperUtil.errorToast(that, "Error, code=" + statCode + ", error=" + error.toString());            }
         }
 
         new APIUtil.GetTopicPost(this, intentId, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_posts);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        layoutManager = new LinearLayoutManager(this);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new ShowPostsAdapter(null);
+        final ShowPostsAdapter adapter = new ShowPostsAdapter(null);
         recyclerView.setAdapter(adapter);
 
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -145,7 +140,7 @@ public class ShowPostsActivity extends ActionBarActivity {
                     int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
                     if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
                         HelperUtil.debugToast(that, "Loading...");
-                        loadAPage();
+                        loadAPage(adapter);
                     }
                 }
             }
@@ -153,15 +148,32 @@ public class ShowPostsActivity extends ActionBarActivity {
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        loadAPage();
+        int intentTopicId = getIntent().getIntExtra(INTENT_KEY_ID, 0);
+
+        new APIUtil.GetTopic(this, intentTopicId, new APIUtil.APICallback() {
+            @Override
+            public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                try {
+                    mTopicInfo.parse(new String(body));
+                    loadAPage(adapter);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    onFailure(-1, headers, body, e);
+                }
+                setTitle(mTopicInfo.Title);
+            }
+
+            @Override
+            public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                HelperUtil.errorToast(that, "Error: " + "code=" + statCode + ", error=" + error.toString());
+            }
+        }).execute();
     }
 
 
-    private class ShowPostsAdapter extends RecyclerView.Adapter<ShowPostsAdapter.ViewHolder> {
+    private class ShowPostsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private XMLUtil.ArrayOf<XMLUtil.PostInfo> mData;
-        private Integer data_POHitCount;
-        private Integer data_POReplyCount;
 
         public final void appendData(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
             if (mData == null) {
@@ -172,11 +184,9 @@ public class ShowPostsActivity extends ActionBarActivity {
             notifyDataSetChanged();
         }
 
-
         public ShowPostsAdapter(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
             mData = data;
         }
-
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -184,12 +194,27 @@ public class ShowPostsActivity extends ActionBarActivity {
             return new ViewHolder(itemLayoutView);
         }
 
-
         @Override
         public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-            XMLUtil.PostInfo dataItem = mData.get(position);
+            final XMLUtil.PostInfo dataItem = mData.get(position);
 
-            if (viewHolder.data_avatarUrl == null) {
+            viewHolder.isCreated = 1;
+
+            viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复 #" + dataItem.Floor : dataItem.Title);
+            viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
+            viewHolder.content.setText(dataItem.Content);
+
+            if (dataItem.Floor == 1) {
+                viewHolder.replyInfo.setText(mTopicInfo.HitCount + " 次点击, " + mTopicInfo.ReplyCount + " 次回复");
+            }
+
+            // ViewHolder 异步加载图像： 加载之前设置viewHolder.setRecyclable(false)
+            //                         加载之后设置viewHolder.setRecyclable(true)
+            String avaUrl = CacheUtil.id_avaUrlCache.get(dataItem.UserId);
+            if (avaUrl != null) {
+                ImageUtil.setViewHolderImage(that, viewHolder, viewHolder.avatar, avaUrl);
+            } else {
+                viewHolder.setIsRecyclable(false); // todo pair with (true)
                 new APIUtil.GetIdUser(that, dataItem.UserId, new APIUtil.APICallback() {
                     @Override
                     public void onSuccess(int statCode, Header[] headers, byte[] body) {
@@ -197,85 +222,50 @@ public class ShowPostsActivity extends ActionBarActivity {
                         try {
                             info.parse(new String(body));
                         } catch (Exception e) {
-                            HelperUtil.errorToast(that, "User info parsing error");
                             e.printStackTrace();
+                            onFailure(-1, headers, body, e);
+                            return;
                         }
-                        viewHolder.data_avatarUrl = info.PortraitUrl.startsWith("http") ? info.PortraitUrl : ("http://www.cc98.org/" + info.PortraitUrl);
-                        HelperUtil.generalDebug("ShowPostsActivity", "displayImage called 1");
-                        viewHolder.avatar.setPadding(0, 0, 0, 0);
-                        ImageUtil.getImageLoader(that).displayImage(viewHolder.data_avatarUrl, viewHolder.avatar);
+                        String newAvaUrl = info.PortraitUrl.startsWith("http") ? info.PortraitUrl : ("http://www.cc98.org/" + info.PortraitUrl);
+                        CacheUtil.id_avaUrlCache.put(info.Id, newAvaUrl);
+                        ImageUtil.setViewHolderImage(that, viewHolder, viewHolder.avatar, newAvaUrl);
+                        viewHolder.setIsRecyclable(true);
                     }
 
                     @Override
                     public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                         viewHolder.avatar.setImageResource(R.drawable.ic_close_white_36dp);
+                        viewHolder.setIsRecyclable(true);
                     }
                 }).execute();
-            } else {
-                HelperUtil.generalDebug("ShowPostsActivity", "displayImage called 2");
-                ImageUtil.getImageLoader(that).displayImage(viewHolder.data_avatarUrl, viewHolder.avatar);
             }
-
-            viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复" : dataItem.Title);
-            viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
-
-            viewHolder.replyInfo.setVisibility(dataItem.Floor == 1 ? View.VISIBLE : View.GONE);
-            if (dataItem.Floor == 1 && data_POHitCount != null) {
-                viewHolder.replyInfo.setText(data_POHitCount + "次点击，" + data_POReplyCount + "次回复");
-            } else if (dataItem.Floor == 1 && data_POHitCount == null) {
-                new APIUtil.GetTopic(that, intentId, new APIUtil.APICallback() {
-                    @Override
-                    public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                        try {
-                            XMLUtil.TopicInfo topicInfo = new XMLUtil.TopicInfo();
-                            topicInfo.parse(new String(body));
-                            data_POHitCount = topicInfo.HitCount;
-                            data_POReplyCount = topicInfo.ReplyCount;
-                            viewHolder.replyInfo.setText(topicInfo.HitCount + "次点击，" + topicInfo.ReplyCount + "次回复");
-                        } catch (Exception e) {
-                            HelperUtil.errorToast(that, "Parse exception:" + e.toString());
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                        setProgressFinished();
-                        HelperUtil.errorToast(that, "Network failed, code=" + statCode + ", info=" + (body == null ? "null" : new String(body)));
-                    }
-                }).execute();
-
-            }
-
-            viewHolder.content.setText(dataItem.Content);
         }
-
 
         @Override
         public int getItemCount() {
             return (mData == null) ? 0 : mData.size();
         }
+    }
 
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-            public ImageView avatar;
+        public ImageView avatar;
 
-            public TextView title;
-            public TextView authorInfo;
-            public TextView replyInfo;
-            public TextView content;
+        public TextView title;
+        public TextView authorInfo;
+        public TextView replyInfo;
+        public TextView content;
 
-            public String data_avatarUrl;
+        public int isCreated = 0;
 
-            public ViewHolder(View itemLayoutView) {
-                super(itemLayoutView);
-                avatar = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
-                title = (TextView) itemLayoutView.findViewById(R.id.text_title);
-                authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
-                replyInfo = (TextView) itemLayoutView.findViewById(R.id.text_replyInfo);
-                content = (TextView) itemLayoutView.findViewById(R.id.text_content);
-            }
+        public ViewHolder(View itemLayoutView) {
+            super(itemLayoutView);
+            avatar = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
+            title = (TextView) itemLayoutView.findViewById(R.id.text_title);
+            authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
+            replyInfo = (TextView) itemLayoutView.findViewById(R.id.text_replyInfo);
+            content = (TextView) itemLayoutView.findViewById(R.id.text_content);
         }
     }
 }

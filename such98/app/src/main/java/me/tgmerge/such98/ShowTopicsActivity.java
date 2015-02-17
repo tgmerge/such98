@@ -2,7 +2,6 @@ package me.tgmerge.such98;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -34,7 +33,6 @@ import me.tgmerge.such98.Util.XMLUtil;
  * startPos - initial position for paging, default=0
  *      value:
  *          int           - start position
- * title - activity title
  */
 public class ShowTopicsActivity extends ActionBarActivity {
 
@@ -63,22 +61,15 @@ public class ShowTopicsActivity extends ActionBarActivity {
 
     public final static String INTENT_KEY_ID = "id";
     public final static int ID_NEW = -1, ID_HOT = -2;
-    public final static String INTENT_KEY_STARTPOS = "startPos";
+    public final static String INTENT_KEY_START_POS = "startPos";
     public final static int ITEM_PER_PAGE = 10;
-    public final static String INTENT_KEY_TITLE = "title";
 
     private boolean isLoading = false;
     private boolean isNoMoreItem = false;
 
     private int lastLoadStartPos = -1;
 
-    private RecyclerView recyclerView = null;
-    private LinearLayoutManager layoutManager = null;
-    private ShowTopicsAdapter adapter = null;
-
     private final Activity that = this;
-
-    private String title;
 
     private final void setProgressLoading() {
         isLoading = true;
@@ -90,20 +81,14 @@ public class ShowTopicsActivity extends ActionBarActivity {
         isLoading = false;
     }
 
-    private final void loadAPage() {
+    private final void loadAPage(final ShowTopicsAdapter adapter) {
         setProgressLoading();
 
         Intent intent = getIntent();
         final int intentId = intent.getIntExtra(INTENT_KEY_ID, 0);
-        int intentStartPos = intent.getIntExtra(INTENT_KEY_STARTPOS, 0);
+        int intentStartPos = intent.getIntExtra(INTENT_KEY_START_POS, 0);
 
         final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
-
-        title = intent.getStringExtra(INTENT_KEY_TITLE);
-        if (title == null) {
-            title = "Topics, BoardId=" + intentId;
-        }
-        setTitle(title);
 
         class Callback implements APIUtil.APICallback {
             @Override
@@ -121,8 +106,8 @@ public class ShowTopicsActivity extends ActionBarActivity {
                 try {
                     topicInfoArr.parse(new String(body));
                 } catch (Exception e) {
-                    HelperUtil.errorToast(that, "Parse exception:" + e.toString());
                     e.printStackTrace();
+                    onFailure(-1, headers, body, e);
                 }
 
                 if (topicInfoArr.size() == 0) {
@@ -138,7 +123,7 @@ public class ShowTopicsActivity extends ActionBarActivity {
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 setProgressFinished();
-                HelperUtil.errorToast(that, "Network failed, code=" + statCode + ", info=" + (body == null ? "null" : new String(body)));
+                HelperUtil.errorToast(that, "Error, code=" + statCode + ", error=" + error.toString());
             }
         }
 
@@ -161,12 +146,13 @@ public class ShowTopicsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_topics);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        layoutManager = new LinearLayoutManager(this);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new ShowTopicsAdapter(null);
+        final ShowTopicsAdapter adapter = new ShowTopicsAdapter(null);
         recyclerView.setAdapter(adapter);
 
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -177,8 +163,8 @@ public class ShowTopicsActivity extends ActionBarActivity {
                     int totalItemCount = layoutManager.getItemCount();
                     int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
                     if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                        HelperUtil.debugToast(that, "Loading...");
-                        loadAPage();
+                        HelperUtil.debugToast(that, "Loading more...");
+                        loadAPage(adapter);
                     }
                 }
             }
@@ -186,11 +172,43 @@ public class ShowTopicsActivity extends ActionBarActivity {
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        loadAPage();
+        int intentBoardId = getIntent().getIntExtra(INTENT_KEY_ID, 0);
+        final XMLUtil.BoardInfo boardInfo = new XMLUtil.BoardInfo();
+
+        if (intentBoardId == ID_HOT) {
+            boardInfo.Id = ID_HOT;
+            boardInfo.Name = "热门主题";
+            setTitle(boardInfo.Name);
+            loadAPage(adapter);
+        } else if (intentBoardId == ID_NEW) {
+            boardInfo.Id = ID_NEW;
+            boardInfo.Name = "最新主题";
+            setTitle(boardInfo.Name);
+            loadAPage(adapter);
+        } else {
+            new APIUtil.GetBoard(this, intentBoardId, new APIUtil.APICallback() {
+                @Override
+                public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                    try {
+                        boardInfo.parse(new String(body));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        onFailure(-1, headers, body, e);
+                    }
+                    setTitle(boardInfo.Name);
+                    loadAPage(adapter);
+                }
+
+                @Override
+                public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                    HelperUtil.errorToast(that, "Error: " + "code=" + statCode + ", error=" + error.toString());
+                }
+            }).execute();
+        }
     }
 
 
-    private class ShowTopicsAdapter extends RecyclerView.Adapter<ShowTopicsAdapter.ViewHolder> {
+    private class ShowTopicsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         private XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> mData;
         private Class mDataItemClass;
@@ -251,65 +269,59 @@ public class ShowTopicsActivity extends ActionBarActivity {
                 viewHolder.icon.setImageResource(dataItem.TopState.equals(XMLUtil.TopicInfo.TOPSTATE_NONE)
                                                  ? R.drawable.ic_comment_text_outline_white_36dp
                                                  : R.drawable.ic_comment_alert_outline_white_36dp);
-                viewHolder.title.setText(dataItem.Title);
-                viewHolder.authorInfo.setText(dataItem.AuthorName);
-                viewHolder.lastPostInfo.setText(dataItem.LastPostInfo.UserName);
 
-                viewHolder.data_boardName = title;
+                viewHolder.title.setText(dataItem.Title);
+                viewHolder.authorInfo.setText(dataItem.AuthorName + " @ " + dataItem.CreateTime);
+                viewHolder.lastPostInfo.setText(dataItem.LastPostInfo.UserName + " - " + dataItem.LastPostInfo.ContentSummary);
+
                 viewHolder.data_topicId = dataItem.Id;
-                viewHolder.data_topicTitle = dataItem.Title;
 
             } else {
                 XMLUtil.ArrayOf<XMLUtil.HotTopicInfo> thisData = (XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) mData;
                 XMLUtil.HotTopicInfo dataItem = thisData.get(position);
 
                 viewHolder.icon.setImageResource(R.drawable.ic_comment_fire_outline_white_36dp);
+
                 viewHolder.title.setText(dataItem.Title);
-                viewHolder.authorInfo.setText(dataItem.AuthorName);
+                viewHolder.authorInfo.setText(dataItem.AuthorName + " @ " + dataItem.CreateTime);
                 viewHolder.lastPostInfo.setText(dataItem.BoardName + ", " + dataItem.ParticipantCount + "人参与");
 
-                viewHolder.data_boardName = dataItem.BoardName;
                 viewHolder.data_topicId = dataItem.Id;
-                viewHolder.data_topicTitle = dataItem.Title;
             }
         }
-
 
         @Override
         public int getItemCount() {
             return (mData == null) ? 0 : mData.size();
         }
+    }
 
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public ImageView icon;
+        public TextView title;
+        public TextView authorInfo;
+        public TextView lastPostInfo;
 
-            public ImageView icon;
-            public TextView title;
-            public TextView authorInfo;
-            public TextView lastPostInfo;
+        public int data_topicId;
 
-            public int data_topicId;
-            public String data_topicTitle;
-            public String data_boardName;
+        public ViewHolder(View itemLayoutView) {
+            super(itemLayoutView);
+            icon = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
+            title = (TextView) itemLayoutView.findViewById(R.id.text_title);
+            authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
+            lastPostInfo = (TextView) itemLayoutView.findViewById(R.id.text_lastPostInfo);
 
-            public ViewHolder(View itemLayoutView) {
-                super(itemLayoutView);
-                icon = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
-                title = (TextView) itemLayoutView.findViewById(R.id.text_title);
-                authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
-                lastPostInfo = (TextView) itemLayoutView.findViewById(R.id.text_lastPostInfo);
+            itemLayoutView.setOnClickListener(this);
+        }
 
-                itemLayoutView.setOnClickListener(this);
-            }
-
-            @Override
-            public void onClick(View v) {
-                HelperUtil.generalDebug("ShowTopicsActivity", "onClick! " + v.toString());
-                if (v instanceof RelativeLayout) {
-                    // click on whole item
-                    HelperUtil.generalDebug("ShowTopicsActivity", "Clicked: " + data_topicId + ", " + data_topicTitle);
-                    ActivityUtil.openShowPostsActivity(v.getContext(), data_topicId, 0, data_boardName);
-                }
+        @Override
+        public void onClick(View v) {
+            HelperUtil.generalDebug("ShowTopicsActivity", "onClick! " + v.toString());
+            if (v instanceof RelativeLayout) {
+                // click on whole item
+                HelperUtil.generalDebug("ShowTopicsActivity", "Clicked: " + data_topicId);
+                ActivityUtil.openShowPostsActivity(v.getContext(), data_topicId, 0);
             }
         }
     }

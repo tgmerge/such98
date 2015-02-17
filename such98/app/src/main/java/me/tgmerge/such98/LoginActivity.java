@@ -51,7 +51,7 @@ public class LoginActivity extends ActionBarActivity {
             startActivity(new Intent(this, LoginPageActivity.class));
         } else {
             HelperUtil.debugToast(this, "LoginActivity: token exists");
-            ActivityUtil.openShowBoardsActivity(this, ShowBoardsActivity.ID_CUSTOM, 0, "定制版面");
+            ActivityUtil.openShowBoardsActivity(this, ShowBoardsActivity.ID_CUSTOM, 0);
         }
     }
 

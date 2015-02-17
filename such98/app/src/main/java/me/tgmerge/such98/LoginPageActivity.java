@@ -29,7 +29,7 @@ public class LoginPageActivity extends ActionBarActivity {
             public void onSuccess() {
                 String token = OAuthUtil.getAccessToken(that);
                 HelperUtil.debugToast(that, "Login success, token=" + (token.length() > 10 ? token.substring(0, 10) : token));
-                ActivityUtil.openShowBoardsActivity(that, ShowBoardsActivity.ID_CUSTOM, 0, "定制版面");
+                ActivityUtil.openShowBoardsActivity(that, ShowBoardsActivity.ID_CUSTOM, 0);
             }
 
             @Override
