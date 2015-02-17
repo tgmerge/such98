@@ -1,9 +1,7 @@
 package me.tgmerge.such98;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,13 +11,14 @@ import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.OAuthUtil;
 
 
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends BaseDrawerActivity {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        getLayoutInflater().inflate(R.layout.activity_login, frameLayout);
+        //setContentView(R.layout.activity_login);
     }
 
 

@@ -10,13 +10,21 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <!--
+        	We will launch BaseDrawerActivity as launcher.
+        	We will check if BaseDrawerActivity launch first time and open desired activity and set navigation item selected
+	        edit: we won't
+        <activity
+            android:name=".BaseDrawerActivity"
+            android:noHistory="true">
+        </activity>
+        -->
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
             android:noHistory="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
