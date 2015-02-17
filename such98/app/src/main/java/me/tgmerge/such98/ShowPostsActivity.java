@@ -25,7 +25,7 @@ import me.tgmerge.such98.Util.ImageUtil;
 import me.tgmerge.such98.Util.XMLUtil;
 
 
-public class ShowPostsActivity extends ActionBarActivity {
+public class ShowPostsActivity extends BaseDrawerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -118,7 +118,8 @@ public class ShowPostsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_posts);
+        //setContentView(R.layout.activity_show_posts);
+        getLayoutInflater().inflate(R.layout.activity_show_posts, frameLayout);
 
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 

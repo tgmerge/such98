@@ -36,7 +36,7 @@ import me.tgmerge.such98.Util.XMLUtil;
  *      value:
  *          int           - start position
  */
-public class ShowBoardsActivity extends ActionBarActivity {
+public class ShowBoardsActivity extends BaseDrawerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -168,7 +168,8 @@ public class ShowBoardsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_boards);
+        getLayoutInflater().inflate(R.layout.activity_show_boards, frameLayout);
+        //setContentView(R.layout.activity_show_boards);
 
         // RecyclerView
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);

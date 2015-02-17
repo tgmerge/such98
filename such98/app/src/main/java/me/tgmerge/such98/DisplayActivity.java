@@ -18,7 +18,7 @@ import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.OAuthUtil;
 
 
-public class DisplayActivity extends ActionBarActivity {
+public class DisplayActivity extends BaseDrawerActivity {
 
     Vector<APIUtil.APIRequest> tests;
     int testNo = 0;
@@ -29,7 +29,8 @@ public class DisplayActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display);
+        //setContentView(R.layout.activity_display);
+        getLayoutInflater().inflate(R.layout.activity_display, frameLayout);
 
         text = (EditText) findViewById(R.id.editText);
         textToken = (EditText) findViewById(R.id.editText_token);
