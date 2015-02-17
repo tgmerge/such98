@@ -12,19 +12,20 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 
-// 使用
-//      new APIUtil.PostTopicPost(2803718, "title", "content", new APIUtil.APICallback() {
-//          @Override
-//          public void onSuccess(int statCode, Header[] headers, byte[] body) {
-//              Toast.makeText(that, new String(body), Toast.LENGTH_LONG).show();
-//          }
-//
-//          @Override
-//          public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-//              Toast.makeText(that, statCode + ", " + error.toString(), Toast.LENGTH_LONG).show();
-//          }
-//      }).execute();
-
+/**
+ *  Usage:
+ *      new APIUtil.PostTopicPost(2803718, "title", "content", new APIUtil.APICallback() {
+ *          @ Override
+ *          public void onSuccess(int statCode, Header[] headers, byte[] body) {
+ *              Toast.makeText(that, new String(body), Toast.LENGTH_LONG).show();
+ *          }
+ *
+ *          @ Override
+ *          public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+ *              Toast.makeText(that, statCode + ", " + error.toString(), Toast.LENGTH_LONG).show();
+ *          }
+ *      }).execute(); <-- Important
+ */
 public final class APIUtil {
 
     private static final AsyncHttpClient sClient = new AsyncHttpClient();
@@ -545,8 +546,6 @@ public final class APIUtil {
 
     // - utility methods -
 
-
-    // Similar to javascript encodeURIComponent
     private static final String encodeURIComponent(final String s) {
         String result;
 
@@ -567,7 +566,7 @@ public final class APIUtil {
 
 
     // Add a parameter to passed-in URL.
-    // if the "value" arg is null, no modification is done to URL.
+    // if the "value" arg is null, nothing will be applied to URL.
     private static final String addURIParamIfExists(String url, String key, String value) {
         if (url == null || url.equals("")) {
             return url;

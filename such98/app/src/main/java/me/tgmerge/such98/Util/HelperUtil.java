@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 /**
  * Created by tgmerge on 2/13.
+ * Some misc utility methods
  */
 public final class HelperUtil {
     public static final void generalDebug(String cat, String msg) {

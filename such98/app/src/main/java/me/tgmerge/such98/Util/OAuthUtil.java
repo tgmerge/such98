@@ -15,32 +15,37 @@ import java.util.regex.Pattern;
 
 import me.tgmerge.such98.R;
 
-/* Target usage:
+/**
+ * Usage:
  *
- * Config:
- *   add "authorize_url", "token_url", "scope", "client_id", "client_secret" into string resources
+ * 1. Config:
+ *   add "authorize_url", "token_url", "scope", "client_id", "client_secret" into string.xml resources
+ *   i.e. client_info.xml
  *
- * Login:
- *   OAuthUtil.OAuthManager oam = new OAuthUtil.OAuthManager(Activity ctx);           - new instance of util class
- *   oam.fire(WebView webview, OAuthCallback callback);     - open oauth process in webview
+ * 2. Login:
+ *   OAuthUtil.OAuthManager oam = new OAuthUtil.OAuthManager(Activity ctx); - instance of manager
+ *   oam.fire(WebView webview, OAuthCallback callback);                     - start oauth process in webview
  *
- * Refresh token:
- *   OAuthUtil.OAuthManager oam = new OAuthUtil.OAuthManager(Activity ctx);
- *   oam.refreshToken(OAuthCallback callback);
+ * -- Refresh token(todo not working due to bugs of cc98 API?):
+ *   OAuthUtil.OAuthManager oam = new OAuthUtil.OAuthManager(Activity ctx); - instance of manager
+ *   oam.refreshToken(OAuthCallback callback);                              - will create an invisible webview
+ *                                                                            on current Activity and refresh
+ *   (due to certification issue, token refreshing can't be achieved by https request without webview)
  *
- * Get access token:
- *   OAuthUtil.getAccessToken(Context ctx);                - static method
+ * -- Get access token:
+ *   OAuthUtil.getAccessToken(Context ctx);
  *
- * Clear access token:
- *   OAuthUtil.clearAccessToken(Context ctx);              - static method
+ * -- Clear access token:
+ *   OAuthUtil.clearAccessToken(Context ctx);
  */
-
 public class OAuthUtil {
 
+    /**
+     * @param act
+     * @return OAuthManager instance configured by values in xml resource file,
+     *         for logging-in or refreshing token
+     */
     public static final OAuthManager newOAuthManager(Activity act) {
-        // fetch config from string values
-        // create a oauthmanager
-        // and return it
         return new OAuthManager(act,
                                 act.getString(R.string.authorize_url),
                                 act.getString(R.string.token_url),
@@ -74,7 +79,6 @@ public class OAuthUtil {
             this.mClientID = clientID;
             this.mClientSecret = clientSecret;
         }
-
 
         // 在webView中开启OAuth2 authorization code过程。
         // 如果成功，将存储access token和refresh token，并开启succActivity
@@ -128,9 +132,6 @@ public class OAuthUtil {
                 callback.onFailure();
             }
         }
-
-
-        // - - - class - - -
 
 
         // 在使用refreshToken()、使用fire()时传递此对象，覆盖onSuccess和onFail方法

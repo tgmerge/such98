@@ -4,6 +4,7 @@ import android.util.LruCache;
 
 /**
  * Created by tgmerge on 2/17.
+ * Cache, other than which provided by universal-image-loader
  */
 public class CacheUtil {
 

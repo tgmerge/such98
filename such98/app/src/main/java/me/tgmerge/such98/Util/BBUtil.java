@@ -9,17 +9,18 @@ import java.util.Vector;
 
 /**
  * Created by tgmerge on 2/17.
+ * Provides methods to render BBCode(to html, on TextView, load images, etc)
  */
 public class BBUtil {
 
     public static final void setBBcodeToTextView(Context ctx, TextView textView, String bb) {
         String html = bb2html(bb);
-        Spanned spanned = Html.fromHtml(html, new UILImageGetter(textView, ctx), null);
+        //Spanned spanned = Html.fromHtml(html, new UILImageGetter(textView, ctx), null); todo  UILgetter not working
+        Spanned spanned = Html.fromHtml(html, null, null);
         textView.setText(spanned);
     }
 
     private static final Vector<Pair<String, String>> bbMap = new Vector<>();
-//    private static final Map<String, String> bbMap = new HashMap<String, String>();
 
     static {
         bbMap.add(new Pair<>("(\r\n|\r|\n|\n\r)", "<br/>"));
@@ -38,8 +39,7 @@ public class BBUtil {
         bbMap.add(new Pair<>("\\[center\\](.+?)\\[/center\\]", "<div align='center'>$1"));
         bbMap.add(new Pair<>("\\[align=(.+?)\\](.+?)\\[/align\\]", "<div align='$1'>$2"));
         bbMap.add(new Pair<>("\\[size=(.+?)\\](.+?)\\[/size\\]", "<span style='font-size:$1;'>$2</span>"));
-        bbMap.add(new Pair<>("\\[img\\](.+?)\\[/img\\]", "<img src='$1' />"));
-        bbMap.add(new Pair<>("\\[img=(.+?),(.+?)\\](.+?)\\[/img\\]", "<img width='$1' height='$2' src='$3' />"));
+        //bbMap.add(new Pair<>("\\[img=(.+?),(.+?)\\](.+?)\\[/img\\]", "<img width='$1' height='$2' src='$3' />"));
         bbMap.add(new Pair<>("\\[email\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$1</a>"));
         bbMap.add(new Pair<>("\\[email=(.+?)\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$2</a>"));
         bbMap.add(new Pair<>("\\[url\\](.+?)\\[/url\\]", "<a href='$1'>$1</a>"));
@@ -48,7 +48,9 @@ public class BBUtil {
         //bbMap.add(new Pair<>("\\[video\\](.+?)\\[/video\\]", "<video src='$1' />"));
 
         // todo image laoder is buggy
-        //bbMap.add(new Pair<>("\\[upload=(bmp|png|gif|jpg)\\](.+?)\\[/upload\\]", "<img src='$2' />"));
+        bbMap.add(new Pair<>("\\[upload(=bmp|=png|=gif|=jpg)?(,\\d)\\](.+?)\\[/upload\\]", "<img src='$3' />"));
+        bbMap.add(new Pair<>("\\[img(=\\d)?\\](.+?)\\[/img\\]", "<img src='$2' />"));
+
         bbMap.add(new Pair<>("\\[color=(.+?)\\](.+?)\\[/color\\]", "<font color=$1>$2</font>"));
         bbMap.add(new Pair<>("\\[quotex\\](.+?)\\[/quotex\\]", "<blockquote>$1</blockquote>"));
         bbMap.add(new Pair<>("\\[right\\](.+?)\\[/right\\]", "<div align='right'>$1"));

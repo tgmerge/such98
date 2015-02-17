@@ -18,6 +18,7 @@ import me.tgmerge.such98.R;
 
 /**
  * Created by tgmerge on 2/16.
+ * Provides methods for loading and displaying image (i.e. avatar)
  */
 public class ImageUtil {
 
@@ -41,8 +42,10 @@ public class ImageUtil {
         return ImageLoader.getInstance();
     }
 
-    // it's a async- task, so isRecyclable showld be set to false first
-    // to prevent problem caused by recycling viewHolder before image downloaded
+    // Download image, load it on ImageView in a ViewHolder.
+    //   It's a async-task, so isRecyclable flag of ViewHolder should be set to false first,
+    //     to prevent problems from recycling viewHolder before image is downloaded and set.
+    //   Once the image is set, or failed to load, the isRecyclable flag should be set to true.
     public static final void setViewHolderImage(Activity act, final RecyclerView.ViewHolder viewHolder, final ImageView imgView, String url) {
         viewHolder.setIsRecyclable(false);
         ImageUtil.getImageLoader(act).displayImage(url, imgView, new SimpleImageLoadingListener() {

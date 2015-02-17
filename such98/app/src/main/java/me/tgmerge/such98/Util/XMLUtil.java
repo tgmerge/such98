@@ -15,11 +15,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
-import me.tgmerge.such98.Util.HelperUtil;
-
 /**
  * Created by tgmerge on 2/8.
- * 扩展一个新的xml的方法：参考BoardLastPostInfo和BoardInfo
+ * Extending new XMLObj: see BoardLastPostInfo and BoardInfo
+ *
+ * Usage:
+ *
+ *   XMLUtil.ArrayOf<XMLUtil.BoardInfo> boardInfoArr = new ArrayOf<>(XMLUtil.BoardInfo.class);
+ *   boardInfoArr.parse(String s);
+ *
+ *   XMLUtil.BoardInfo boardInfo = new XMLUtil.BoardInfo();
+ *   boardInfo.parse(String s);
  */
 public class XMLUtil {
 
