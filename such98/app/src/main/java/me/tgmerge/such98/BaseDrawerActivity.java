@@ -8,12 +8,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.ScrollView;
 
 
 /**
@@ -40,7 +36,8 @@ public class BaseDrawerActivity extends ActionBarActivity {
      * ListView to add navigation drawer item in it.
      * We have made it protected to access it in child class. We will just use it in child class to make item selected according to activity opened.
      */
-    protected ListView mDrawerList;
+    //protected ListView mDrawerList;
+    protected FrameLayout mDrawerFrame;
 
     /**
      * List item array for navigation drawer items.
@@ -76,22 +73,23 @@ public class BaseDrawerActivity extends ActionBarActivity {
 
         frameLayout = (FrameLayout)findViewById(R.id.content_frame);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        //mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerFrame = (FrameLayout) findViewById(R.id.drawer_frame);
 
         // set a custom shadow that overlays the main content when the drawer opens
         //mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, listArray));
+        /*mDrawerList.setAdapter(new ArrayAdapter<>(this, R.layout.drawer_list_item, listArray));
         mDrawerList.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-
                 openActivity(position);
             }
-        });
+        });*/
+        //todo set mDrawerFrame's adapter and clickListener
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -151,7 +149,7 @@ public class BaseDrawerActivity extends ActionBarActivity {
      *
      * Launching activity when any list item is clicked.
      */
-    protected void openActivity(int position) {
+    //protected void openActivity(int position) {
 
         /**
          * We can set title & itemChecked here but as this BaseDrawerActivity is parent for other activity,
@@ -161,7 +159,7 @@ public class BaseDrawerActivity extends ActionBarActivity {
          */
 //		mDrawerList.setItemChecked(position, true);
 //		setTitle(listArray[position]);
-        mDrawerLayout.closeDrawer(mDrawerList);
+/*        mDrawerLayout.closeDrawer(mDrawerList);
         BaseDrawerActivity.position = position; //Setting currently selected position in this field so that it will be available in our child activities.
 
         switch (position) {
@@ -186,7 +184,7 @@ public class BaseDrawerActivity extends ActionBarActivity {
         }
 
         Toast.makeText(this, "Selected Item Position::"+position, Toast.LENGTH_LONG).show();
-    }
+    }*/
 
     //@Override
     //public boolean onCreateOptionsMenu(Menu menu) {
@@ -217,7 +215,7 @@ public class BaseDrawerActivity extends ActionBarActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
-        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerFrame);
         menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }

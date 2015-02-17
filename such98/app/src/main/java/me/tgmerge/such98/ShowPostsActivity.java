@@ -205,6 +205,8 @@ public class ShowPostsActivity extends BaseDrawerActivity {
             if (dataItem.Floor == 1) {
                 viewHolder.replyInfo.setVisibility(View.VISIBLE);
                 viewHolder.replyInfo.setText(mTopicInfo.HitCount + " 次点击, " + mTopicInfo.ReplyCount + " 次回复");
+            } else {
+                viewHolder.replyInfo.setVisibility(View.GONE);
             }
 
             // ViewHolder 异步加载图像： 加载之前设置viewHolder.setRecyclable(false)
