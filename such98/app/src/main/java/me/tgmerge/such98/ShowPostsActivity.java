@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,13 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-
 import org.apache.http.Header;
-
 import me.tgmerge.such98.Util.APIUtil;
+import me.tgmerge.such98.Util.BBUtil;
 import me.tgmerge.such98.Util.CacheUtil;
 import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.ImageUtil;
@@ -202,9 +199,10 @@ public class ShowPostsActivity extends ActionBarActivity {
 
             viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复 #" + dataItem.Floor : dataItem.Title);
             viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
-            viewHolder.content.setText(dataItem.Content);
+            BBUtil.setBBcodeToTextView(that, viewHolder.content, dataItem.Content); // todo prevent to process every time
 
             if (dataItem.Floor == 1) {
+                viewHolder.replyInfo.setVisibility(View.VISIBLE);
                 viewHolder.replyInfo.setText(mTopicInfo.HitCount + " 次点击, " + mTopicInfo.ReplyCount + " 次回复");
             }
 
