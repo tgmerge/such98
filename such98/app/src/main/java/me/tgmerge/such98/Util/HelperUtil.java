@@ -19,10 +19,12 @@ public final class HelperUtil {
     }
 
     public static final void errorToast(Context ctx, CharSequence msg) {
+        generalError("HelperUtil", "errorToast: " + msg);
         Toast.makeText(ctx, "ERROR:" + msg, Toast.LENGTH_LONG).show();
     }
 
     public static final void debugToast(Context ctx, CharSequence msg) {
+        generalDebug("HelperUtil", "debugToast: " + msg);
         Toast.makeText(ctx, "INFO:" + msg, Toast.LENGTH_LONG).show();
     }
 }

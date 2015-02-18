@@ -23,12 +23,16 @@ import me.tgmerge.such98.R;
 public class ImageUtil {
 
     public static final ImageLoader getImageLoader(Context ctx) {
+        return getImageLoader(ctx, 80);
+    }
+
+    public static final ImageLoader getImageLoader(Context ctx, int roundRadius) {
         if (!ImageLoader.getInstance().isInited()) {
             DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                     .showImageOnFail(R.drawable.ic_close_white_48dp)
                     .cacheInMemory(true)
                     .cacheOnDisk(true)
-                    .displayer(new RoundedBitmapDisplayer(80))
+                    .displayer(new RoundedBitmapDisplayer(roundRadius))
                     .build();
 
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(ctx.getApplicationContext())
@@ -41,6 +45,16 @@ public class ImageUtil {
         }
         return ImageLoader.getInstance();
     }
+
+
+    public static final void setImage(Activity act, final ImageView imgView, int roundRadius, String url) {
+        ImageUtil.getImageLoader(act, roundRadius).displayImage(url, imgView, new SimpleImageLoadingListener() {
+            public void onLoadingComplete(String uri, View view, Bitmap loadedImage) {
+                imgView.setPadding(0, 0, 0, 0);
+            }
+        });
+    }
+
 
     // Download image, load it on ImageView in a ViewHolder.
     //   It's a async-task, so isRecyclable flag of ViewHolder should be set to false first,

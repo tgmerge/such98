@@ -1,5 +1,6 @@
 package me.tgmerge.such98;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,7 +30,7 @@ public class LoginPageActivity extends ActionBarActivity {
             public void onSuccess() {
                 String token = OAuthUtil.getAccessToken(that);
                 HelperUtil.debugToast(that, "Login success, token=" + (token.length() > 10 ? token.substring(0, 10) : token));
-                ActivityUtil.openShowBoardsActivity(that, ShowBoardsActivity.ID_CUSTOM, 0);
+                ActivityUtil.Action.showCustomBoards(that, true);
             }
 
             @Override

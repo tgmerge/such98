@@ -212,6 +212,12 @@ public class ShowBoardsActivity extends BaseDrawerActivity {
             boardInfo.Name = "个人定制";
             setTitle(boardInfo.Name);
             loadAPage(adapter);
+        } else if (intentBoardId == ID_ROOT) {
+            boardInfo.Id = ID_ROOT;
+            boardInfo.ChildBoardCount = -1;
+            boardInfo.Name = "主版面";
+            setTitle(boardInfo.Name);
+            loadAPage(adapter);
         } else {
             new APIUtil.GetBoard(this, intentBoardId, new APIUtil.APICallback() {
                 @Override
@@ -313,16 +319,16 @@ public class ShowBoardsActivity extends BaseDrawerActivity {
             if (v instanceof TextView) {
                 // click on the text view, force show topics
                 HelperUtil.generalDebug("ShowBoardsActivity", "Force open as board: " + data_boardId + ", " + data_isCat);
-                ActivityUtil.openShowTopicsActivity(v.getContext(), data_boardId, 0);
+                ActivityUtil.openShowTopicsActivity(v.getContext(), data_boardId, 0, false);
             } else if (v instanceof RelativeLayout) {
                 // click on whole item, starting new activity
                 HelperUtil.generalDebug("ShowBoardsActivity", "Clicked: " + data_boardId + ", " + data_isCat);
                 if (data_isCat) {
                     // clicked board is a category, start ShowBoardsActivity
-                    ActivityUtil.openShowBoardsActivity(v.getContext(), data_boardId, 0);
+                    ActivityUtil.openShowBoardsActivity(v.getContext(), data_boardId, 0, false);
                 } else {
                     // clicked board has no sub-boards, start ShowTopicsActivity
-                    ActivityUtil.openShowTopicsActivity(v.getContext(), data_boardId, 0);
+                    ActivityUtil.openShowTopicsActivity(v.getContext(), data_boardId, 0, false);
                 }
             }
         }

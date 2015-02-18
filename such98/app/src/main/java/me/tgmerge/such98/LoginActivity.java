@@ -1,5 +1,6 @@
 package me.tgmerge.such98;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -50,7 +51,7 @@ public class LoginActivity extends BaseDrawerActivity {
             startActivity(new Intent(this, LoginPageActivity.class));
         } else {
             HelperUtil.debugToast(this, "LoginActivity: token exists");
-            ActivityUtil.openShowBoardsActivity(this, ShowBoardsActivity.ID_CUSTOM, 0);
+            ActivityUtil.Action.showCustomBoards(this, true);
         }
     }
 

@@ -322,7 +322,7 @@ public class ShowTopicsActivity extends BaseDrawerActivity {
             if (v instanceof RelativeLayout) {
                 // click on whole item
                 HelperUtil.generalDebug("ShowTopicsActivity", "Clicked: " + data_topicId);
-                ActivityUtil.openShowPostsActivity(v.getContext(), data_topicId, 0);
+                ActivityUtil.openShowPostsActivity(v.getContext(), data_topicId, 0, false);
             }
         }
     }

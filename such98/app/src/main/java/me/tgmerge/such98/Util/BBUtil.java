@@ -51,6 +51,7 @@ public class BBUtil {
         bbMap.add(new Pair<>("\\[upload(=bmp|=png|=gif|=jpg)?(,\\d)\\](.+?)\\[/upload\\]", "<img src='$3' />"));
         bbMap.add(new Pair<>("\\[img(=\\d)?\\](.+?)\\[/img\\]", "<img src='$2' />"));
 
+        bbMap.add(new Pair<>("\\[font=(.+?)\\](.+?)\\[/font\\]", "<font face='$1'>$2</font>"));
         bbMap.add(new Pair<>("\\[color=(.+?)\\](.+?)\\[/color\\]", "<font color=$1>$2</font>"));
         bbMap.add(new Pair<>("\\[quotex\\](.+?)\\[/quotex\\]", "<blockquote>$1</blockquote>"));
         bbMap.add(new Pair<>("\\[right\\](.+?)\\[/right\\]", "<div align='right'>$1"));

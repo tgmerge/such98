@@ -1,9 +1,7 @@
 package me.tgmerge.such98;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +12,7 @@ import org.apache.http.Header;
 import java.util.Vector;
 
 import me.tgmerge.such98.Util.APIUtil;
+import me.tgmerge.such98.Util.ActivityUtil;
 import me.tgmerge.such98.Util.HelperUtil;
 import me.tgmerge.such98.Util.OAuthUtil;
 
@@ -107,9 +106,7 @@ public class DisplayActivity extends BaseDrawerActivity {
     }
 
     public void onReloginButtonClicked(View view) {
-        OAuthUtil.clearToken(this);
-        startActivity(new Intent(this, LoginActivity.class));
-        finish();
+        ActivityUtil.Action.relogin(this, true);
     }
 
     public void onRefreshTokenButtonClicked(View view) {
@@ -148,37 +145,27 @@ public class DisplayActivity extends BaseDrawerActivity {
     }
 
     public void act1Clicked(View view) {
-        startActivity(new Intent(this, ShowBoardsActivity.class));
+        ActivityUtil.Action.showRootBoard(this);
     }
 
     public void act2Clicked(View view) {
-        Intent intent = new Intent(this, ShowBoardsActivity.class);
-        intent.putExtra(ShowBoardsActivity.INTENT_KEY_ID, ShowBoardsActivity.ID_CUSTOM);
-        startActivity(intent);
+        ActivityUtil.Action.showCustomBoards(this, false);
     }
 
     public void act3Clicked(View view) {
-        Intent intent = new Intent(this, ShowBoardsActivity.class);
-        intent.putExtra(ShowBoardsActivity.INTENT_KEY_ID, 2);
-        startActivity(intent);
+        ActivityUtil.openShowBoardsActivity(this, 2, 0, false);
     }
 
     public void act4Clicked(View view) {
-        Intent intent = new Intent(this, ShowTopicsActivity.class);
-        intent.putExtra(ShowTopicsActivity.INTENT_KEY_ID, 100);
-        startActivity(intent);
+        ActivityUtil.openShowTopicsActivity(this, 100, 0, false);
     }
 
     public void act5Clicked(View view) {
-        Intent intent = new Intent(this, ShowTopicsActivity.class);
-        intent.putExtra(ShowTopicsActivity.INTENT_KEY_ID, ShowTopicsActivity.ID_NEW);
-        startActivity(intent);
+        ActivityUtil.Action.showNewTopics(this);
     }
 
     public void act6Clicked(View view) {
-        Intent intent = new Intent(this, ShowTopicsActivity.class);
-        intent.putExtra(ShowTopicsActivity.INTENT_KEY_ID, ShowTopicsActivity.ID_HOT);
-        startActivity(intent);
+        ActivityUtil.Action.showHotTopics(this);
     }
 
     @Override
