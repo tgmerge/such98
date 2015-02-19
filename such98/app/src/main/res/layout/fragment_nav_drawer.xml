@@ -1,0 +1,211 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_view"
+    android:layout_width="245dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    tools:context="me.tgmerge.such98.fragment.NavDrawerFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/background_material_light">
+
+        <RelativeLayout
+            android:id="@+id/drawer_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingLeft="16dp">
+
+            <ImageView
+                android:id="@+id/drawer_ava_circle"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/ic_circle_grey600_48dp"/>
+
+            <ImageView
+                android:id="@+id/drawer_ava"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:padding="12dp"
+                android:src="@drawable/ic_account_outline_white_48dp"
+                android:layout_centerInParent="true"
+                android:layout_alignLeft="@id/drawer_ava_circle"
+                android:layout_alignTop="@id/drawer_ava_circle"/>
+
+            <TextView
+                android:id="@+id/drawer_username"
+                android:text="Username Here"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:gravity="bottom"
+                android:paddingBottom="2dp"
+                android:layout_below="@id/drawer_ava_circle"/>
+
+            <TextView
+                android:id="@+id/drawer_userinfo"
+                android:text="User description here"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:gravity="top"
+                android:layout_below="@id/drawer_username"/>
+
+        </RelativeLayout>
+
+        <View
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/text_dividers"/>
+
+        <TextView
+            android:text="版面"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"/>
+
+        <TextView
+            android:id="@+id/drawer_function_root_board"
+            android:text="主版面"
+            android:textSize="14sp"
+            android:textColor="@color/text_text"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_folder_multiple_outline_grey600_24dp"
+            android:layout_height="48dp"
+            android:paddingLeft="16dp"
+            android:drawablePadding="32dp"
+            android:clickable="true"
+            android:background="@drawable/drawer_textview_selector"/>
+
+        <TextView
+            android:id="@+id/drawer_function_custom_board"
+            android:text="定制版面"
+            android:textSize="14sp"
+            android:textColor="@color/text_text"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_star_outline_grey600_24dp"
+            android:layout_height="48dp"
+            android:paddingLeft="16dp"
+            android:drawablePadding="32dp"
+            android:clickable="true"
+            android:background="@drawable/drawer_textview_selector"/>
+
+        <TextView
+            android:id="@+id/drawer_function_hot_topic"
+            android:text="热门主题"
+            android:textSize="14sp"
+            android:textColor="@color/text_text"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_comment_fire_outline_grey600_24dp"
+            android:layout_height="48dp"
+            android:paddingLeft="16dp"
+            android:drawablePadding="32dp"
+            android:clickable="true"
+            android:background="@drawable/drawer_textview_selector"/>
+
+        <TextView
+            android:id="@+id/drawer_function_new_topic"
+            android:text="最新主题"
+            android:textSize="14sp"
+            android:textColor="@color/text_text"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_comment_text_outline_grey600_24dp"
+            android:layout_height="48dp"
+            android:paddingLeft="16dp"
+            android:drawablePadding="32dp"
+            android:clickable="true"
+            android:background="@drawable/drawer_textview_selector"/>
+
+        <View
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/text_dividers"/>
+
+        <TextView
+            android:text="短消息"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"/>
+
+        <TextView
+            android:id="@+id/drawer_function_message"
+            android:text="短消息"
+            android:textSize="14sp"
+            android:textColor="@color/text_text"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_email_outline_grey600_24dp"
+            android:layout_height="48dp"
+            android:paddingLeft="16dp"
+            android:drawablePadding="32dp"
+            android:clickable="true"
+            android:background="@drawable/drawer_textview_selector"/>
+
+        <View
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/text_dividers"/>
+
+        <TextView
+            android:text="其他"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"/>
+
+        <TextView
+            android:id="@+id/drawer_function_setting"
+            android:text="设置"
+            android:textSize="14sp"
+            android:textColor="@color/text_text"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_settings_grey600_24dp"
+            android:layout_height="48dp"
+            android:paddingLeft="16dp"
+            android:drawablePadding="32dp"
+            android:clickable="true"
+            android:background="@drawable/drawer_textview_selector"/>
+
+        <TextView
+            android:id="@+id/drawer_function_logout"
+            android:text="退出登录"
+            android:textSize="14sp"
+            android:textColor="@color/text_text"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:drawableLeft="@drawable/ic_logout_grey600_24dp"
+            android:layout_height="48dp"
+            android:paddingLeft="16dp"
+            android:drawablePadding="32dp"
+            android:clickable="true"
+            android:background="@drawable/drawer_textview_selector"/>
+
+    </LinearLayout>
+
+</ScrollView>

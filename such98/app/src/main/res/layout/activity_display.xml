@@ -102,5 +102,11 @@
         android:layout_height="wrap_content"
         android:onClick="act6Clicked"/>
 
+    <Button android:id="@+id/button_Act7"
+        android:text="Fragment test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="act7Clicked"/>
+
 </LinearLayout>
 </ScrollView>

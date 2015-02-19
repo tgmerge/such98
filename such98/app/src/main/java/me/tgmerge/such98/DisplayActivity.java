@@ -1,6 +1,7 @@
 package me.tgmerge.such98;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +12,7 @@ import org.apache.http.Header;
 
 import java.util.Vector;
 
+import me.tgmerge.such98.fragment.FragmentBoardsActivity;
 import me.tgmerge.such98.Util.APIUtil;
 import me.tgmerge.such98.Util.ActivityUtil;
 import me.tgmerge.such98.Util.HelperUtil;
@@ -166,6 +168,10 @@ public class DisplayActivity extends BaseDrawerActivity {
 
     public void act6Clicked(View view) {
         ActivityUtil.Action.showHotTopics(this);
+    }
+
+    public void act7Clicked(View view) {
+        startActivity(new Intent(this, FragmentBoardsActivity.class));
     }
 
     @Override

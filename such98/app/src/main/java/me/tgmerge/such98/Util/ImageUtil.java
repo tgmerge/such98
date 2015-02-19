@@ -47,8 +47,8 @@ public class ImageUtil {
     }
 
 
-    public static final void setImage(Activity act, final ImageView imgView, int roundRadius, String url) {
-        ImageUtil.getImageLoader(act, roundRadius).displayImage(url, imgView, new SimpleImageLoadingListener() {
+    public static final void setImage(Context ctx, final ImageView imgView, int roundRadius, String url) {
+        ImageUtil.getImageLoader(ctx, roundRadius).displayImage(url, imgView, new SimpleImageLoadingListener() {
             public void onLoadingComplete(String uri, View view, Bitmap loadedImage) {
                 imgView.setPadding(0, 0, 0, 0);
             }

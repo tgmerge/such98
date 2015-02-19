@@ -50,6 +50,10 @@
             android:name=".ShowPostsActivity"
             android:label="@string/title_activity_show_posts" >
         </activity>
+        <activity
+            android:name=".fragment.FragmentBoardsActivity"
+            android:label="@string/title_activity_fragment_boards" >
+        </activity>
     </application>
 
 </manifest>
