@@ -1,6 +1,5 @@
 package me.tgmerge.such98;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -46,7 +45,7 @@ public class LoginActivity extends BaseDrawerActivity {
     }
 
     public void onLoginButtonClicked(View view) {
-        if (OAuthUtil.getAccessToken(this).equals("")) {
+        if (OAuthUtil.getAccessToken().equals("")) {
             HelperUtil.debugToast(this, "LoginActivity: no token");
             startActivity(new Intent(this, LoginPageActivity.class));
         } else {

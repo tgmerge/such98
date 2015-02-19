@@ -1,9 +1,10 @@
 package me.tgmerge.such98.Util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -14,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.SuchApplication;
 
 /**
  * Usage:
@@ -23,11 +25,11 @@ import me.tgmerge.such98.R;
  *   i.e. client_info.xml
  *
  * 2. Login:
- *   OAuthUtil.OAuthManager oam = new OAuthUtil.OAuthManager(Activity ctx); - instance of manager
+ *   OAuthUtil.OAuthManager oam = new OAuthUtil.OAuthManager(Context ctx); - instance of manager
  *   oam.fire(WebView webview, OAuthCallback callback);                     - start oauth process in webview
  *
  * -- Refresh token(todo not working due to bugs of cc98 API?):
- *   OAuthUtil.OAuthManager oam = new OAuthUtil.OAuthManager(Activity ctx); - instance of manager
+ *   OAuthUtil.OAuthManager oam = new OAuthUtil.OAuthManager(Context ctx); - instance of manager
  *   oam.refreshToken(OAuthCallback callback);                              - will create an invisible webview
  *                                                                            on current Activity and refresh
  *   (due to certification issue, token refreshing can't be achieved by https request without webview)
@@ -41,23 +43,23 @@ import me.tgmerge.such98.R;
 public class OAuthUtil {
 
     /**
-     * @param act
+     * @param ctx
      * @return OAuthManager instance configured by values in xml resource file,
      *         for logging-in or refreshing token
      */
-    public static final OAuthManager newOAuthManager(Activity act) {
-        return new OAuthManager(act,
-                                act.getString(R.string.authorize_url),
-                                act.getString(R.string.token_url),
-                                act.getString(R.string.scope),
-                                act.getString(R.string.client_id),
-                                act.getString(R.string.client_secret));
+    public static final OAuthManager newOAuthManager(Context ctx) {
+        return new OAuthManager(ctx,
+                                ctx.getString(R.string.authorize_url),
+                                ctx.getString(R.string.token_url),
+                                ctx.getString(R.string.scope),
+                                ctx.getString(R.string.client_id),
+                                ctx.getString(R.string.client_secret));
     }
 
 
     public static final class OAuthManager {
 
-        private Activity mAct;
+        private Context mCtx;
 
         private String mAuthorizeURL;
         private String mTokenURL;
@@ -69,10 +71,10 @@ public class OAuthUtil {
         private final String JS_INTERFACE = "HTMLOUT";
 
 
-        public OAuthManager(Activity act, String authorizeURL, String tokenURL, String scope,
+        public OAuthManager(Context ctx, String authorizeURL, String tokenURL, String scope,
                             String clientID, String clientSecret) {
             logDebug("OAuthUtil: initializing, authURL = " + authorizeURL);
-            this.mAct = act;
+            this.mCtx = ctx;
             this.mAuthorizeURL = authorizeURL;
             this.mTokenURL = tokenURL;
             this.mScope = scope;
@@ -103,15 +105,17 @@ public class OAuthUtil {
             logDebug("refreshToken: refreshing token");
 
             // 在ctx上创建一个webview，并执行更新token的工作
-            mAct.runOnUiThread(new Runnable() {
+            // good way to run code on ui thread
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    WebView webView = new WebView(mAct);
+                    WebView webView = new WebView(mCtx);
+
                     webView.getSettings().setJavaScriptEnabled(true);
                     webView.setWebViewClient(new OAuthWebViewClient());
                     webView.addJavascriptInterface(new MyJSInterface(webView, callback), JS_INTERFACE);
                     String postLoad = "grant_type=refresh_token";
-                    postLoad += "&refresh_token=" + getRefreshToken(mAct);
+                    postLoad += "&refresh_token=" + getRefreshToken();
                     postLoad += "&client_id=" + mClientID;
                     postLoad += "&client_secret=" + mClientSecret;
                     logDebug("refreshToken: postLoad:" + postLoad.substring(0, 20));
@@ -121,12 +125,12 @@ public class OAuthUtil {
         }
 
 
-        private static final void processTokenHTML(Context ctx, String html, OAuthCallback callback) {
+        private static final void processTokenHTML(String html, OAuthCallback callback) {
             logDebug("processTokenHTML: processing " + html.substring(0, 10));
             Matcher m1 = Pattern.compile("\"access_token\":\"([^\"},]+)\"").matcher(html);
             Matcher m2 = Pattern.compile("\"refresh_token\":\"([^\"},]+)\"").matcher(html);
             if (m1.find() && m2.find()) {
-                setToken(ctx, m1.group(1), m2.group(1));
+                setToken(m1.group(1), m2.group(1));
                 callback.onSuccess();
             } else {
                 callback.onFailure();
@@ -190,7 +194,6 @@ public class OAuthUtil {
                         authCode = m.group(1);
                     } else {
                         // token not found, login failed
-                        // startFailActivity(mAct, mFailActivity);
                         // todo do something to reflect callback!
                     }
 
@@ -241,13 +244,14 @@ public class OAuthUtil {
                 logDebug("processHTML: " + (html == null ? "null" : "..."));
 
                 // 处理access token结束后，删除webview
-                mAct.runOnUiThread(new Runnable() {
+                // run on ui thread
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        processTokenHTML(mAct, html, mCallback);
+                        processTokenHTML(html, mCallback);
                         logDebug("processHTML: destroying webview");
                         mWebView.destroy();
-                        mAct = null;
+                        mCtx = null;
                     }
                 });
             }
@@ -263,32 +267,32 @@ public class OAuthUtil {
     private static final String KEY_REFRESH_TOKEN = "refreshToken";
 
 
-    public static final void clearToken(Context ctx) {
+    public static final void clearToken() {
         logDebug("clearToken: clearing");
-        setToken(ctx, "", "");
+        setToken("", "");
     }
 
 
-    private static final void setToken(Context ctx, String accessToken, String refreshToken) {
+    private static final void setToken(String accessToken, String refreshToken) {
         logDebug("setToken: access = " + (accessToken.length() > 10 ? accessToken.substring(0, 10) : accessToken));
         logDebug("setToken: refresh = " + (refreshToken.length() > 10 ? refreshToken.substring(0, 10) : refreshToken));
-        SharedPreferences.Editor editor = ctx.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = SuchApplication.getContext().getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE).edit();
         editor.putString(KEY_ACCESS_TOKEN, accessToken);
         editor.putString(KEY_REFRESH_TOKEN, refreshToken);
         editor.apply();
     }
 
 
-    public static final String getAccessToken(Context ctx) {
-        SharedPreferences pref = ctx.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+    public static final String getAccessToken() {
+        SharedPreferences pref = SuchApplication.getContext().getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
         String accessToken = pref.getString(KEY_ACCESS_TOKEN, "");
         logDebug("getAccessToken: " + accessToken.substring(0, accessToken.length() > 10 ? 10 : accessToken.length() / 2));
         return accessToken;
     }
 
 
-    private static final String getRefreshToken(Context ctx) {
-        SharedPreferences pref = ctx.getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+    private static final String getRefreshToken() {
+        SharedPreferences pref = SuchApplication.getContext().getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
         String refreshToken = pref.getString(KEY_REFRESH_TOKEN, "");
         logDebug("getRefreshToken: " + refreshToken.substring(0, refreshToken.length() > 10 ? 10 : refreshToken.length() / 2));
         return refreshToken;

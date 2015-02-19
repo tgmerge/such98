@@ -40,13 +40,13 @@ public final class ActivityUtil {
 
         public static final void relogin(Context ctx) { relogin(ctx, true); }
         public static final void relogin(Context ctx, boolean clearTask) {
-            OAuthUtil.clearToken(ctx);
+            OAuthUtil.clearToken();
             openLoginPageActivity(ctx, clearTask);
         }
 
         public static final void logout(Context ctx) { logout(ctx, true); }
         public static final void logout(Context ctx, boolean clearTask) {
-            OAuthUtil.clearToken(ctx);
+            OAuthUtil.clearToken();
             openLoginActivity(ctx, clearTask);
         }
 

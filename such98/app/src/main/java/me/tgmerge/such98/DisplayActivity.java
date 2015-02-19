@@ -94,7 +94,7 @@ public class DisplayActivity extends BaseDrawerActivity {
             tests.add(new APIUtil.PostMessage(this, "tgmerge", "testTitle", "testContent", new MyCallback()));
         }
 
-        textToken.setText(OAuthUtil.getAccessToken(that));
+        textToken.setText(OAuthUtil.getAccessToken());
 
         if (testNo < tests.size()) {
             HelperUtil.debugToast(that, "Test #" + testNo + ", " + tests.get(testNo).getClass().getName());
@@ -111,12 +111,12 @@ public class DisplayActivity extends BaseDrawerActivity {
 
     public void onRefreshTokenButtonClicked(View view) {
         final OAuthUtil.OAuthManager oam = OAuthUtil.newOAuthManager(this);
-        String token = OAuthUtil.getAccessToken(this);
+        String token = OAuthUtil.getAccessToken();
         HelperUtil.debugToast(this, "Old token: " + (token.length() > 10 ? token.substring(0, 10) : token));
         oam.refreshToken(new OAuthUtil.OAuthManager.OAuthCallback() {
             @Override
             public void onSuccess() {
-                String newToken = OAuthUtil.getAccessToken(that);
+                String newToken = OAuthUtil.getAccessToken();
                 HelperUtil.debugToast(that, "New token:" + (newToken.length() > 10 ? newToken.substring(0, 10) : newToken));
             }
 

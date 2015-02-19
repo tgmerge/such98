@@ -1,6 +1,5 @@
 package me.tgmerge.such98;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,7 +27,7 @@ public class LoginPageActivity extends ActionBarActivity {
         oam.fire(webView, new OAuthUtil.OAuthManager.OAuthCallback() {
             @Override
             public void onSuccess() {
-                String token = OAuthUtil.getAccessToken(that);
+                String token = OAuthUtil.getAccessToken();
                 HelperUtil.debugToast(that, "Login success, token=" + (token.length() > 10 ? token.substring(0, 10) : token));
                 ActivityUtil.Action.showCustomBoards(that, true);
             }
