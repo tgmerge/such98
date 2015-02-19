@@ -1,8 +1,8 @@
 package me.tgmerge.such98.fragment;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,20 +18,20 @@ import org.apache.http.Header;
 import java.util.Arrays;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.Util.APIUtil;
-import me.tgmerge.such98.Util.ActivityUtil;
-import me.tgmerge.such98.Util.HelperUtil;
-import me.tgmerge.such98.Util.XMLUtil;
+import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.ActivityUtil;
+import me.tgmerge.such98.util.HelperUtil;
+import me.tgmerge.such98.util.XMLUtil;
 
 
-public class ShowBoardsFragment extends Fragment {
+public class BoardsFragment extends Fragment {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM_ID = "id";
     private static final String ARG_PARAM_POS = "pos";
 
-    private int mParamId;
-    private int mParamPos;
+    private int mParamId = 0;
+    private int mParamPos = 0;
 
     // consts for mParamId;
     public static final int ID_ROOT = 0, ID_CUSTOM = -1;
@@ -45,10 +45,10 @@ public class ShowBoardsFragment extends Fragment {
      *
      * @param paramId  The fragment will show board #paramId (ID_ROOT and ID_CUSTOM is also valid)
      * @param paramPos Items from #paramPos will be shown at the beginning
-     * @return A new instance of fragment ShowBoardsFragment.
+     * @return A new instance of fragment BoardsFragment.
      */
-    public static ShowBoardsFragment newInstance(int paramId, int paramPos) {
-        ShowBoardsFragment fragment = new ShowBoardsFragment();
+    public static BoardsFragment newInstance(int paramId, int paramPos) {
+        BoardsFragment fragment = new BoardsFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM_ID, paramId);
         args.putInt(ARG_PARAM_POS, paramPos);
@@ -71,7 +71,7 @@ public class ShowBoardsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        thisView = inflater.inflate(R.layout.fragment_show_boards, container, false);
+        thisView = inflater.inflate(R.layout.fragment_boards, container, false);
         return thisView;
     }
 
@@ -345,14 +345,14 @@ public class ShowBoardsFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            HelperUtil.generalDebug("ShowBoardsActivity", "onClick " + v.toString());
+            HelperUtil.generalDebug("ShowBoardsFragment", "onClick " + v.toString());
             if (v instanceof TextView) {
                 // click on the text view, force show topics
-                HelperUtil.generalDebug("ShowBoardsActivity", "Force open as board: " + data_boardId + ", " + data_isCat);
+                HelperUtil.generalDebug("ShowBoardsFragment", "Force open as board: " + data_boardId + ", " + data_isCat);
                 ActivityUtil.openShowTopicsActivity(v.getContext(), data_boardId, 0, false);
             } else if (v instanceof RelativeLayout) {
                 // click on whole item, starting new activity
-                HelperUtil.generalDebug("ShowBoardsActivity", "Clicked: " + data_boardId + ", " + data_isCat);
+                HelperUtil.generalDebug("ShowBoardsFragment", "Clicked: " + data_boardId + ", " + data_isCat);
                 if (data_isCat) {
                     // clicked board is a category, start ShowBoardsActivity
                     ActivityUtil.openShowBoardsActivity(v.getContext(), data_boardId, 0, false);

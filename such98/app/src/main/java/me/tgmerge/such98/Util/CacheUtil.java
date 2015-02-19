@@ -1,4 +1,4 @@
-package me.tgmerge.such98.Util;
+package me.tgmerge.such98.util;
 
 import android.util.LruCache;
 

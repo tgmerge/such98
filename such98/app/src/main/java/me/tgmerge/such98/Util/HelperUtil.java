@@ -1,4 +1,4 @@
-package me.tgmerge.such98.Util;
+package me.tgmerge.such98.util;
 
 import android.content.Context;
 import android.os.Looper;

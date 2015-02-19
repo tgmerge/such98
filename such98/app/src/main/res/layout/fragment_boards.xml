@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.tgmerge.such98.ShowPostsActivity">
+    tools:context="me.tgmerge.such98.fragment.BoardsFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"/>
+        android:scrollbars="vertical"
+        android:background="@color/text_dividers"/>
 
     <ProgressBar
         android:id="@+id/progressBar"

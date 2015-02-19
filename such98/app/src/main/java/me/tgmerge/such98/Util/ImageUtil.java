@@ -1,6 +1,5 @@
-package me.tgmerge.such98.Util;
+package me.tgmerge.such98.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
@@ -60,9 +59,9 @@ public class ImageUtil {
     //   It's a async-task, so isRecyclable flag of ViewHolder should be set to false first,
     //     to prevent problems from recycling viewHolder before image is downloaded and set.
     //   Once the image is set, or failed to load, the isRecyclable flag should be set to true.
-    public static final void setViewHolderImage(Activity act, final RecyclerView.ViewHolder viewHolder, final ImageView imgView, String url) {
+    public static final void setViewHolderImage(Context ctx, final RecyclerView.ViewHolder viewHolder, final ImageView imgView, String url) {
         viewHolder.setIsRecyclable(false);
-        ImageUtil.getImageLoader(act).displayImage(url, imgView, new SimpleImageLoadingListener() {
+        ImageUtil.getImageLoader(ctx).displayImage(url, imgView, new SimpleImageLoadingListener() {
             public void onLoadingComplete(String uri, View view, Bitmap loadedImage) {
                 imgView.setPadding(0, 0, 0, 0);
                 viewHolder.setIsRecyclable(true);

@@ -1,14 +1,15 @@
 package me.tgmerge.such98.fragment;
 
-import android.content.res.Configuration;
 import android.app.Fragment;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.content.res.Configuration;
+import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,12 +18,12 @@ import android.widget.TextView;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.Util.APIUtil;
-import me.tgmerge.such98.Util.ActivityUtil;
-import me.tgmerge.such98.Util.CacheUtil;
-import me.tgmerge.such98.Util.HelperUtil;
-import me.tgmerge.such98.Util.ImageUtil;
-import me.tgmerge.such98.Util.XMLUtil;
+import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.ActivityUtil;
+import me.tgmerge.such98.util.CacheUtil;
+import me.tgmerge.such98.util.HelperUtil;
+import me.tgmerge.such98.util.ImageUtil;
+import me.tgmerge.such98.util.XMLUtil;
 
 /**
  * Nav drawer fragment.
@@ -135,6 +136,22 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
         });
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if(mDrawerLayout.isDrawerOpen(mThisView)) {
+                    mDrawerLayout.closeDrawer(mThisView);
+                }
+                else {
+                    mDrawerLayout.openDrawer(mThisView);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

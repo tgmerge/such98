@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:padding="0dp"
     android:orientation="vertical"
-    tools:context="me.tgmerge.such98.LoginPageActivity">
+    tools:context="me.tgmerge.such98.activity.LoginPageActivity">
 
     <WebView android:id="@+id/webView_login"
         android:layout_width="match_parent"

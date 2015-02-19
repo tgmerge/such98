@@ -1,24 +1,25 @@
-package me.tgmerge.such98;
+package me.tgmerge.such98.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import me.tgmerge.such98.Util.ActivityUtil;
-import me.tgmerge.such98.Util.HelperUtil;
-import me.tgmerge.such98.Util.OAuthUtil;
+import me.tgmerge.such98.R;
+import me.tgmerge.such98.util.ActivityUtil;
+import me.tgmerge.such98.util.HelperUtil;
+import me.tgmerge.such98.util.OAuthUtil;
 
 
-public class LoginActivity extends BaseDrawerActivity {
+public class LoginActivity extends ActionBarActivity {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getLayoutInflater().inflate(R.layout.activity_login, frameLayout);
-        //setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login);
     }
 
 

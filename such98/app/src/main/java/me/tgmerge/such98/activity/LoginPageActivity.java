@@ -1,4 +1,4 @@
-package me.tgmerge.such98;
+package me.tgmerge.such98.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,9 +8,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
-import me.tgmerge.such98.Util.ActivityUtil;
-import me.tgmerge.such98.Util.HelperUtil;
-import me.tgmerge.such98.Util.OAuthUtil;
+import me.tgmerge.such98.R;
+import me.tgmerge.such98.util.ActivityUtil;
+import me.tgmerge.such98.util.HelperUtil;
+import me.tgmerge.such98.util.OAuthUtil;
 
 
 public class LoginPageActivity extends ActionBarActivity {

@@ -12,7 +12,6 @@
     <string name="title_activity_show_boards">ShowBoardsActivity</string>
     <string name="title_activity_show_topics">ShowTopicsActivity</string>
     <string name="title_activity_show_posts">ShowPostsActivity</string>
-    <string name="hello_world">Hello world!</string>
 
     <string name="open_drawer">Open Drawer</string>
     <string name="close_drawer">Close Drawer</string>

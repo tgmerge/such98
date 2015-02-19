@@ -11,17 +11,9 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         android:name="me.tgmerge.such98.SuchApplication">
-        <!--
-        	We will launch BaseDrawerActivity as launcher.
-        	We will check if BaseDrawerActivity launch first time and open desired activity and set navigation item selected
-	        edit: we won't
+
         <activity
-            android:name=".BaseDrawerActivity"
-            android:noHistory="true">
-        </activity>
-        -->
-        <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:label="@string/app_name"
             android:noHistory="true" >
             <intent-filter>
@@ -30,29 +22,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginPageActivity"
+            android:name=".activity.LoginPageActivity"
             android:label="@string/title_activity_login_page"
             android:noHistory="true" >
         </activity>
         <activity
-            android:name=".DisplayActivity"
+            android:name=".activity.DisplayActivity"
             android:label="@string/title_activity_display" >
         </activity>
         <activity
-            android:name=".ShowBoardsActivity"
+            android:name=".activity.ShowBoardsActivity"
             android:label="@string/title_activity_show_boards" >
         </activity>
         <activity
-            android:name=".ShowTopicsActivity"
+            android:name=".activity.ShowTopicsActivity"
             android:label="@string/title_activity_show_topics" >
         </activity>
         <activity
-            android:name=".ShowPostsActivity"
+            android:name=".activity.ShowPostsActivity"
             android:label="@string/title_activity_show_posts" >
-        </activity>
-        <activity
-            android:name=".fragment.FragmentBoardsActivity"
-            android:label="@string/title_activity_fragment_boards" >
         </activity>
     </application>
 

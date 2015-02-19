@@ -1,13 +1,15 @@
-package me.tgmerge.such98.Util;
+package me.tgmerge.such98.util;
 
 import android.content.Context;
 import android.content.Intent;
 
-import me.tgmerge.such98.LoginActivity;
-import me.tgmerge.such98.LoginPageActivity;
-import me.tgmerge.such98.ShowBoardsActivity;
-import me.tgmerge.such98.ShowPostsActivity;
-import me.tgmerge.such98.ShowTopicsActivity;
+import me.tgmerge.such98.activity.LoginActivity;
+import me.tgmerge.such98.activity.LoginPageActivity;
+import me.tgmerge.such98.activity.ShowBoardsActivity;
+import me.tgmerge.such98.activity.ShowPostsActivity;
+import me.tgmerge.such98.activity.ShowTopicsActivity;
+import me.tgmerge.such98.fragment.BoardsFragment;
+import me.tgmerge.such98.fragment.TopicsFragment;
 
 /**
  * Created by tgmerge on 2/15.
@@ -20,22 +22,22 @@ public final class ActivityUtil {
 
         public static final void showHotTopics(Context ctx) { showHotTopics(ctx, false); }
         public static final void showHotTopics(Context ctx, boolean clearTask) {
-            openShowTopicsActivity(ctx, ShowTopicsActivity.ID_HOT, 0, clearTask);
+            openShowTopicsActivity(ctx, TopicsFragment.ID_HOT, 0, clearTask);
         }
 
         public static final void showNewTopics(Context ctx) { showNewTopics(ctx, false); }
         public static final void showNewTopics(Context ctx, boolean clearTask) {
-            openShowTopicsActivity(ctx, ShowTopicsActivity.ID_NEW, 0, clearTask);
+            openShowTopicsActivity(ctx, TopicsFragment.ID_NEW, 0, clearTask);
         }
 
         public static final void showRootBoard(Context ctx) { showRootBoard(ctx, false); }
         public static final void showRootBoard(Context ctx, boolean clearTask) {
-            openShowBoardsActivity(ctx, ShowBoardsActivity.ID_ROOT, 0, clearTask);
+            openShowBoardsActivity(ctx, BoardsFragment.ID_ROOT, 0, clearTask);
         }
 
         public static final void showCustomBoards(Context ctx) { showCustomBoards(ctx, false); }
         public static final void showCustomBoards(Context ctx, boolean clearTask) {
-            openShowBoardsActivity(ctx, ShowBoardsActivity.ID_CUSTOM, 0, clearTask);
+            openShowBoardsActivity(ctx, BoardsFragment.ID_CUSTOM, 0, clearTask);
         }
 
         public static final void relogin(Context ctx) { relogin(ctx, true); }

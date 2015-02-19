@@ -1,8 +1,9 @@
-package me.tgmerge.such98;
+package me.tgmerge.such98.activity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,14 +13,14 @@ import org.apache.http.Header;
 
 import java.util.Vector;
 
-import me.tgmerge.such98.fragment.FragmentBoardsActivity;
-import me.tgmerge.such98.Util.APIUtil;
-import me.tgmerge.such98.Util.ActivityUtil;
-import me.tgmerge.such98.Util.HelperUtil;
-import me.tgmerge.such98.Util.OAuthUtil;
+import me.tgmerge.such98.R;
+import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.ActivityUtil;
+import me.tgmerge.such98.util.HelperUtil;
+import me.tgmerge.such98.util.OAuthUtil;
 
 
-public class DisplayActivity extends BaseDrawerActivity {
+public class DisplayActivity extends ActionBarActivity {
 
     Vector<APIUtil.APIRequest> tests;
     int testNo = 0;
@@ -30,8 +31,7 @@ public class DisplayActivity extends BaseDrawerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_display);
-        getLayoutInflater().inflate(R.layout.activity_display, frameLayout);
+        setContentView(R.layout.activity_display);
 
         text = (EditText) findViewById(R.id.editText);
         textToken = (EditText) findViewById(R.id.editText_token);
@@ -171,7 +171,7 @@ public class DisplayActivity extends BaseDrawerActivity {
     }
 
     public void act7Clicked(View view) {
-        startActivity(new Intent(this, FragmentBoardsActivity.class));
+        startActivity(new Intent(this, ShowBoardsActivity.class));
     }
 
     @Override

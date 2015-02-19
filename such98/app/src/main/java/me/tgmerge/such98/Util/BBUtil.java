@@ -1,10 +1,10 @@
-package me.tgmerge.such98.Util;
+package me.tgmerge.such98.util;
 
-import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Pair;
 import android.widget.TextView;
+
 import java.util.Vector;
 
 /**
@@ -13,7 +13,7 @@ import java.util.Vector;
  */
 public class BBUtil {
 
-    public static final void setBBcodeToTextView(Context ctx, TextView textView, String bb) {
+    public static final void setBBcodeToTextView(TextView textView, String bb) {
         String html = bb2html(bb);
         //Spanned spanned = Html.fromHtml(html, new UILImageGetter(textView, ctx), null); todo  UILgetter not working
         Spanned spanned = Html.fromHtml(html, null, null);

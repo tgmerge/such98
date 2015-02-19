@@ -1,14 +1,12 @@
-package me.tgmerge.such98;
+package me.tgmerge.such98.fragment;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,71 +14,168 @@ import android.widget.TextView;
 
 import org.apache.http.Header;
 
-import me.tgmerge.such98.Util.APIUtil;
-import me.tgmerge.such98.Util.BBUtil;
-import me.tgmerge.such98.Util.CacheUtil;
-import me.tgmerge.such98.Util.HelperUtil;
-import me.tgmerge.such98.Util.ImageUtil;
-import me.tgmerge.such98.Util.XMLUtil;
+import me.tgmerge.such98.R;
+import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.BBUtil;
+import me.tgmerge.such98.util.CacheUtil;
+import me.tgmerge.such98.util.HelperUtil;
+import me.tgmerge.such98.util.ImageUtil;
+import me.tgmerge.such98.util.XMLUtil;
 
 
-public class ShowPostsActivity extends BaseDrawerActivity {
+public class PostsFragment extends Fragment {
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_show_posts, menu);
-        return true;
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM_ID = "id";
+    private static final String ARG_PARAM_POS = "pos";
+
+    private int mParamId = 0;
+    private int mParamPos = 0;
+
+    // root view of this fragment
+    View thisView = null;
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param paramId  The fragment will show board #paramId (ID_ROOT and ID_CUSTOM is also valid)
+     * @param paramPos Items from #paramPos will be shown at the beginning
+     * @return A new instance of fragment BoardsFragment.
+     */
+    public static PostsFragment newInstance(int paramId, int paramPos) {
+        PostsFragment fragment = new PostsFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_PARAM_ID, paramId);
+        args.putInt(ARG_PARAM_POS, paramPos);
+        fragment.setArguments(args);
+        return fragment;
     }
 
+    // onCreate: params will be set to member variables.
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mParamId = getArguments().getInt(ARG_PARAM_ID);
+            mParamPos = getArguments().getInt(ARG_PARAM_POS);
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    // onCreateView: inflate the layout for this fragment.
+    //               saving layout in thisView for further usage in class methods
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        thisView = inflater.inflate(R.layout.fragment_posts, container, false);
+        return thisView;
     }
 
 
-    public final static String INTENT_KEY_ID = "id";
-    public final static String INTENT_KEY_START_POS = "startPos";
-    public final static int ITEM_PER_PAGE = 10;
+    // onAttach: called at the very first
+    // http://developer.android.com/training/basics/fragments/communicating.html
+    //           todo register parent activity as listeners
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+    }
+
+    // onDetach: call at the very last
+    //           todo recycle resources, setting them to null will be fine
+    //           todo clear listeners references
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+
+    // onActivityCreated: the activity has finished its "onCreated"
+    //                    this will be also called when fragment replace happens.
+    // see http://segmentfault.com/blog/shiyongdanshuiyu/1190000000650573
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        final RecyclerView recyclerView = (RecyclerView) thisView.findViewById(R.id.recyclerView);
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+
+        final ShowPostsAdapter adapter = new ShowPostsAdapter(null);
+        recyclerView.setAdapter(adapter);
+
+        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy) {
+                if (!isLoading && !isNoMoreItem) {
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                        HelperUtil.debugToast(getActivity(), "Loading...");
+                        loadAPage(adapter);
+                    }
+                }
+            }
+        });
+
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        int intentTopicId = mParamId;
+
+        new APIUtil.GetTopic(getActivity(), intentTopicId, new APIUtil.APICallback() {
+            @Override
+            public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                try {
+                    mTopicInfo.parse(new String(body));
+                    loadAPage(adapter);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    onFailure(-1, headers, body, e);
+                }
+                getActivity().setTitle(mTopicInfo.Title);
+            }
+
+            @Override
+            public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                HelperUtil.errorToast(getActivity(), "Error: " + "code=" + statCode + ", error=" + error.toString());
+            }
+        }).execute();
+    }
+
+
+    // - - -
 
     private boolean isLoading = false;
     private boolean isNoMoreItem = false;
 
     private int lastLoadStartPos = -1;
 
+    public static final int ITEM_PER_PAGE = 10;
+
     // Adapter 使用这两个值的时候，必然已经被设置过了
     private int mIntentId;
     private final XMLUtil.TopicInfo mTopicInfo = new XMLUtil.TopicInfo();
 
-    private final Activity that = this;
+
+    // - - -
 
     private final void setProgressLoading() {
         isLoading = true;
-        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        thisView.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
     }
 
     private final void setProgressFinished() {
-        findViewById(R.id.progressBar).setVisibility(View.GONE);
+        thisView.findViewById(R.id.progressBar).setVisibility(View.GONE);
         isLoading = false;
     }
+
 
     private final void loadAPage(final ShowPostsAdapter adapter) {
         setProgressLoading();
 
-        Intent intent = getIntent();
-        int intentId = intent.getIntExtra(INTENT_KEY_ID, 0);
-        mIntentId = intentId;
-        int intentStartPos = intent.getIntExtra(INTENT_KEY_START_POS, 0);
+        int intentId = mParamId;
+        int intentStartPos = mParamPos;
 
         final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
 
@@ -97,7 +192,7 @@ public class ShowPostsActivity extends BaseDrawerActivity {
 
                 if (postInfoArr.size() == 0) {
                     isNoMoreItem = true;
-                    HelperUtil.debugToast(that, "End of list");
+                    HelperUtil.debugToast(getActivity(), "End of list");
                 } else {
                     adapter.appendData(postInfoArr);
                     lastLoadStartPos = pageStart;
@@ -108,63 +203,11 @@ public class ShowPostsActivity extends BaseDrawerActivity {
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 setProgressFinished();
-                HelperUtil.errorToast(that, "Error, code=" + statCode + ", error=" + error.toString());            }
+                HelperUtil.errorToast(getActivity(), "Error, code=" + statCode + ", error=" + error.toString());
+            }
         }
 
-        new APIUtil.GetTopicPost(this, intentId, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_show_posts);
-        getLayoutInflater().inflate(R.layout.activity_show_posts, frameLayout);
-
-        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        final ShowPostsAdapter adapter = new ShowPostsAdapter(null);
-        recyclerView.setAdapter(adapter);
-
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView view, int dx, int dy) {
-                if (!isLoading && !isNoMoreItem) {
-                    int visibleItemCount = layoutManager.getChildCount();
-                    int totalItemCount = layoutManager.getItemCount();
-                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
-                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                        HelperUtil.debugToast(that, "Loading...");
-                        loadAPage(adapter);
-                    }
-                }
-            }
-        });
-
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        int intentTopicId = getIntent().getIntExtra(INTENT_KEY_ID, 0);
-
-        new APIUtil.GetTopic(this, intentTopicId, new APIUtil.APICallback() {
-            @Override
-            public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                try {
-                    mTopicInfo.parse(new String(body));
-                    loadAPage(adapter);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    onFailure(-1, headers, body, e);
-                }
-                setTitle(mTopicInfo.Title);
-            }
-
-            @Override
-            public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast(that, "Error: " + "code=" + statCode + ", error=" + error.toString());
-            }
-        }).execute();
+        new APIUtil.GetTopicPost(getActivity(), intentId, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
     }
 
 
@@ -199,7 +242,7 @@ public class ShowPostsActivity extends BaseDrawerActivity {
 
             viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复 #" + dataItem.Floor : dataItem.Title);
             viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
-            BBUtil.setBBcodeToTextView(that, viewHolder.content, dataItem.Content); // todo prevent to process every time
+            BBUtil.setBBcodeToTextView(viewHolder.content, dataItem.Content); // todo prevent to process every time
 
             if (dataItem.Floor == 1) {
                 viewHolder.replyInfo.setVisibility(View.VISIBLE);
@@ -212,10 +255,10 @@ public class ShowPostsActivity extends BaseDrawerActivity {
             //                         加载之后设置viewHolder.setRecyclable(true)
             String avaUrl = CacheUtil.id_avaUrlCache.get(dataItem.UserId);
             if (avaUrl != null) {
-                ImageUtil.setViewHolderImage(that, viewHolder, viewHolder.avatar, avaUrl);
+                ImageUtil.setViewHolderImage(getActivity(), viewHolder, viewHolder.avatar, avaUrl);
             } else {
                 viewHolder.setIsRecyclable(false); // todo pair with (true)
-                new APIUtil.GetIdUser(that, dataItem.UserId, new APIUtil.APICallback() {
+                new APIUtil.GetIdUser(getActivity(), dataItem.UserId, new APIUtil.APICallback() {
                     @Override
                     public void onSuccess(int statCode, Header[] headers, byte[] body) {
                         XMLUtil.UserInfo info = new XMLUtil.UserInfo();
@@ -228,7 +271,7 @@ public class ShowPostsActivity extends BaseDrawerActivity {
                         }
                         String newAvaUrl = info.PortraitUrl.startsWith("http") ? info.PortraitUrl : ("http://www.cc98.org/" + info.PortraitUrl);
                         CacheUtil.id_avaUrlCache.put(info.Id, newAvaUrl);
-                        ImageUtil.setViewHolderImage(that, viewHolder, viewHolder.avatar, newAvaUrl);
+                        ImageUtil.setViewHolderImage(getActivity(), viewHolder, viewHolder.avatar, newAvaUrl);
                         viewHolder.setIsRecyclable(true);
                     }
 
@@ -268,4 +311,5 @@ public class ShowPostsActivity extends BaseDrawerActivity {
             content = (TextView) itemLayoutView.findViewById(R.id.text_content);
         }
     }
+
 }
