@@ -35,7 +35,9 @@ public class ImageUtil {
                     .build();
 
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(ctx.getApplicationContext())
+                    .denyCacheImageMultipleSizesInMemory()
                     .threadPoolSize(2)
+                    .memoryCacheSize(2 * 1024 * 1024)
                     .diskCacheFileCount(500)
                     .defaultDisplayImageOptions(defaultOptions)
                     .build();
