@@ -304,7 +304,7 @@ public class TopicsFragment extends Fragment {
 
                 viewHolder.title.setText(dataItem.Title);
                 viewHolder.authorInfo.setText(dataItem.AuthorName + " @ " + dataItem.CreateTime);
-                viewHolder.lastPostInfo.setText(dataItem.LastPostInfo.UserName + " - " + dataItem.LastPostInfo.ContentSummary);
+                viewHolder.lastPostInfo.setText(dataItem.LastPostInfo.UserName + " @ " + dataItem.LastPostInfo.Time);
 
                 viewHolder.data_topicId = dataItem.Id;
 

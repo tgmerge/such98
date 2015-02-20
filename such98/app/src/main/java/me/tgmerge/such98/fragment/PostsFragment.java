@@ -334,7 +334,7 @@ public class PostsFragment extends Fragment {
                 case R.id.image_quote:
                     String quoteTitle = "回复 " + postInfo.UserName + "(#" + postInfo.Floor + ")";
                     ActivityUtil.openNewPostDialog(v.getContext(), topicInfo.Id, quoteTitle,
-                            "[quotex][I]> " + postInfo.UserName + "@" + postInfo.Time + "(#" + postInfo.Floor + ")[/I]\n" +
+                            "[quotex][i]> " + postInfo.UserName + "@" + postInfo.Time + "(#" + postInfo.Floor + ")[/i]\n" +
                             postInfo.Content + "[/quotex]\n\n");
             }
         }
