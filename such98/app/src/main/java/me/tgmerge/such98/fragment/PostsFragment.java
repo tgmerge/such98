@@ -16,6 +16,7 @@ import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.BBUtil;
 import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.HelperUtil;
@@ -238,7 +239,8 @@ public class PostsFragment extends Fragment {
         public void onBindViewHolder(final ViewHolder viewHolder, int position) {
             final XMLUtil.PostInfo dataItem = mData.get(position);
 
-            viewHolder.isCreated = 1;
+            viewHolder.topicInfo = mTopicInfo;
+            viewHolder.postInfo = mData.get(position);
 
             viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复 #" + dataItem.Floor : dataItem.Title);
             viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
@@ -291,7 +293,7 @@ public class PostsFragment extends Fragment {
     }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public ImageView avatar;
 
@@ -300,7 +302,11 @@ public class PostsFragment extends Fragment {
         public TextView replyInfo;
         public TextView content;
 
-        public int isCreated = 0;
+        public ImageView imgReply;
+        public ImageView imgQuote;
+
+        public XMLUtil.TopicInfo topicInfo;
+        public XMLUtil.PostInfo postInfo;
 
         public ViewHolder(View itemLayoutView) {
             super(itemLayoutView);
@@ -309,6 +315,28 @@ public class PostsFragment extends Fragment {
             authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
             replyInfo = (TextView) itemLayoutView.findViewById(R.id.text_replyInfo);
             content = (TextView) itemLayoutView.findViewById(R.id.text_content);
+            imgReply = (ImageView) itemLayoutView.findViewById(R.id.image_reply);
+            imgQuote = (ImageView) itemLayoutView.findViewById(R.id.image_quote);
+
+            // set item click listener
+            imgReply.setOnClickListener(this);
+            imgQuote.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            HelperUtil.generalDebug("PostsFragment", "onClick " + v.toString());
+            switch (v.getId()) {
+                case R.id.image_reply:
+                    String replyTitle = (postInfo.Floor == 1) ? "" : "回复 " + postInfo.UserName + "(#" + postInfo.Floor + ")";
+                    ActivityUtil.openNewPostDialog(v.getContext(), topicInfo.Id, replyTitle, "");
+                    break;
+                case R.id.image_quote:
+                    String quoteTitle = "回复 " + postInfo.UserName + "(#" + postInfo.Floor + ")";
+                    ActivityUtil.openNewPostDialog(v.getContext(), topicInfo.Id, quoteTitle,
+                            "[quotex][I]> " + postInfo.UserName + "@" + postInfo.Time + "(#" + postInfo.Floor + ")[/I]\n" +
+                            postInfo.Content + "[/quotex]\n\n");
+            }
         }
     }
 

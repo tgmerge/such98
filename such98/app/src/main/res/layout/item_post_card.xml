@@ -112,16 +112,22 @@
             android:layout_below="@id/view_divider_content">
 
             <ImageView
+                android:id="@+id/image_reply"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginLeft="24dp"
-                android:src="@drawable/ic_reply_grey600_24dp"/>
+                android:src="@drawable/ic_reply_grey600_24dp"
+                android:clickable="true"
+                android:background="@drawable/touch_background_selector"/>
 
             <ImageView
+                android:id="@+id/image_quote"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginLeft="24dp"
-                android:src="@drawable/ic_quote_grey600_24dp"/>
+                android:src="@drawable/ic_quote_grey600_24dp"
+                android:clickable="true"
+                android:background="@drawable/touch_background_selector"/>
 
         </LinearLayout>
 

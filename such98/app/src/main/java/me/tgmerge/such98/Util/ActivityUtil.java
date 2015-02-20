@@ -1,5 +1,8 @@
 package me.tgmerge.such98.util;
 
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 
@@ -9,6 +12,7 @@ import me.tgmerge.such98.activity.ShowBoardsActivity;
 import me.tgmerge.such98.activity.ShowPostsActivity;
 import me.tgmerge.such98.activity.ShowTopicsActivity;
 import me.tgmerge.such98.fragment.BoardsFragment;
+import me.tgmerge.such98.fragment.NewPostFragment;
 import me.tgmerge.such98.fragment.TopicsFragment;
 
 /**
@@ -119,6 +123,18 @@ public final class ActivityUtil {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         }
         ctx.startActivity(intent);
+    }
+
+    public static final void openNewPostDialog(Context ctx, int topicId, String replyTitle, String replyContent) {
+        logDebug("Starting NewPostFragment(FragmentDialog)");
+        if (ctx instanceof Activity) {
+            FragmentTransaction ft = ((Activity) ctx).getFragmentManager().beginTransaction();
+            ft.addToBackStack(null);
+            DialogFragment newFragment = NewPostFragment.newInstance(topicId, replyTitle, replyContent);
+            newFragment.show(ft, "NewPostFragment");
+        } else {
+            HelperUtil.errorToast(ctx, "openNewPostDialog: Context" + ctx.toString() + " is not Activity");
+        }
     }
 
     // - - -

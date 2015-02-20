@@ -84,7 +84,7 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
 
         // Register on click listener
         mThisView.findViewById(R.id.image_send).setOnClickListener(this);
-        
+
         return mThisView;
     }
 
@@ -151,8 +151,8 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
         String postTitle = ((EditText) mThisView.findViewById(R.id.edit_title)).getText().toString();
         String postContent = ((EditText) mThisView.findViewById(R.id.edit_content)).getText().toString();
 
-        if (postTitle.equals("") || postContent.equals("")) {
-            HelperUtil.errorToast(getActivity(), "Title or content cannot be empty");
+        if (postContent.equals("")) {
+            HelperUtil.errorToast(getActivity(), "Post content cannot be empty");
             return;
         }
 
