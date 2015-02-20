@@ -1,6 +1,8 @@
 package me.tgmerge.such98.activity;
 
 import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -14,6 +16,7 @@ import org.apache.http.Header;
 import java.util.Vector;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.fragment.NewPostFragment;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
@@ -171,7 +174,10 @@ public class DisplayActivity extends ActionBarActivity {
     }
 
     public void act7Clicked(View view) {
-        startActivity(new Intent(this, ShowBoardsActivity.class));
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.addToBackStack(null);
+        DialogFragment newFragment = NewPostFragment.newInstance(2803718, "Reply title", "Reply content");
+        newFragment.show(ft, "dialog");
     }
 
     @Override
