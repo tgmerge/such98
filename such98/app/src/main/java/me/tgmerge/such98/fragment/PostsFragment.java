@@ -172,7 +172,7 @@ public class PostsFragment extends Fragment {
 
 
                 // first load
-                int maxPage = (mTopicInfo.ReplyCount + 1) / ITEM_PER_PAGE;
+                int maxPage = mTopicInfo.ReplyCount / ITEM_PER_PAGE;
 
                 // set initial loading position
                 if (mParamPos == PARAM_POS_BEGINNING) {
