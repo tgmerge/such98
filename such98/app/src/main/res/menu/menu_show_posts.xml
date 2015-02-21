@@ -3,11 +3,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="me.tgmerge.such98.OldShowPostsActivity">
     <item
-        android:id="@+id/action_toLastPage"
-        android:title="Last page"
-        app:showAsAction="never"/>
+        android:id="@+id/action_refresh"
+        android:title="Refresh"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="1"
+        android:icon="@drawable/ic_refresh_white_36dp"/>
+    <item
+        android:id="@+id/action_reply"
+        android:title="Reply"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="2"
+        android:icon="@drawable/ic_plus_white_36dp"/>
     <item
         android:id="@+id/action_toFirstPage"
         android:title="First page"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        android:orderInCategory="3"/>
+    <item
+        android:id="@+id/action_toLastPage"
+        android:title="Last page"
+        app:showAsAction="never"
+        android:orderInCategory="4"/>
 </menu>

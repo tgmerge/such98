@@ -484,11 +484,11 @@ public class XMLUtil {
 
 
     private static final void logDebug(String msg) {
-        HelperUtil.generalDebug("XMLUtil", msg);
+        //HelperUtil.generalDebug("XMLUtil", msg);
     }
 
 
     private static final void logError(String msg) {
-        HelperUtil.generalError("XMLUtil", msg);
+        //HelperUtil.generalError("XMLUtil", msg);
     }
 }

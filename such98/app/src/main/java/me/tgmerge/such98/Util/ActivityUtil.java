@@ -2,6 +2,7 @@ package me.tgmerge.such98.util;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import me.tgmerge.such98.activity.ShowPostsActivity;
 import me.tgmerge.such98.activity.ShowTopicsActivity;
 import me.tgmerge.such98.fragment.BoardsFragment;
 import me.tgmerge.such98.fragment.NewPostFragment;
+import me.tgmerge.such98.fragment.PostsFragment;
 import me.tgmerge.such98.fragment.TopicsFragment;
 
 /**
@@ -69,6 +71,32 @@ public final class ActivityUtil {
         public static final void setting(Context ctx) { setting(ctx, false); }
         public static final void setting(Context ctx, boolean clearTask) {
             // todo
+        }
+
+        public static final void postGotoFirstPage(Activity act, int containerId, int topicId) {
+            FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
+            transaction.replace(containerId, PostsFragment.newInstance(topicId,PostsFragment.PARAM_POS_BEGINNING));
+            transaction.commit();
+        }
+
+        public static final void postGotoLastPage(Activity act, int containerId, int topicId) {
+            FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
+            transaction.replace(containerId, PostsFragment.newInstance(topicId,PostsFragment.PARAM_POS_END));
+            transaction.commit();
+        }
+
+        public static final void addPostFragment(Activity act, int containerId, int topicId, int startPos) {
+            FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
+            transaction.add(containerId, PostsFragment.newInstance(topicId, startPos));
+            transaction.commit();
+        }
+
+        public static final void reloadFragment(Activity act, int containerId) {
+            Fragment fg = act.getFragmentManager().findFragmentById(containerId);
+            FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
+            transaction.detach(fg);
+            transaction.attach(fg);
+            transaction.commit();
         }
     }
 
