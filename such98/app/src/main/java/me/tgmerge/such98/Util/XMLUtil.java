@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
@@ -369,8 +370,24 @@ public class XMLUtil {
             mObjs.addAll(obj.mObjs);
         }
 
-        public void append(Collection<T> obj) {
+        public void append(List<T> obj) {
             mObjs.addAll(obj);
+        }
+
+        public void appendFront(ArrayOf<T> obj) {
+            Collections.reverse(mObjs);
+            Collections.reverse(obj.mObjs);
+            mObjs.addAll(obj.mObjs);
+            Collections.reverse(obj.mObjs);
+            Collections.reverse(mObjs);
+        }
+
+        public void appendFront(List<T> obj) {
+            Collections.reverse(mObjs);
+            Collections.reverse(obj);
+            mObjs.addAll(obj);
+            Collections.reverse(obj);
+            Collections.reverse(mObjs);
         }
     }
 

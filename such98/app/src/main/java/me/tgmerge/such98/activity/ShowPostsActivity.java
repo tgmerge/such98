@@ -1,9 +1,12 @@
 package me.tgmerge.such98.activity;
 
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import me.tgmerge.such98.R;
@@ -43,6 +46,14 @@ public class ShowPostsActivity extends ActionBarActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_show_posts, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -50,10 +61,23 @@ public class ShowPostsActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_toLastPage) {
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.container, PostsFragment.newInstance(
+                    getIntent().getIntExtra(INTENT_KEY_ID, 0),
+                    PostsFragment.PARAM_POS_END
+            ));
+            transaction.commit();
+            return true;
+        } else if (id == R.id.action_toFirstPage) {
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.container, PostsFragment.newInstance(
+                    getIntent().getIntExtra(INTENT_KEY_ID, 0),
+                    PostsFragment.PARAM_POS_BEGINNING
+            ));
+            transaction.commit();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

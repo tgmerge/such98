@@ -3,9 +3,11 @@ package me.tgmerge.such98.fragment;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +32,13 @@ public class PostsFragment extends Fragment {
     private static final String ARG_PARAM_ID = "id";
     private static final String ARG_PARAM_POS = "pos";
 
+    public static final int PARAM_POS_BEGINNING = 0;
+    public static final int PARAM_POS_END = -1;
+
     private int mParamId = 0;
     private int mParamPos = 0;
+
+    private final XMLUtil.TopicInfo mTopicInfo = new XMLUtil.TopicInfo();
 
     // root view of this fragment
     View thisView = null;
@@ -72,23 +79,10 @@ public class PostsFragment extends Fragment {
         return thisView;
     }
 
-
-    // onAttach: called at the very first
-    // http://developer.android.com/training/basics/fragments/communicating.html
-    //           todo register parent activity as listeners
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    // onDetach: call at the very last
-    //           todo recycle resources, setting them to null will be fine
-    //           todo clear listeners references
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
+    RecyclerView mRecyclerView;
+    LinearLayoutManager mLayoutManager;
+    SwipeRefreshLayout mSwipeLayout;
+    ShowPostsAdapter mAdapter;
 
     // onActivityCreated: the activity has finished its "onCreated"
     //                    this will be also called when fragment replace happens.
@@ -97,44 +91,103 @@ public class PostsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final RecyclerView recyclerView = (RecyclerView) thisView.findViewById(R.id.recyclerView);
+        // config recycler view
+        mRecyclerView = (RecyclerView) thisView.findViewById(R.id.recyclerView);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final ShowPostsAdapter adapter = new ShowPostsAdapter(null);
-        recyclerView.setAdapter(adapter);
+        mAdapter = new ShowPostsAdapter(null);
+        mRecyclerView.setAdapter(mAdapter);
 
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        // on refresh listener is only used to load previous page.
+        // "load next page" is triggered by recycler view's "scroll to bottom" event,
+        // in which indicator of swipeLayout is shown by isRefreshing(), then "load next page"
+        // is called manually.
+        mSwipeLayout = (SwipeRefreshLayout) thisView.findViewById(R.id.swipe_container);
+        mSwipeLayout.setEnabled(false);
+        mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onScrolled(RecyclerView view, int dx, int dy) {
-                if (!isLoading && !isNoMoreItem) {
-                    int visibleItemCount = layoutManager.getChildCount();
-                    int totalItemCount = layoutManager.getItemCount();
-                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
-                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                        HelperUtil.debugToast(getActivity(), "Loading...");
-                        loadAPage(adapter);
-                    }
-                }
+            public void onRefresh() {
+                loadPreviousPage(mAdapter);
             }
         });
 
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        // loading topic info...
+        setProgressLoading();
 
-        int intentTopicId = mParamId;
-
-        new APIUtil.GetTopic(getActivity(), intentTopicId, new APIUtil.APICallback() {
+        new APIUtil.GetTopic(getActivity(), mParamId, new APIUtil.APICallback() {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                // save topic info into fragment
                 try {
                     mTopicInfo.parse(new String(body));
-                    loadAPage(adapter);
                 } catch (Exception e) {
                     e.printStackTrace();
                     onFailure(-1, headers, body, e);
+                    return;
                 }
+                // set title
                 getActivity().setTitle(mTopicInfo.Title);
+
+                mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+                    @Override
+                    public void onScrolled(RecyclerView view, int dx, int dy) {
+                        if (mSwipeLayout.isRefreshing()) {
+                            return;
+                        }
+
+                        // scrolled to top?
+                        if (mHasPreviousPage) {
+                            int firstChildTop = mRecyclerView.getChildAt(0).getTop();
+                            int firstVisiblePos = mLayoutManager.findFirstVisibleItemPosition();
+                            if (firstChildTop > 0 && firstChildTop < 20 && firstVisiblePos == 0) {
+                                // scrolled to top?
+                                mSwipeLayout.setEnabled(true);
+                                return;
+                            }
+                        }
+
+                        // scrolled to bottom?
+                        if (mHasNextPage) {
+                            int visibleItemCount = mLayoutManager.getChildCount();
+                            int totalItemCount = mLayoutManager.getItemCount();
+                            int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
+                            if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                                // scrolled to bottom?
+                                setProgressLoading();
+                                loadNextPage(mAdapter);
+                                return;
+                            }
+                        }
+
+                        // otherwise...
+                        mSwipeLayout.setEnabled(false);
+                    }
+                });
+
+                // loading topic info: finished
+                setProgressFinished();
+
+
+                // first load
+                int maxPage = (mTopicInfo.ReplyCount + 1) / ITEM_PER_PAGE;
+
+                // set initial loading position
+                if (mParamPos == PARAM_POS_BEGINNING) {
+                    mPreviousPage = -1;
+                    mNextPage = 0;
+                    loadNextPage(mAdapter);
+                } else if (mParamPos == PARAM_POS_END) {
+                    mPreviousPage = maxPage;
+                    mNextPage = maxPage + 1;
+                    loadPreviousPage(mAdapter);
+                } else {
+                    mNextPage = mParamPos/ITEM_PER_PAGE;
+                    mPreviousPage = mNextPage - 1;
+                    loadNextPage(mAdapter);
+                }
             }
 
             @Override
@@ -147,68 +200,84 @@ public class PostsFragment extends Fragment {
 
     // - - -
 
-    private boolean isLoading = false;
-    private boolean isNoMoreItem = false;
-
-    private int lastLoadStartPos = -1;
-
-    public static final int ITEM_PER_PAGE = 10;
-
-    // Adapter 使用这两个值的时候，必然已经被设置过了
-    private int mIntentId;
-    private final XMLUtil.TopicInfo mTopicInfo = new XMLUtil.TopicInfo();
-
-
-    // - - -
-
     private final void setProgressLoading() {
-        isLoading = true;
-        thisView.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        mSwipeLayout.setRefreshing(true);
+        mSwipeLayout.setEnabled(false);
     }
 
     private final void setProgressFinished() {
-        thisView.findViewById(R.id.progressBar).setVisibility(View.GONE);
-        isLoading = false;
+        mSwipeLayout.setRefreshing(false);
+        mSwipeLayout.setEnabled(false);
+    }
+
+    public static final int ITEM_PER_PAGE = 10;
+
+    private int mPreviousPage = -1;
+    private int mNextPage = -1;
+
+    private boolean mHasPreviousPage = true;
+    private boolean mHasNextPage = true;
+
+    private boolean isLoaded = false;
+
+    private final void loadNextPage(ShowPostsAdapter adapter) {
+        loadPage(false, adapter);
+    }
+
+    private final void loadPreviousPage(ShowPostsAdapter adapter) {
+        loadPage(true, adapter);
     }
 
 
-    private final void loadAPage(final ShowPostsAdapter adapter) {
-        setProgressLoading();
+    // loadprevious true: previous false: next
+    private final void loadPage(final boolean loadPrevious, final ShowPostsAdapter adapter) {
 
-        int intentId = mParamId;
-        int intentStartPos = mParamPos;
+        final int posToLoad = (loadPrevious) ? mPreviousPage*ITEM_PER_PAGE : mNextPage*ITEM_PER_PAGE;
+        final int sizeToLoad = ITEM_PER_PAGE;
 
-        final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
+        if (loadPrevious && (!mHasPreviousPage || posToLoad < 0)) {
+            HelperUtil.debugToast(getActivity(), "Already at first page");
+            mHasPreviousPage = false;
+            setProgressFinished();
+            return;
+        } else if (!loadPrevious && (!mHasNextPage || posToLoad > mTopicInfo.ReplyCount)) {
+            HelperUtil.debugToast(getActivity(), "Already at last page");
+            mHasNextPage = false;
+            setProgressFinished();
+            return;
+        }
 
         class Callback implements APIUtil.APICallback {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                XMLUtil.ArrayOf<XMLUtil.PostInfo> postInfoArr = new XMLUtil.ArrayOf<>(XMLUtil.PostInfo.class);
+                XMLUtil.ArrayOf<XMLUtil.PostInfo> postsInfo = new XMLUtil.ArrayOf<>(XMLUtil.PostInfo.class);
                 try {
-                    postInfoArr.parse(new String(body));
+                    postsInfo.parse(new String(body));
                 } catch (Exception e) {
                     e.printStackTrace();
                     onFailure(-1, headers, body, e);
+                    return;
                 }
-
-                if (postInfoArr.size() == 0) {
-                    isNoMoreItem = true;
-                    HelperUtil.debugToast(getActivity(), "End of list");
+                if (loadPrevious) {
+                    adapter.appendDataFront(postsInfo);
+                    mPreviousPage --;
                 } else {
-                    adapter.appendData(postInfoArr);
-                    lastLoadStartPos = pageStart;
+                    adapter.appendData(postsInfo);
+                    mNextPage ++;
                 }
                 setProgressFinished();
             }
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                setProgressFinished();
                 HelperUtil.errorToast(getActivity(), "Error, code=" + statCode + ", error=" + error.toString());
+                setProgressFinished();
             }
         }
 
-        new APIUtil.GetTopicPost(getActivity(), intentId, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
+        setProgressLoading();
+        HelperUtil.debugToast(getActivity(), "Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
+        new APIUtil.GetTopicPost(getActivity(), mParamId, posToLoad, null, sizeToLoad, new Callback()).execute();
     }
 
 
@@ -225,6 +294,15 @@ public class PostsFragment extends Fragment {
             notifyDataSetChanged();
         }
 
+        public final void appendDataFront(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
+            if (mData == null) {
+                mData = data;
+            } else {
+                mData.appendFront(data);
+            }
+            notifyItemRangeInserted(0, data.size());
+        }
+
         public ShowPostsAdapter(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
             mData = data;
         }
@@ -237,10 +315,16 @@ public class PostsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(final ViewHolder viewHolder, int position) {
+
+            if (!isLoaded) {
+                mSwipeLayout.setEnabled(true);
+                isLoaded = true;
+            }
+
             final XMLUtil.PostInfo dataItem = mData.get(position);
 
-            viewHolder.topicInfo = mTopicInfo;
-            viewHolder.postInfo = mData.get(position);
+            viewHolder.data_topicInfo = mTopicInfo;
+            viewHolder.data_postInfo = mData.get(position);
 
             viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复 #" + dataItem.Floor : dataItem.Title);
             viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
@@ -248,7 +332,7 @@ public class PostsFragment extends Fragment {
 
             if (dataItem.Floor == 1) {
                 viewHolder.replyInfo.setVisibility(View.VISIBLE);
-                viewHolder.replyInfo.setText(mTopicInfo.HitCount + " 次点击, " + mTopicInfo.ReplyCount + " 次回复");
+                viewHolder.replyInfo.setText(viewHolder.data_topicInfo.HitCount + " 次点击, " + viewHolder.data_topicInfo.ReplyCount + " 次回复");
             } else {
                 viewHolder.replyInfo.setVisibility(View.GONE);
             }
@@ -296,7 +380,6 @@ public class PostsFragment extends Fragment {
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public ImageView avatar;
-
         public TextView title;
         public TextView authorInfo;
         public TextView replyInfo;
@@ -305,8 +388,8 @@ public class PostsFragment extends Fragment {
         public ImageView imgReply;
         public ImageView imgQuote;
 
-        public XMLUtil.TopicInfo topicInfo;
-        public XMLUtil.PostInfo postInfo;
+        public XMLUtil.TopicInfo data_topicInfo;
+        public XMLUtil.PostInfo data_postInfo;
 
         public ViewHolder(View itemLayoutView) {
             super(itemLayoutView);
@@ -328,14 +411,14 @@ public class PostsFragment extends Fragment {
             HelperUtil.generalDebug("PostsFragment", "onClick " + v.toString());
             switch (v.getId()) {
                 case R.id.image_reply:
-                    String replyTitle = (postInfo.Floor == 1) ? "" : "回复 " + postInfo.UserName + "(#" + postInfo.Floor + ")";
-                    ActivityUtil.openNewPostDialog(v.getContext(), topicInfo.Id, replyTitle, "");
+                    String replyTitle = (data_postInfo.Floor == 1) ? "" : "回复 " + data_postInfo.UserName + "(#" + data_postInfo.Floor + ")";
+                    ActivityUtil.openNewPostDialog(v.getContext(), data_topicInfo.Id, replyTitle, "");
                     break;
                 case R.id.image_quote:
-                    String quoteTitle = "回复 " + postInfo.UserName + "(#" + postInfo.Floor + ")";
-                    ActivityUtil.openNewPostDialog(v.getContext(), topicInfo.Id, quoteTitle,
-                            "[quotex][i]> " + postInfo.UserName + "@" + postInfo.Time + "(#" + postInfo.Floor + ")[/i]\n" +
-                            postInfo.Content + "[/quotex]\n\n");
+                    String quoteTitle = "回复 " + data_postInfo.UserName + "(#" + data_postInfo.Floor + ")";
+                    ActivityUtil.openNewPostDialog(v.getContext(), data_topicInfo.Id, quoteTitle,
+                            "[quotex][i]> " + data_postInfo.UserName + "@" + data_postInfo.Time + "(#" + data_postInfo.Floor + ")[/i]\n" +
+                                    data_postInfo.Content + "[/quotex]\n\n");
             }
         }
     }
