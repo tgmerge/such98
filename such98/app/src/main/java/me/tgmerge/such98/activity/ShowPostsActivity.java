@@ -23,7 +23,7 @@ public class ShowPostsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment_base);
+        setContentView(R.layout.fragment_base);
 
         mNavDrawerFragment = (NavDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);

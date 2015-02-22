@@ -4,7 +4,6 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.view.MenuItem;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.fragment.boards.BoardsFragment;
@@ -23,7 +22,7 @@ public class ShowBoardsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment_base);
+        setContentView(R.layout.fragment_base);
 
         mNavigationDrawerFragment = (NavDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
