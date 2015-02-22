@@ -88,6 +88,9 @@ public class TopicsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mHasPreviousPage = true;
+        mHasNextPage = true;
+
         mRecyclerView = (RecyclerView) mThisView.findViewById(R.id.recyclerView);
         mSwipeLayout = (SwipeRefreshLayout) mThisView.findViewById(R.id.swipe_container);
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -241,8 +244,8 @@ public class TopicsFragment extends Fragment {
     private int mPreviousPage = -1;
     private int mNextPage = -1;
 
-    private boolean mHasPreviousPage = true;
-    private boolean mHasNextPage = true;
+    private boolean mHasPreviousPage;
+    private boolean mHasNextPage;
 
     private boolean isLoaded = false;
 
