@@ -7,11 +7,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="2dp"
-    card_view:contentPadding="16dp"
-    android:layout_marginLeft="0dp"
-    android:layout_marginRight="0dp"
+    card_view:contentPaddingTop="16dp"
+    card_view:contentPaddingLeft="16dp"
+    card_view:contentPaddingRight="16dp"
     android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp">
+    android:layout_marginBottom="4dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
+    android:background="@color/item_background">
 
     <LinearLayout
         android:orientation="vertical"
@@ -77,61 +80,42 @@
 
         </RelativeLayout>
 
-        <View
-            android:visibility="gone"
-            android:id="@+id/view_divider_header"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/text_dividers"
-            android:layout_below="@id/relativeLayout_header"/>
-
         <TextView
             android:id="@+id/text_content"
             android:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
             android:textColor="@color/text_text"
             android:textSize="16sp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/view_divider_header"/>
-
-        <View
-            android:visibility="gone"
-            android:id="@+id/view_divider_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/text_dividers"
-            android:layout_below="@id/relativeLayout_header"/>
+            android:layout_height="wrap_content"/>
 
         <LinearLayout
+            android:paddingTop="8dp"
+            android:paddingBottom="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="right"
-            android:layout_below="@id/view_divider_content">
+            android:gravity="right">
 
             <ImageView
                 android:id="@+id/image_reply"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="4dp"
                 android:layout_marginLeft="24dp"
                 android:src="@drawable/ic_reply_grey600_24dp"
                 android:clickable="true"
-                android:background="@drawable/touch_background_selector"/>
+                android:background="@drawable/background_touch_selector"/>
 
             <ImageView
                 android:id="@+id/image_quote"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="4dp"
                 android:layout_marginLeft="24dp"
                 android:src="@drawable/ic_quote_grey600_24dp"
                 android:clickable="true"
-                android:background="@drawable/touch_background_selector"/>
+                android:background="@drawable/background_touch_selector"/>
 
         </LinearLayout>
 

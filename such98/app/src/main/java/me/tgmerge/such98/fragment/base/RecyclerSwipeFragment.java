@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment;
+package me.tgmerge.such98.fragment.base;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -102,7 +102,6 @@ public abstract class RecyclerSwipeFragment extends Fragment {
                     int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
                     if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
                         // scrolled to bottom?
-                        setProgressLoading();
                         loadNextPage(mAdapter);
                         return;
                     }
@@ -129,6 +128,7 @@ public abstract class RecyclerSwipeFragment extends Fragment {
                 loadPreviousPage(mAdapter);
             }
         });
+        mSwipeLayout.setColorSchemeResources(R.color.swipe_refresh_1, R.color.swipe_refresh_2, R.color.swipe_refresh_3);
 
         // loading topic info...
         setProgressLoading();
@@ -160,8 +160,8 @@ public abstract class RecyclerSwipeFragment extends Fragment {
     protected boolean isLoaded = false;
 
     protected final void setProgressLoading() {
+        mSwipeLayout.setEnabled(true);
         mSwipeLayout.setRefreshing(true);
-        mSwipeLayout.setEnabled(false);
     }
 
     protected final void setProgressFinished() {
@@ -181,6 +181,8 @@ public abstract class RecyclerSwipeFragment extends Fragment {
     // true: previous
     // false: next
     protected final void loadPage(final boolean loadPrevious, final RecyclerSwipeAdapter adapter) {
+        setProgressLoading();
+
         final int posToLoad = (loadPrevious) ? mPreviousPage*ITEM_PER_PAGE : mNextPage*ITEM_PER_PAGE;
         final int sizeToLoad = ITEM_PER_PAGE;
 

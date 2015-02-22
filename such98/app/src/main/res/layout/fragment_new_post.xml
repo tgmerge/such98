@@ -11,7 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/background_light">
+        android:background="@color/item_background">
 
         <LinearLayout
             android:id="@+id/new_post_header"
@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp">
+            android:layout_marginRight="16dp"
+            android:gravity="center_vertical">
 
             <FrameLayout
                 android:layout_width="40dp"
@@ -42,7 +43,6 @@
             </FrameLayout>
 
             <EditText
-                android:layout_gravity="bottom"
                 android:id="@+id/new_post_title"
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -58,10 +58,11 @@
             <ImageView
                 android:id="@+id/new_post_send"
                 android:src="@drawable/ic_send_grey600_24dp"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="4dp"
                 android:clickable="true"
-                android:background="@drawable/touch_background_selector"/>
+                android:background="@drawable/background_transparent_touch_selector"/>
 
         </LinearLayout>
 
@@ -98,7 +99,6 @@
             android:layout_gravity="center"
             android:layout_centerInParent="true"
             style="@android:style/Widget.Holo.Light.ProgressBar"/>
-
 
     </RelativeLayout>
 </ScrollView>

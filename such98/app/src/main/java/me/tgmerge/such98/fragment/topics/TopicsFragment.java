@@ -8,8 +8,8 @@ import android.view.View;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.RecyclerSwipeAdapter;
-import me.tgmerge.such98.fragment.RecyclerSwipeFragment;
+import me.tgmerge.such98.fragment.base.RecyclerSwipeAdapter;
+import me.tgmerge.such98.fragment.base.RecyclerSwipeFragment;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
@@ -67,6 +67,12 @@ public class TopicsFragment extends RecyclerSwipeFragment {
                         onFailure(-1, headers, body, e);
                         return;
                     }
+
+                    // todo prevent rotate screen -> crash
+                    if (getActivity() == null) {
+                        return;
+                    }
+
                     // loading topic info: finished
                     getActivity().setTitle(mBoardInfo.Name);
                     mRecyclerView.setEnabled(true);

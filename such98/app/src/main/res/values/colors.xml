@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- text -->
     <item name="text_text" type="color">#212121</item>
-    <item name="text_secondary" type="color">#727272</item>
-    <item name="text_dividers" type="color">#DADADA</item>
-    <item name="text_background" type="color">#FFFFFF</item>
+    <item name="text_secondary" type="color">#757575</item>
+    <item name="text_icon" type="color">#757575</item>
+    <item name="text_hint" type="color">#BDBDBD</item>
+    <item name="text_disabled" type="color">#BDBDBD</item>
+    <item name="text_dividers" type="color">#E0E0E0</item>
+    <item name="text_background" type="color">#FAFAFA</item>
 
+    <!-- recycler view -->
+    <item name="container_background" type="color">#EBEBEB</item>
+    <item name="item_background" type="color">#FAFAFA</item>
 
+    <!-- primary -->
+    <item name="indigo_100" type="color">#C5CAE9</item>
+    <item name="indigo_500" type="color">#3F51B5</item>
+    <item name="indigo_700" type="color">#303F9F</item>
 
+    <!-- accent -->
+    <item name="red_accent_700" type="color">#D50000</item>
 
-
+    <!-- swipe refresh -->
+    <item name="swipe_refresh_1" type="color">#2196F3</item> <!-- blue 500-->
+    <item name="swipe_refresh_2" type="color">#4CAF50</item> <!-- green 500 -->
+    <item name="swipe_refresh_3" type="color">#F44336</item> <!-- red 500 -->
 
 </resources>

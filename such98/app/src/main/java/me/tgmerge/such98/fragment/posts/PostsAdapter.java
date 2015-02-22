@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.RecyclerSwipeAdapter;
+import me.tgmerge.such98.fragment.base.RecyclerSwipeAdapter;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.BBUtil;
 import me.tgmerge.such98.util.CacheUtil;

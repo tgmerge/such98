@@ -2,21 +2,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/activity_horizontal_margin"
+    android:padding="16dp"
     android:orientation="vertical"
     tools:context=".LoginActivity"
     android:gravity="center">
+
+    <ImageView
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="96dp"
+        android:src="@drawable/ic_circle_grey600_48dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/text_dividers"/>
 
     <Button android:id="@+id/button_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login"
+        android:textColor="@color/text_secondary"
+        style="?android:attr/borderlessButtonStyle"
+        android:background="@drawable/background_transparent_touch_selector"
         android:onClick="onLoginButtonClicked"/>
 
     <Button android:id="@+id/button_test"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Test List"
+        android:textColor="@color/text_disabled"
+        style="?android:attr/borderlessButtonStyle"
+        android:background="@drawable/background_transparent_touch_selector"
         android:onClick="onTestButtonClicked"/>
+
 
 </LinearLayout>

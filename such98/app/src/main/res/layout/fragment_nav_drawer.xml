@@ -11,14 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/background_material_light">
+        android:background="@color/item_background">
 
         <RelativeLayout
             android:id="@+id/drawer_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
-            android:paddingLeft="16dp">
+            android:paddingLeft="16dp"
+            android:clickable="true"
+            android:background="@drawable/background_transparent_touch_selector">
 
             <ImageView
                 android:id="@+id/drawer_avatar_circle"
@@ -88,7 +90,7 @@
             android:paddingLeft="16dp"
             android:drawablePadding="32dp"
             android:clickable="true"
-            android:background="@drawable/touch_background_selector"/>
+            android:background="@drawable/background_transparent_touch_selector"/>
 
         <TextView
             android:id="@+id/drawer_function_custom_board"
@@ -102,7 +104,7 @@
             android:paddingLeft="16dp"
             android:drawablePadding="32dp"
             android:clickable="true"
-            android:background="@drawable/touch_background_selector"/>
+            android:background="@drawable/background_transparent_touch_selector"/>
 
         <TextView
             android:id="@+id/drawer_function_hot_topic"
@@ -116,7 +118,7 @@
             android:paddingLeft="16dp"
             android:drawablePadding="32dp"
             android:clickable="true"
-            android:background="@drawable/touch_background_selector"/>
+            android:background="@drawable/background_transparent_touch_selector"/>
 
         <TextView
             android:id="@+id/drawer_function_new_topic"
@@ -130,7 +132,7 @@
             android:paddingLeft="16dp"
             android:drawablePadding="32dp"
             android:clickable="true"
-            android:background="@drawable/touch_background_selector"/>
+            android:background="@drawable/background_transparent_touch_selector"/>
 
         <View
             android:layout_marginTop="4dp"
@@ -160,7 +162,7 @@
             android:paddingLeft="16dp"
             android:drawablePadding="32dp"
             android:clickable="true"
-            android:background="@drawable/touch_background_selector"/>
+            android:background="@drawable/background_transparent_touch_selector"/>
 
         <View
             android:layout_marginTop="4dp"
@@ -190,7 +192,7 @@
             android:paddingLeft="16dp"
             android:drawablePadding="32dp"
             android:clickable="true"
-            android:background="@drawable/touch_background_selector"/>
+            android:background="@drawable/background_transparent_touch_selector"/>
 
         <TextView
             android:id="@+id/drawer_function_logout"
@@ -204,7 +206,7 @@
             android:paddingLeft="16dp"
             android:drawablePadding="32dp"
             android:clickable="true"
-            android:background="@drawable/touch_background_selector"/>
+            android:background="@drawable/background_transparent_touch_selector"/>
 
     </LinearLayout>
 

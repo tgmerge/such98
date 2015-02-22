@@ -7,17 +7,14 @@
     android:layout_height="wrap_content"
     android:minHeight="72dp"
     android:paddingTop="16dp"
-    android:paddingBottom="16dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:layout_marginBottom="1dp"
-    android:background="@color/text_background">
+    android:background="@drawable/background_touch_selector">
 
     <ImageView
         android:id="@+id/img_circle"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentLeft="true"
+        android:layout_marginLeft="16dp"
         android:src="@drawable/ic_circle_grey600_48dp"
         android:layout_centerInParent="true"/>
 
@@ -33,14 +30,15 @@
 
     <TextView
         android:id="@+id/text_name"
-        android:text="Two-line item\n"
+        android:text="Two-line item"
         android:textSize="16sp"
         android:textColor="@color/text_text"
         android:paddingBottom="3dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="56dp"/>
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="16dp"/>
 
     <TextView
         android:id="@+id/text_isCategory"
@@ -49,7 +47,8 @@
         android:textColor="@color/text_secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"/>
 
     <TextView
         android:id="@+id/text_description"
@@ -59,7 +58,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="56dp"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="16dp"
         android:layout_below="@id/text_name"/>
 
     <TextView
@@ -68,12 +68,28 @@
         android:text="作为帖子版面打开"
         android:textSize="14sp"
         android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:paddingRight="20dp"
         android:textColor="@color/text_text"
-        android:background="@drawable/touch_background_selector"
+        android:background="@drawable/background_transparent_touch_selector"
         android:layout_below="@id/text_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="56dp"/>
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="16dp"/>
+
+    <Space
+        android:layout_height="15dp"
+        android:layout_width="match_parent"
+        android:layout_below="@id/text_openAsNotCat" />
+
+    <View
+        android:id="@+id/view_divider_content"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/text_dividers"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="72dp"/>
 
 </RelativeLayout>

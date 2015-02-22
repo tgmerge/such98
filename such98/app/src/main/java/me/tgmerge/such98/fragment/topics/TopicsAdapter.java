@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.RecyclerSwipeAdapter;
+import me.tgmerge.such98.fragment.base.RecyclerSwipeAdapter;
 import me.tgmerge.such98.util.XMLUtil;
 
 class TopicsAdapter extends RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> {
