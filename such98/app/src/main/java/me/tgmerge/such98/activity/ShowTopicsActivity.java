@@ -36,7 +36,7 @@ public class ShowTopicsActivity extends ActionBarActivity {
         // Set up the content.
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.add(R.id.container, TopicsFragment.newInstance(
-                        getIntent().getIntExtra(INTENT_KEY_ID, TopicsFragment.ID_HOT),
+                        getIntent().getIntExtra(INTENT_KEY_ID, TopicsFragment.PARAM_ID_HOT),
                         getIntent().getIntExtra(INTENT_KEY_START_POS, 0))
         );
         transaction.commit();

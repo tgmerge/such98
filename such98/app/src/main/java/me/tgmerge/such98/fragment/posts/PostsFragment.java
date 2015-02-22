@@ -38,14 +38,9 @@ public class PostsFragment extends Fragment {
     private int mParamId = 0;
     private int mParamPos = 0;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param paramId  The fragment will show board #paramId (ID_ROOT and ID_CUSTOM is also valid)
-     * @param paramPos Items from #paramPos will be shown at the beginning
-     * @return A new instance of fragment BoardsFragment.
-     */
+    // root view of this fragment
+    View mThisView = null;
+
     public static PostsFragment newInstance(int paramId, int paramPos) {
         PostsFragment fragment = new PostsFragment();
         Bundle args = new Bundle();
@@ -65,9 +60,6 @@ public class PostsFragment extends Fragment {
         }
         setHasOptionsMenu(true);
     }
-
-    // root view of this fragment
-    View mThisView = null;
 
     // onCreateView: inflate the layout for this fragment.
     //               saving layout in mThisView for further usage in class methods
@@ -216,7 +208,7 @@ public class PostsFragment extends Fragment {
             case R.id.action_refresh:
                 ActivityUtil.reloadFragment(activity, containerId);
                 return true;
-            case R.id.action_reply:
+            case R.id.action_new_reply:
                 ActivityUtil.openNewPostDialog(activity, containerId, "", "");
                 return true;
             case R.id.action_toFirstPage:

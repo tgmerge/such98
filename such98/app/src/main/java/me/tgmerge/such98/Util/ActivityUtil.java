@@ -33,12 +33,12 @@ public final class ActivityUtil {
         // activity
         public static final void showHotTopics(Context ctx) { showHotTopics(ctx, false); }
         public static final void showHotTopics(Context ctx, boolean clearTask) {
-            openShowTopicsActivity(ctx, TopicsFragment.ID_HOT, 0, clearTask);
+            openShowTopicsActivity(ctx, TopicsFragment.PARAM_ID_HOT, 0, clearTask);
         }
 
         public static final void showNewTopics(Context ctx) { showNewTopics(ctx, false); }
         public static final void showNewTopics(Context ctx, boolean clearTask) {
-            openShowTopicsActivity(ctx, TopicsFragment.ID_NEW, 0, clearTask);
+            openShowTopicsActivity(ctx, TopicsFragment.PARAM_ID_NEW, 0, clearTask);
         }
 
         public static final void showRootBoard(Context ctx) { showRootBoard(ctx, false); }
@@ -87,8 +87,20 @@ public final class ActivityUtil {
             loadPostsFragment(act, containerId, topicId, PostsFragment.PARAM_POS_END);
         }
 
-        public static final void postFragmentFloor(Activity act, int containerId, int topicId, int pos) {
+        public static final void postFragmentToFloor(Activity act, int containerId, int topicId, int pos) {
             loadPostsFragment(act, containerId, topicId, pos);
+        }
+
+        public static final void topicFragmentFirstPage(Activity act, int containerId, int boardId) {
+            loadTopicsFragment(act, containerId, boardId, TopicsFragment.PARAM_POS_BEGINNING);
+        }
+
+        public static final void topicFragmentLastPage(Activity act, int containerId, int boardId) {
+            loadTopicsFragment(act, containerId, boardId, TopicsFragment.PARAM_POS_END);
+        }
+
+        public static final void topicFragmentToItem(Activity act, int containerId, int topicId, int pos) {
+            loadTopicsFragment(act, containerId, topicId, pos);
         }
 
 
@@ -189,6 +201,32 @@ public final class ActivityUtil {
         alert.show();
     }
 
+    public static final void openGotoTopicItemDialog(final Activity act, final int containerId, final int boardId, final int itemNum) {
+        logDebug("Opening 'goto topic item' dialog, bID=" + boardId + ", itemNum=" + itemNum);
+        AlertDialog.Builder alert = new AlertDialog.Builder(act);
+        alert.setTitle("Jump to");
+        final EditText input = new EditText(act);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setHint("Topic (1-" + itemNum + ")");
+        alert.setView(input);
+        alert.setPositiveButton("Jump", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    int floor = Integer.parseInt(input.getText().toString());
+                    if (floor > itemNum || floor < 1) {
+                        throw new NumberFormatException("floor=" + floor + " is invalid");
+                    }
+                    loadTopicsFragment(act, containerId, boardId, floor - 1);
+                } catch (NumberFormatException e) {
+                    HelperUtil.errorToast(act, "Wrong item number");
+                    e.printStackTrace();
+                }
+            }
+        });
+        alert.show();
+    }
+
     // fragment
 
     public static final void reloadFragment(Activity act, int containerId) {
@@ -204,6 +242,14 @@ public final class ActivityUtil {
         logDebug("Loading PostsFragment, id=" + topicId + ", pos=" + startPos);
         FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
         PostsFragment fragment = PostsFragment.newInstance(topicId, startPos);
+        transaction.replace(containerId, fragment);
+        transaction.commit();
+    }
+
+    public static final void loadTopicsFragment(Activity act, int containerId, int boardId, int startPos) {
+        logDebug("Loading TopicsFragment, id=" + boardId + ", pos=" + startPos);
+        FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
+        TopicsFragment fragment = TopicsFragment.newInstance(boardId, startPos);
         transaction.replace(containerId, fragment);
         transaction.commit();
     }

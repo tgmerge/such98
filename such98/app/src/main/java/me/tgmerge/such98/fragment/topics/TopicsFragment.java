@@ -3,10 +3,13 @@ package me.tgmerge.such98.fragment.topics;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -14,6 +17,7 @@ import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
@@ -24,23 +28,22 @@ public class TopicsFragment extends Fragment {
     private static final String ARG_PARAM_ID = "id";
     private static final String ARG_PARAM_POS = "pos";
 
+    public static final int PARAM_POS_BEGINNING = 0;
+    public static final int PARAM_POS_END = -1;
+
+    public static final int PARAM_ID_NEW = -1;
+    public static final int PARAM_ID_HOT = -2;
+
+    // should be bigger than top margin of recyclerView items
+    // TODO solve this
+    private static final int SWIPE_ENABLE_RANGE = 20;
+
     private int mParamId = 0;
     private int mParamPos = 0;
 
-    // consts for mParamId;
-    public static final int ID_NEW = -1, ID_HOT = -2;
-
     // root view of this fragment
-    View thisView = null;
+    View mThisView = null;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param paramId  The fragment will show board #paramId (ID_ROOT and ID_CUSTOM is also valid)
-     * @param paramPos Items from #paramPos will be shown at the beginning
-     * @return A new instance of fragment BoardsFragment.
-     */
     public static TopicsFragment newInstance(int paramId, int paramPos) {
         TopicsFragment fragment = new TopicsFragment();
         Bundle args = new Bundle();
@@ -50,7 +53,6 @@ public class TopicsFragment extends Fragment {
         return fragment;
     }
 
-    // onCreate: params will be set to member variables.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,92 +60,145 @@ public class TopicsFragment extends Fragment {
             mParamId = getArguments().getInt(ARG_PARAM_ID);
             mParamPos = getArguments().getInt(ARG_PARAM_POS);
         }
+        if (mParamId != PARAM_ID_HOT && mParamId != PARAM_ID_NEW) {
+            setHasOptionsMenu(true);
+        }
     }
 
-    // onCreateView: inflate the layout for this fragment.
-    //               saving layout in thisView for further usage in class methods
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        thisView = inflater.inflate(R.layout.fragment_topics, container, false);
-        return thisView;
+        mThisView = inflater.inflate(R.layout.fragment_topics, container, false);
+        return mThisView;
     }
 
-
-    // onAttach: called at the very first
-    // http://developer.android.com/training/basics/fragments/communicating.html
-    //           todo register parent activity as listeners
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_fragment_topics, menu);
     }
 
-    // onDetach: call at the very last
-    //           todo recycle resources, setting them to null will be fine
-    //           todo clear listeners references
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
+    RecyclerView mRecyclerView;
+    LinearLayoutManager mLayoutManager;
+    SwipeRefreshLayout mSwipeLayout;
+    TopicsAdapter mAdapter;
 
+    XMLUtil.BoardInfo mBoardInfo = new XMLUtil.BoardInfo();
 
-    // onActivityCreated: the activity has finished its "onCreated"
-    //                    this will be also called when fragment replace happens.
-    // see http://segmentfault.com/blog/shiyongdanshuiyu/1190000000650573
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final RecyclerView recyclerView = (RecyclerView) thisView.findViewById(R.id.recyclerView);
+        mRecyclerView = (RecyclerView) mThisView.findViewById(R.id.recyclerView);
+        mSwipeLayout = (SwipeRefreshLayout) mThisView.findViewById(R.id.swipe_container);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mAdapter = new TopicsAdapter(null);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-
-        final TopicsAdapter adapter = new TopicsAdapter(null);
-        recyclerView.setAdapter(adapter);
-
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        mRecyclerView.setEnabled(false);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView view, int dx, int dy) {
-                if (!isLoading && !isNoMoreItem) {
-                    int visibleItemCount = layoutManager.getChildCount();
-                    int totalItemCount = layoutManager.getItemCount();
-                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
-                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                        HelperUtil.debugToast(getActivity(), "Loading more...");
-                        loadAPage(adapter);
+                if (mSwipeLayout.isRefreshing()) {
+                    return;
+                }
+
+                if (mHasPreviousPage) {
+                    int firstChildTop = mRecyclerView.getChildAt(0).getTop();
+                    int firstVisiblePos = mLayoutManager.findFirstVisibleItemPosition();
+                    if (firstChildTop > 0 && firstChildTop < SWIPE_ENABLE_RANGE && firstVisiblePos == 0) {
+                        // scrolled to top?
+                        mSwipeLayout.setEnabled(true);
+                        return;
                     }
+                }
+
+                if (mHasNextPage) {
+                    int visibleItemCount = mLayoutManager.getChildCount();
+                    int totalItemCount = mLayoutManager.getItemCount();
+                    int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                        // scrolled to bottom?
+                        setProgressLoading();
+                        loadNextPage(mAdapter);
+                        return;
+                    }
+                }
+
+                // otherwise...
+                if (mSwipeLayout.isEnabled()) {
+                    mSwipeLayout.setEnabled(false);
                 }
             }
         });
 
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        // config adapter
+        mAdapter.setSwipeLayout(mSwipeLayout);
 
-        int intentBoardId = mParamId;
-        final XMLUtil.BoardInfo boardInfo = new XMLUtil.BoardInfo();
+        mSwipeLayout.setEnabled(false);
+        mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadPreviousPage(mAdapter);
+            }
+        });
 
-        if (intentBoardId == ID_HOT) {
-            boardInfo.Id = ID_HOT;
-            boardInfo.Name = "热门主题";
-            getActivity().setTitle(boardInfo.Name);
-            loadAPage(adapter);
-        } else if (intentBoardId == ID_NEW) {
-            boardInfo.Id = ID_NEW;
-            boardInfo.Name = "最新主题";
-            getActivity().setTitle(boardInfo.Name);
-            loadAPage(adapter);
+        setProgressLoading();
+
+        if (mParamId == PARAM_ID_HOT) {
+            mBoardInfo.Id = PARAM_ID_HOT;
+            mBoardInfo.Name = "热门主题";
+            mBoardInfo.TotalTopicCount = 10;
+            getActivity().setTitle(mBoardInfo.Name);
+            mPreviousPage = -1;
+            mNextPage = 0;
+            loadNextPage(mAdapter);
+        } else if (mParamId == PARAM_ID_NEW) {
+            mBoardInfo.Id = PARAM_ID_NEW;
+            mBoardInfo.Name = "最新主题";
+            mBoardInfo.TotalTopicCount = 500; // todo verify
+            getActivity().setTitle(mBoardInfo.Name);
+            mPreviousPage = -1;
+            mNextPage = 0;
+            loadNextPage(mAdapter);
         } else {
-            new APIUtil.GetBoard(getActivity(), intentBoardId, new APIUtil.APICallback() {
+            new APIUtil.GetBoard(getActivity(), mParamId, new APIUtil.APICallback() {
                 @Override
                 public void onSuccess(int statCode, Header[] headers, byte[] body) {
                     try {
-                        boardInfo.parse(new String(body));
+                        mBoardInfo.parse(new String(body));
                     } catch (Exception e) {
                         e.printStackTrace();
                         onFailure(-1, headers, body, e);
+                        return;
                     }
-                    getActivity().setTitle(boardInfo.Name);
-                    loadAPage(adapter);
+                    // loading topic info: finished
+                    getActivity().setTitle(mBoardInfo.Name);
+                    mRecyclerView.setEnabled(true);
+                    setProgressFinished();
+
+                    // first load
+                    int maxPage = mBoardInfo.TotalTopicCount / ITEM_PER_PAGE;
+
+                    // set initial loading position
+                    if (mParamPos == PARAM_POS_BEGINNING) {
+                        mPreviousPage = -1;
+                        mNextPage = 0;
+                        loadNextPage(mAdapter);
+                    } else if (mParamPos == PARAM_POS_END) {
+                        mPreviousPage = maxPage;
+                        mNextPage = maxPage + 1;
+                        loadPreviousPage(mAdapter);
+                    } else {
+                        mNextPage = mParamPos/ITEM_PER_PAGE;
+                        mPreviousPage = mNextPage - 1;
+                        loadNextPage(mAdapter);
+                    }
+
+                    if(!isLoaded) {
+                        mSwipeLayout.setEnabled(true);
+                        isLoaded = true;
+                    }
                 }
 
                 @Override
@@ -154,62 +209,108 @@ public class TopicsFragment extends Fragment {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Activity activity = getActivity();
+        int containerId = ((View) mThisView.getParent()).getId();
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                ActivityUtil.reloadFragment(activity, containerId);
+                return true;
+            case R.id.action_new_topic:
+                //ActivityUtil.openNewTopicDialog(activity, containerId, "", "");
+                return true;
+            case R.id.action_toFirstPage:
+                ActivityUtil.Action.topicFragmentFirstPage(activity, containerId, mParamId);
+                return true;
+            case R.id.action_toLastPage:
+                ActivityUtil.Action.topicFragmentLastPage(activity, containerId, mParamId);
+                return true;
+            case R.id.action_toItem:
+                ActivityUtil.openGotoTopicItemDialog(activity, containerId, mParamId, mBoardInfo.TotalTopicCount);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     // - - -
 
-    private boolean isLoading = false;
-    private boolean isNoMoreItem = false;
-
-    private int lastLoadStartPos = -1;
-
     public static final int ITEM_PER_PAGE = 10;
+
+    private int mPreviousPage = -1;
+    private int mNextPage = -1;
+
+    private boolean mHasPreviousPage = true;
+    private boolean mHasNextPage = true;
+
+    private boolean isLoaded = false;
 
     // - - -
 
     private final void setProgressLoading() {
-        isLoading = true;
-        thisView.findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
+        mSwipeLayout.setRefreshing(true);
+        mSwipeLayout.setEnabled(false);
     }
 
     private final void setProgressFinished() {
-        thisView.findViewById(R.id.progress_bar).setVisibility(View.GONE);
-        isLoading = false;
+        mSwipeLayout.setRefreshing(false);
+        mSwipeLayout.setEnabled(false);
     }
 
-    private final void loadAPage(final TopicsAdapter adapter) {
-        setProgressLoading();
 
-        final int intentId = mParamId;
-        int intentStartPos = mParamPos;
+    private final void loadNextPage(TopicsAdapter adapter) {
+        loadPage(false, adapter);
+    }
 
-        final int pageStart = (this.lastLoadStartPos < 0) ? intentStartPos : this.lastLoadStartPos + ITEM_PER_PAGE;
+    private final void loadPreviousPage(TopicsAdapter adapter) {
+        loadPage(true, adapter);
+    }
+
+    private final void loadPage(final boolean loadPrevious, final TopicsAdapter adapter) {
+
+        final int posToLoad = (loadPrevious) ? mPreviousPage*ITEM_PER_PAGE : mNextPage*ITEM_PER_PAGE;
+        final int sizeToLoad = ITEM_PER_PAGE;
+
+        if (loadPrevious && (!mHasPreviousPage || posToLoad < 0)) {
+            HelperUtil.debugToast(getActivity(), "Already at first page");
+            mHasPreviousPage = false;
+            setProgressFinished();
+            return;
+        } else if (!loadPrevious && (!mHasNextPage || posToLoad > mBoardInfo.TotalTopicCount - 1)) {
+            HelperUtil.debugToast(getActivity(), "Already at last page");
+            mHasNextPage = false;
+            setProgressFinished();
+            return;
+        }
 
         class Callback implements APIUtil.APICallback {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                XMLUtil.ArrayOf<?> topicInfoArr;
+                XMLUtil.ArrayOf<?> topicsInfo;
 
-                if (intentId == ID_HOT) {
+                if (mParamId == PARAM_ID_HOT) {
                     // Hot topics
-                    topicInfoArr = new XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>(XMLUtil.HotTopicInfo.class);
+                    topicsInfo = new XMLUtil.ArrayOf<>(XMLUtil.HotTopicInfo.class);
                 } else {
                     // Other topics
-                    topicInfoArr = new XMLUtil.ArrayOf<XMLUtil.TopicInfo>(XMLUtil.TopicInfo.class);
+                    topicsInfo = new XMLUtil.ArrayOf<>(XMLUtil.TopicInfo.class);
                 }
 
                 try {
-                    topicInfoArr.parse(new String(body));
+                    topicsInfo.parse(new String(body));
                 } catch (Exception e) {
                     e.printStackTrace();
                     onFailure(-1, headers, body, e);
+                    return;
                 }
 
-                if (topicInfoArr.size() == 0) {
-                    isNoMoreItem = true;
-                    HelperUtil.debugToast(getActivity(), "Already at last page");
+                if (loadPrevious) {
+                    adapter.appendDataFront(topicsInfo);
+                    mPreviousPage --;
                 } else {
-                    adapter.appendData(topicInfoArr);
-                    lastLoadStartPos = pageStart;
+                    adapter.appendData(topicsInfo);
+                    mNextPage ++;
                 }
                 setProgressFinished();
             }
@@ -221,17 +322,18 @@ public class TopicsFragment extends Fragment {
             }
         }
 
-        if (intentId == ID_NEW) {
+        HelperUtil.debugToast(getActivity(), "Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
+        if (mParamId == PARAM_ID_NEW) {
             // Show new topics
-            new APIUtil.GetNewTopic(getActivity(), pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
+            new APIUtil.GetNewTopic(getActivity(), posToLoad, null, sizeToLoad, new Callback()).execute();
 
-        } else if (intentId == ID_HOT) {
+        } else if (mParamId == PARAM_ID_HOT) {
             // show hot topics
-            new APIUtil.GetHotTopic(getActivity(), pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
+            new APIUtil.GetHotTopic(getActivity(), posToLoad, null, sizeToLoad, new Callback()).execute();
 
         } else {
             // show topics by board id
-            new APIUtil.GetBoardTopic(getActivity(), intentId, pageStart, null, ITEM_PER_PAGE, new Callback()).execute();
+            new APIUtil.GetBoardTopic(getActivity(), mParamId, posToLoad, null, sizeToLoad, new Callback()).execute();
         }
     }
 

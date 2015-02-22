@@ -1,5 +1,6 @@
 package me.tgmerge.such98.fragment.topics;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,13 @@ class TopicsAdapter extends RecyclerView.Adapter<TopicViewHolder> {
 
     private XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> mData;
     private Class mDataItemClass;
+
+    private boolean mIsNeverLoaded = true;
+    private SwipeRefreshLayout mSwipeLayout = null;
+
+    public final void setSwipeLayout(SwipeRefreshLayout swipeLayout) {
+        mSwipeLayout = swipeLayout;
+    }
 
     public final void setData(XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> data) {
         Class itemClass = (data == null) ? null : data.getItemClass();
@@ -33,13 +41,34 @@ class TopicsAdapter extends RecyclerView.Adapter<TopicViewHolder> {
             return;
         }
 
+        int oldItemCount = mData.size();
+
         if (mDataItemClass == XMLUtil.HotTopicInfo.class) {
             ((XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) mData).append((XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) data);
         } else {
             ((XMLUtil.ArrayOf<XMLUtil.TopicInfo>) mData).append((XMLUtil.ArrayOf<XMLUtil.TopicInfo>) data);
         }
 
-        notifyDataSetChanged();
+        notifyItemRangeInserted(oldItemCount, data.size());
+    }
+
+    public final void appendDataFront(XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> data) {
+        if (mData == null) {
+            setData(data);
+            return;
+        }
+
+        if (data.getItemClass() != mDataItemClass) {
+            return;
+        }
+
+        if (mDataItemClass == XMLUtil.HotTopicInfo.class) {
+            ((XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) mData).appendFront((XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) data);
+        } else {
+            ((XMLUtil.ArrayOf<XMLUtil.TopicInfo>) mData).appendFront((XMLUtil.ArrayOf<XMLUtil.TopicInfo>) data);
+        }
+
+        notifyItemRangeInserted(0, data.size());
     }
 
     public TopicsAdapter(XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> data) {
@@ -61,6 +90,13 @@ class TopicsAdapter extends RecyclerView.Adapter<TopicViewHolder> {
 
     @Override
     public void onBindViewHolder(TopicViewHolder viewHolder, int position) {
+
+        if (mIsNeverLoaded) {
+            if (mSwipeLayout != null) {
+                mSwipeLayout.setEnabled(true);
+            }
+            mIsNeverLoaded = false;
+        }
 
         if (mDataItemClass == XMLUtil.TopicInfo.class) {
             XMLUtil.ArrayOf<XMLUtil.TopicInfo> thisData = (XMLUtil.ArrayOf<XMLUtil.TopicInfo>) mData;
