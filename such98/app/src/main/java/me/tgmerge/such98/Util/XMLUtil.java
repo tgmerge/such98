@@ -139,7 +139,7 @@ public class XMLUtil {
 
 
     @SuppressWarnings("unused")
-    public static final class TopicInfo extends XMLObj {
+    public static class TopicInfo extends XMLObj {
         public String Title;
         public int HitCount;
         public int Id;
@@ -163,7 +163,7 @@ public class XMLUtil {
         public String CreateTime;
         public TopicLastPostInfo LastPostInfo;
 
-        private static final HashSet<String> mDefaults =
+        protected static final HashSet<String> mDefaults =
                 newHashSet("Title", "HitCount", "Id", "BoardId", "BestState", "TopState", "ReplyCount",
                         "IsVote", "IsAnonymous", "AuthorName", "AuthorId", "IsLocked", "CreateTime");
 
@@ -205,20 +205,14 @@ public class XMLUtil {
 
 
     @SuppressWarnings("unused")
-    public static final class HotTopicInfo extends XMLObj {
-        public String Title;
-        public int HitCount;
-        public int Id;
-        public int BoardId;
+    public static final class HotTopicInfo extends TopicInfo {
         public String BoardName;
-        public int ReplyCount;
         public int ParticipantCount;
-        public String AuthorName;
-        public String CreateTime;
 
-        private static final HashSet<String> mDefaults =
-                newHashSet("Title", "HitCount", "Id", "BoardId", "BoardName", "ReplyCount", "ParticipantCount",
-                        "AuthorName", "CreateTime");
+        private static final HashSet<String> mDefaults = newHashSet("BoardName", "ParticipantCount");
+        static {
+            mDefaults.addAll(TopicInfo.mDefaults);
+        }
 
         @Override
         public Set<String> getDefaultFields() {
