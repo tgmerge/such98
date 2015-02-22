@@ -1,45 +1,22 @@
 package me.tgmerge.such98.fragment.posts;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.fragment.RecyclerSwipeAdapter;
+import me.tgmerge.such98.fragment.RecyclerSwipeFragment;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
 
-public class PostsFragment extends Fragment {
-
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM_ID = "id";
-    private static final String ARG_PARAM_POS = "pos";
-
-    public static final int PARAM_POS_BEGINNING = 0;
-    public static final int PARAM_POS_END = -1;
-
-    // should be bigger than top margin of recyclerView items
-    // TODO solve this
-    private static final int SWIPE_ENABLE_RANGE = 20;
-
-    private int mParamId = 0;
-    private int mParamPos = 0;
-
-    // root view of this fragment
-    View mThisView = null;
+public class PostsFragment extends RecyclerSwipeFragment {
 
     public static PostsFragment newInstance(int paramId, int paramPos) {
         PostsFragment fragment = new PostsFragment();
@@ -50,111 +27,13 @@ public class PostsFragment extends Fragment {
         return fragment;
     }
 
-    // onCreate: params will be set to member variables.
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParamId = getArguments().getInt(ARG_PARAM_ID);
-            mParamPos = getArguments().getInt(ARG_PARAM_POS);
-        }
-        setHasOptionsMenu(true);
-    }
-
-    // onCreateView: inflate the layout for this fragment.
-    //               saving layout in mThisView for further usage in class methods
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mThisView = inflater.inflate(R.layout.fragment_posts, container, false);
-        return mThisView;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_fragment_posts, menu);
-    }
-
-    RecyclerView mRecyclerView;
-    LinearLayoutManager mLayoutManager;
-    SwipeRefreshLayout mSwipeLayout;
-    PostsAdapter mAdapter;
-
     private final XMLUtil.TopicInfo mTopicInfo = new XMLUtil.TopicInfo();
 
-    // onActivityCreated: the activity has finished its "onCreated"
-    //                    this will be also called when fragment replace happens.
-    // see http://segmentfault.com/blog/shiyongdanshuiyu/1190000000650573
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    protected PostsAdapter createAdapter() {
+        return new PostsAdapter(getActivity(), null, null);
+    }
 
-        mHasPreviousPage = true;
-        mHasNextPage = true;
-
-        mRecyclerView = (RecyclerView) mThisView.findViewById(R.id.recyclerView);
-        mSwipeLayout = (SwipeRefreshLayout) mThisView.findViewById(R.id.swipe_container);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mAdapter = new PostsAdapter(getActivity(), null, null);
-
-        // config recycler view
-        mRecyclerView.setEnabled(false);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView view, int dx, int dy) {
-                if (mSwipeLayout.isRefreshing()) {
-                    return;
-                }
-
-                if (mHasPreviousPage) {
-                    int firstChildTop = mRecyclerView.getChildAt(0).getTop();
-                    int firstVisiblePos = mLayoutManager.findFirstVisibleItemPosition();
-                    if (firstChildTop > 0 && firstChildTop < SWIPE_ENABLE_RANGE && firstVisiblePos == 0) {
-                        // scrolled to top?
-                        mSwipeLayout.setEnabled(true);
-                        return;
-                    }
-                }
-
-                if (mHasNextPage) {
-                    int visibleItemCount = mLayoutManager.getChildCount();
-                    int totalItemCount = mLayoutManager.getItemCount();
-                    int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
-                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                        // scrolled to bottom?
-                        setProgressLoading();
-                        loadNextPage(mAdapter);
-                        return;
-                    }
-                }
-
-                // otherwise...
-                if (mSwipeLayout.isEnabled()) {
-                    mSwipeLayout.setEnabled(false);
-                }
-            }
-        });
-
-        // config adapter
-        mAdapter.setSwipeLayout(mSwipeLayout);
-
-        // on refresh listener is only used to load previous page.
-        // "load next page" is triggered by recycler view's "scroll to bottom" event,
-        // in which indicator of swipeLayout is shown by isRefreshing(), then "load next page"
-        // is called manually.
-        mSwipeLayout.setEnabled(false);
-        mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadPreviousPage(mAdapter);
-            }
-        });
-
-        // loading topic info...
-        setProgressLoading();
-
+    protected void initialLoad() {
         new APIUtil.GetTopic(getActivity(), mParamId, new APIUtil.APICallback() {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
@@ -169,6 +48,9 @@ public class PostsFragment extends Fragment {
 
                 // loading topic info: finished
                 getActivity().setTitle(mTopicInfo.Title);
+                if (mAdapter instanceof PostsAdapter) {
+                    ((PostsAdapter) mAdapter).setTopicInfo(mTopicInfo);
+                }
                 mRecyclerView.setEnabled(true);
                 setProgressFinished();
 
@@ -229,51 +111,18 @@ public class PostsFragment extends Fragment {
 
     // - - -
 
-    public static final int ITEM_PER_PAGE = 10;
-
-    private int mPreviousPage = -1;
-    private int mNextPage = -1;
-
-    private boolean mHasPreviousPage;
-    private boolean mHasNextPage;
-
-    private boolean isLoaded = false;
-
-    private final void setProgressLoading() {
-        mSwipeLayout.setRefreshing(true);
-        mSwipeLayout.setEnabled(false);
+    protected int getMaxPosToLoad() {
+        return mTopicInfo.ReplyCount;
     }
 
-    private final void setProgressFinished() {
-        mSwipeLayout.setRefreshing(false);
-        mSwipeLayout.setEnabled(false);
-    }
+    protected void load(final boolean loadPrevious, final RecyclerSwipeAdapter adapter, int posToLoad, int sizeToLoad) {
 
-    private final void loadNextPage(PostsAdapter adapter) {
-        loadPage(false, adapter);
-    }
+        final PostsAdapter postsAdapter;
 
-    private final void loadPreviousPage(PostsAdapter adapter) {
-        loadPage(true, adapter);
-    }
-
-    // boolean loadPrevious:
-    // true: previous
-    // false: next
-    private final void loadPage(final boolean loadPrevious, final PostsAdapter adapter) {
-
-        final int posToLoad = (loadPrevious) ? mPreviousPage*ITEM_PER_PAGE : mNextPage*ITEM_PER_PAGE;
-        final int sizeToLoad = ITEM_PER_PAGE;
-
-        if (loadPrevious && (!mHasPreviousPage || posToLoad < 0)) {
-            HelperUtil.debugToast(getActivity(), "Already at first page");
-            mHasPreviousPage = false;
-            setProgressFinished();
-            return;
-        } else if (!loadPrevious && (!mHasNextPage || posToLoad > mTopicInfo.ReplyCount)) {
-            HelperUtil.debugToast(getActivity(), "Already at last page");
-            mHasNextPage = false;
-            setProgressFinished();
+        if (adapter instanceof PostsAdapter) {
+            postsAdapter = (PostsAdapter) adapter;
+        } else {
+            // todo error
             return;
         }
 
@@ -289,10 +138,10 @@ public class PostsFragment extends Fragment {
                     return;
                 }
                 if (loadPrevious) {
-                    adapter.appendDataFront(mTopicInfo, postsInfo);
+                    postsAdapter.appendDataFront(postsInfo);
                     mPreviousPage --;
                 } else {
-                    adapter.appendData(mTopicInfo, postsInfo);
+                    postsAdapter.appendData(postsInfo);
                     mNextPage ++;
                 }
                 setProgressFinished();
@@ -308,5 +157,6 @@ public class PostsFragment extends Fragment {
         setProgressLoading();
         HelperUtil.debugToast(getActivity(), "Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
         new APIUtil.GetTopicPost(getActivity(), mParamId, posToLoad, null, sizeToLoad, new Callback()).execute();
+
     }
 }

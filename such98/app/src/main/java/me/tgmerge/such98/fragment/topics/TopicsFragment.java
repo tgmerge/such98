@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.fragment.RecyclerSwipeAdapter;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
@@ -80,7 +81,7 @@ public class TopicsFragment extends Fragment {
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     SwipeRefreshLayout mSwipeLayout;
-    TopicsAdapter mAdapter;
+    RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> mAdapter;
 
     XMLUtil.BoardInfo mBoardInfo = new XMLUtil.BoardInfo();
 
@@ -262,15 +263,15 @@ public class TopicsFragment extends Fragment {
     }
 
 
-    private final void loadNextPage(TopicsAdapter adapter) {
+    private final void loadNextPage(RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> adapter) {
         loadPage(false, adapter);
     }
 
-    private final void loadPreviousPage(TopicsAdapter adapter) {
+    private final void loadPreviousPage(RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> adapter) {
         loadPage(true, adapter);
     }
 
-    private final void loadPage(final boolean loadPrevious, final TopicsAdapter adapter) {
+    private final void loadPage(final boolean loadPrevious, final RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> adapter) {
 
         final int posToLoad = (loadPrevious) ? mPreviousPage*ITEM_PER_PAGE : mNextPage*ITEM_PER_PAGE;
         final int sizeToLoad = ITEM_PER_PAGE;
@@ -290,18 +291,22 @@ public class TopicsFragment extends Fragment {
         class Callback implements APIUtil.APICallback {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                XMLUtil.ArrayOf<?> topicsInfo;
+                XMLUtil.ArrayOf<XMLUtil.TopicInfo> topicsInfo = new XMLUtil.ArrayOf<>(XMLUtil.TopicInfo.class);
 
-                if (mParamId == PARAM_ID_HOT) {
-                    // Hot topics
-                    topicsInfo = new XMLUtil.ArrayOf<>(XMLUtil.HotTopicInfo.class);
-                } else {
-                    // Other topics
-                    topicsInfo = new XMLUtil.ArrayOf<>(XMLUtil.TopicInfo.class);
-                }
+                String str = new String(body);
 
                 try {
-                    topicsInfo.parse(new String(body));
+                    if (mParamId == PARAM_ID_HOT) {
+                        // Hot topics
+                        XMLUtil.ArrayOf<XMLUtil.HotTopicInfo> hotInfo = new XMLUtil.ArrayOf<>(XMLUtil.HotTopicInfo.class);
+                        hotInfo.parse(str);
+                        topicsInfo.append(hotInfo);
+                    } else {
+                        // Other topics
+                        XMLUtil.ArrayOf<XMLUtil.TopicInfo> info = new XMLUtil.ArrayOf<>(XMLUtil.TopicInfo.class);
+                        info.parse(str);
+                        topicsInfo.append(info);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     onFailure(-1, headers, body, e);

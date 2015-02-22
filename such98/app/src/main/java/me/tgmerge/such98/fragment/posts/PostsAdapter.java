@@ -2,7 +2,6 @@ package me.tgmerge.such98.fragment.posts;
 
 import android.app.Activity;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +9,14 @@ import android.view.ViewGroup;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.fragment.RecyclerSwipeAdapter;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.BBUtil;
 import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.ImageUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
-class PostsAdapter extends RecyclerView.Adapter<PostViewHolder> {
+class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostViewHolder> {
 
     private XMLUtil.ArrayOf<XMLUtil.PostInfo> mData;
     private XMLUtil.TopicInfo mTopicInfo;
@@ -25,12 +25,15 @@ class PostsAdapter extends RecyclerView.Adapter<PostViewHolder> {
     private boolean mIsNeverLoaded = true;
     private SwipeRefreshLayout mSwipeLayout = null;
 
+    public final void setTopicInfo(XMLUtil.TopicInfo topicInfo) {
+        mTopicInfo = topicInfo;
+    }
+
     public final void setSwipeLayout(SwipeRefreshLayout swipeLayout) {
         mSwipeLayout = swipeLayout;
     }
 
-    public final void appendData(XMLUtil.TopicInfo topicInfo, XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
-        mTopicInfo = topicInfo;
+    public final void appendData(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
         int oldItemCount = 0;
         if (mData == null) {
             mData = data;
@@ -41,8 +44,7 @@ class PostsAdapter extends RecyclerView.Adapter<PostViewHolder> {
         notifyItemRangeInserted(oldItemCount, data.size());
     }
 
-    public final void appendDataFront(XMLUtil.TopicInfo topicInfo, XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
-        mTopicInfo = topicInfo;
+    public final void appendDataFront(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
         if (mData == null) {
             mData = data;
         } else {

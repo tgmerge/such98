@@ -20,7 +20,12 @@ public final class HelperUtil {
 
     public static final void errorToast(Context ctx, CharSequence msg) {
         generalError("HelperUtil", "errorToast: " + msg);
-        Toast.makeText(ctx, "ERROR:" + msg, Toast.LENGTH_LONG).show();
+        try {
+            Toast.makeText(ctx, "ERROR:" + msg, Toast.LENGTH_LONG).show();
+        } catch (NullPointerException e) {
+            generalError("HelperUtil", "NullPointerException, ctx=" + ctx + "msg=" + msg);
+            e.printStackTrace();
+        }
     }
 
     public static final void debugToast(Context ctx, CharSequence msg) {

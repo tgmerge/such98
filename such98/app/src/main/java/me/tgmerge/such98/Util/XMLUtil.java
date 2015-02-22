@@ -321,7 +321,7 @@ public class XMLUtil {
     //       o.parse(string);
     @SuppressWarnings("unused")
     public static final class ArrayOf<T extends XMLObj> extends XMLObj {
-        private Vector<T> mObjs = new Vector<>();
+        public Vector<T> mObjs = new Vector<>();
         private Class<T> mObjClass;
 
         public ArrayOf(Class<T> c) {
@@ -361,15 +361,15 @@ public class XMLUtil {
             return mObjs.size();
         }
 
-        public void append(ArrayOf<T> obj) {
+        public void append(ArrayOf<? extends T> obj) {
             mObjs.addAll(obj.mObjs);
         }
 
-        public void append(List<T> obj) {
+        public void append(List<? extends T> obj) {
             mObjs.addAll(obj);
         }
 
-        public void appendFront(ArrayOf<T> obj) {
+        public void appendFront(ArrayOf<? extends T> obj) {
             Collections.reverse(mObjs);
             Collections.reverse(obj.mObjs);
             mObjs.addAll(obj.mObjs);
@@ -377,7 +377,7 @@ public class XMLUtil {
             Collections.reverse(mObjs);
         }
 
-        public void appendFront(List<T> obj) {
+        public void appendFront(List<? extends T> obj) {
             Collections.reverse(mObjs);
             Collections.reverse(obj);
             mObjs.addAll(obj);
