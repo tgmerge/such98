@@ -9,7 +9,7 @@
         android:orderInCategory="1"
         android:icon="@drawable/ic_refresh_white_36dp"/>
     <item
-        android:id="@+id/action_new_reply"
+        android:id="@+id/action_new"
         android:title="Reply"
         app:showAsAction="ifRoom"
         android:orderInCategory="2"
@@ -25,7 +25,7 @@
         app:showAsAction="never"
         android:orderInCategory="4"/>
     <item
-        android:id="@+id/action_toFloor"
+        android:id="@+id/action_toItem"
         android:title="To floor..."
         app:showAsAction="never"
         android:orderInCategory="5"/>

@@ -1,27 +1,48 @@
 package me.tgmerge.such98.fragment.boards;
 
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.fragment.RecyclerSwipeAdapter;
 import me.tgmerge.such98.util.XMLUtil;
 
 /**
 * Created by tgmerge on 2/22.
 */
-class BoardsAdapter extends RecyclerView.Adapter<BoardViewHolder> {
+class BoardsAdapter extends RecyclerSwipeAdapter<XMLUtil.BoardInfo, BoardViewHolder> {
 
     private XMLUtil.ArrayOf<XMLUtil.BoardInfo> mData;
 
+    private boolean mIsNeverLoaded = true;
+    private SwipeRefreshLayout mSwipeLayout = null;
+
+    @Override
+    public void setSwipeLayout(SwipeRefreshLayout swipeLayout) {
+        mSwipeLayout = swipeLayout;
+    }
+
     public final void appendData(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
+        int oldItemCount = 0;
         if (mData == null) {
             mData = data;
         } else {
+            oldItemCount = mData.size();
             mData.append(data);
         }
-        notifyDataSetChanged();
+        notifyItemRangeInserted(oldItemCount, data.size());
+    }
+
+    @Override
+    public void appendDataFront(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
+        if (mData == null) {
+            mData = data;
+        } else {
+            mData.appendFront(data);
+        }
+        notifyItemRangeInserted(0, data.size());
     }
 
     public BoardsAdapter(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
@@ -36,6 +57,14 @@ class BoardsAdapter extends RecyclerView.Adapter<BoardViewHolder> {
 
     @Override
     public void onBindViewHolder(BoardViewHolder viewHolder, int position) {
+
+        if (mIsNeverLoaded) {
+            if (mSwipeLayout != null) {
+                mSwipeLayout.setEnabled(true);
+            }
+            mIsNeverLoaded = false;
+        }
+
         XMLUtil.BoardInfo dataItem = mData.get(position);
 
         viewHolder.icon.setImageResource(dataItem.IsCategory ? R.drawable.ic_folder_multiple_outline_white_36dp : R.drawable.ic_folder_outline_white_36dp);

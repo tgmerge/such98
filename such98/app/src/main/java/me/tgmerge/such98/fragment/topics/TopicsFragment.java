@@ -1,49 +1,25 @@
 package me.tgmerge.such98.fragment.topics;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.fragment.RecyclerSwipeAdapter;
+import me.tgmerge.such98.fragment.RecyclerSwipeFragment;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
 
-public class TopicsFragment extends Fragment {
-
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM_ID = "id";
-    private static final String ARG_PARAM_POS = "pos";
-
-    public static final int PARAM_POS_BEGINNING = 0;
-    public static final int PARAM_POS_END = -1;
+public class TopicsFragment extends RecyclerSwipeFragment {
 
     public static final int PARAM_ID_NEW = -1;
     public static final int PARAM_ID_HOT = -2;
-
-    // should be bigger than top margin of recyclerView items
-    // TODO solve this
-    private static final int SWIPE_ENABLE_RANGE = 20;
-
-    private int mParamId = 0;
-    private int mParamPos = 0;
-
-    // root view of this fragment
-    View mThisView = null;
 
     public static TopicsFragment newInstance(int paramId, int paramPos) {
         TopicsFragment fragment = new TopicsFragment();
@@ -54,100 +30,15 @@ public class TopicsFragment extends Fragment {
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParamId = getArguments().getInt(ARG_PARAM_ID);
-            mParamPos = getArguments().getInt(ARG_PARAM_POS);
-        }
-        if (mParamId != PARAM_ID_HOT && mParamId != PARAM_ID_NEW) {
-            setHasOptionsMenu(true);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mThisView = inflater.inflate(R.layout.fragment_topics, container, false);
-        return mThisView;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_fragment_topics, menu);
-    }
-
-    RecyclerView mRecyclerView;
-    LinearLayoutManager mLayoutManager;
-    SwipeRefreshLayout mSwipeLayout;
-    RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> mAdapter;
-
     XMLUtil.BoardInfo mBoardInfo = new XMLUtil.BoardInfo();
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    protected RecyclerSwipeAdapter createAdapter() {
+        return new TopicsAdapter(null);
+    }
 
-        mHasPreviousPage = true;
-        mHasNextPage = true;
+    protected void initialLoad() {
 
-        mRecyclerView = (RecyclerView) mThisView.findViewById(R.id.recyclerView);
-        mSwipeLayout = (SwipeRefreshLayout) mThisView.findViewById(R.id.swipe_container);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mAdapter = new TopicsAdapter(null);
-
-        mRecyclerView.setEnabled(false);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView view, int dx, int dy) {
-                if (mSwipeLayout.isRefreshing()) {
-                    return;
-                }
-
-                if (mHasPreviousPage) {
-                    int firstChildTop = mRecyclerView.getChildAt(0).getTop();
-                    int firstVisiblePos = mLayoutManager.findFirstVisibleItemPosition();
-                    if (firstChildTop > 0 && firstChildTop < SWIPE_ENABLE_RANGE && firstVisiblePos == 0) {
-                        // scrolled to top?
-                        mSwipeLayout.setEnabled(true);
-                        return;
-                    }
-                }
-
-                if (mHasNextPage) {
-                    int visibleItemCount = mLayoutManager.getChildCount();
-                    int totalItemCount = mLayoutManager.getItemCount();
-                    int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
-                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                        // scrolled to bottom?
-                        setProgressLoading();
-                        loadNextPage(mAdapter);
-                        return;
-                    }
-                }
-
-                // otherwise...
-                if (mSwipeLayout.isEnabled()) {
-                    mSwipeLayout.setEnabled(false);
-                }
-            }
-        });
-
-        // config adapter
-        mAdapter.setSwipeLayout(mSwipeLayout);
-
-        mSwipeLayout.setEnabled(false);
-        mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadPreviousPage(mAdapter);
-            }
-        });
-
-        setProgressLoading();
+        final TopicsAdapter topicsAdapter = (TopicsAdapter) mAdapter;
 
         if (mParamId == PARAM_ID_HOT) {
             mBoardInfo.Id = PARAM_ID_HOT;
@@ -156,7 +47,7 @@ public class TopicsFragment extends Fragment {
             getActivity().setTitle(mBoardInfo.Name);
             mPreviousPage = -1;
             mNextPage = 0;
-            loadNextPage(mAdapter);
+            loadNextPage(topicsAdapter);
         } else if (mParamId == PARAM_ID_NEW) {
             mBoardInfo.Id = PARAM_ID_NEW;
             mBoardInfo.Name = "最新主题";
@@ -164,7 +55,7 @@ public class TopicsFragment extends Fragment {
             getActivity().setTitle(mBoardInfo.Name);
             mPreviousPage = -1;
             mNextPage = 0;
-            loadNextPage(mAdapter);
+            loadNextPage(topicsAdapter);
         } else {
             new APIUtil.GetBoard(getActivity(), mParamId, new APIUtil.APICallback() {
                 @Override
@@ -188,15 +79,15 @@ public class TopicsFragment extends Fragment {
                     if (mParamPos == PARAM_POS_BEGINNING) {
                         mPreviousPage = -1;
                         mNextPage = 0;
-                        loadNextPage(mAdapter);
+                        loadNextPage(topicsAdapter);
                     } else if (mParamPos == PARAM_POS_END) {
                         mPreviousPage = maxPage;
                         mNextPage = maxPage + 1;
-                        loadPreviousPage(mAdapter);
+                        loadPreviousPage(topicsAdapter);
                     } else {
                         mNextPage = mParamPos/ITEM_PER_PAGE;
                         mPreviousPage = mNextPage - 1;
-                        loadNextPage(mAdapter);
+                        loadNextPage(topicsAdapter);
                     }
 
                     if(!isLoaded) {
@@ -221,7 +112,7 @@ public class TopicsFragment extends Fragment {
             case R.id.action_refresh:
                 ActivityUtil.reloadFragment(activity, containerId);
                 return true;
-            case R.id.action_new_topic:
+            case R.id.action_new:
                 //ActivityUtil.openNewTopicDialog(activity, containerId, "", "");
                 return true;
             case R.id.action_toFirstPage:
@@ -237,56 +128,15 @@ public class TopicsFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-
     // - - -
 
-    public static final int ITEM_PER_PAGE = 10;
-
-    private int mPreviousPage = -1;
-    private int mNextPage = -1;
-
-    private boolean mHasPreviousPage;
-    private boolean mHasNextPage;
-
-    private boolean isLoaded = false;
-
-    // - - -
-
-    private final void setProgressLoading() {
-        mSwipeLayout.setRefreshing(true);
-        mSwipeLayout.setEnabled(false);
+    protected int getMaxPosToLoad() {
+        return mBoardInfo.TotalTopicCount - 1;
     }
 
-    private final void setProgressFinished() {
-        mSwipeLayout.setRefreshing(false);
-        mSwipeLayout.setEnabled(false);
-    }
+    protected void load(final boolean loadPrevious, final RecyclerSwipeAdapter adapter, int posToLoad, int sizeToLoad) {
 
-
-    private final void loadNextPage(RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> adapter) {
-        loadPage(false, adapter);
-    }
-
-    private final void loadPreviousPage(RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> adapter) {
-        loadPage(true, adapter);
-    }
-
-    private final void loadPage(final boolean loadPrevious, final RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> adapter) {
-
-        final int posToLoad = (loadPrevious) ? mPreviousPage*ITEM_PER_PAGE : mNextPage*ITEM_PER_PAGE;
-        final int sizeToLoad = ITEM_PER_PAGE;
-
-        if (loadPrevious && (!mHasPreviousPage || posToLoad < 0)) {
-            HelperUtil.debugToast(getActivity(), "Already at first page");
-            mHasPreviousPage = false;
-            setProgressFinished();
-            return;
-        } else if (!loadPrevious && (!mHasNextPage || posToLoad > mBoardInfo.TotalTopicCount - 1)) {
-            HelperUtil.debugToast(getActivity(), "Already at last page");
-            mHasNextPage = false;
-            setProgressFinished();
-            return;
-        }
+        final TopicsAdapter topicsAdapter = (TopicsAdapter) adapter;
 
         class Callback implements APIUtil.APICallback {
             @Override
@@ -314,10 +164,10 @@ public class TopicsFragment extends Fragment {
                 }
 
                 if (loadPrevious) {
-                    adapter.appendDataFront(topicsInfo);
+                    topicsAdapter.appendDataFront(topicsInfo);
                     mPreviousPage --;
                 } else {
-                    adapter.appendData(topicsInfo);
+                    topicsAdapter.appendData(topicsInfo);
                     mNextPage ++;
                 }
                 setProgressFinished();
@@ -344,6 +194,4 @@ public class TopicsFragment extends Fragment {
             new APIUtil.GetBoardTopic(getActivity(), mParamId, posToLoad, null, sizeToLoad, new Callback()).execute();
         }
     }
-
-
 }

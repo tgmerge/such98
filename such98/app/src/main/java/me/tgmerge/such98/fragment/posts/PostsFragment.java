@@ -93,8 +93,8 @@ public class PostsFragment extends RecyclerSwipeFragment {
             case R.id.action_refresh:
                 ActivityUtil.reloadFragment(activity, containerId);
                 return true;
-            case R.id.action_new_reply:
-                ActivityUtil.openNewPostDialog(activity, containerId, "", "");
+            case R.id.action_new:
+                ActivityUtil.openNewPostDialog(activity, mParamId, "", "");
                 return true;
             case R.id.action_toFirstPage:
                 ActivityUtil.Action.postFragmentFirstPage(activity, containerId, mParamId);
@@ -102,7 +102,7 @@ public class PostsFragment extends RecyclerSwipeFragment {
             case R.id.action_toLastPage:
                 ActivityUtil.Action.postFragmentLastPage(activity, containerId, mParamId);
                 return true;
-            case R.id.action_toFloor:
+            case R.id.action_toItem:
                 ActivityUtil.openGotoFloorDialog(activity, containerId, mParamId, mTopicInfo.ReplyCount + 1);
                 return true;
         }
@@ -117,14 +117,7 @@ public class PostsFragment extends RecyclerSwipeFragment {
 
     protected void load(final boolean loadPrevious, final RecyclerSwipeAdapter adapter, int posToLoad, int sizeToLoad) {
 
-        final PostsAdapter postsAdapter;
-
-        if (adapter instanceof PostsAdapter) {
-            postsAdapter = (PostsAdapter) adapter;
-        } else {
-            // todo error
-            return;
-        }
+        final PostsAdapter postsAdapter = (PostsAdapter) adapter;
 
         class Callback implements APIUtil.APICallback {
             @Override

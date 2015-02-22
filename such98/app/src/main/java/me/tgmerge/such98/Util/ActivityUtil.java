@@ -43,12 +43,12 @@ public final class ActivityUtil {
 
         public static final void showRootBoard(Context ctx) { showRootBoard(ctx, false); }
         public static final void showRootBoard(Context ctx, boolean clearTask) {
-            openShowBoardsActivity(ctx, BoardsFragment.ID_ROOT, 0, clearTask);
+            openShowBoardsActivity(ctx, BoardsFragment.PARAM_ID_ROOT, 0, clearTask);
         }
 
         public static final void showCustomBoards(Context ctx) { showCustomBoards(ctx, false); }
         public static final void showCustomBoards(Context ctx, boolean clearTask) {
-            openShowBoardsActivity(ctx, BoardsFragment.ID_CUSTOM, 0, clearTask);
+            openShowBoardsActivity(ctx, BoardsFragment.PARAM_ID_CUSTOM, 0, clearTask);
         }
 
         public static final void relogin(Context ctx) { relogin(ctx, true); }

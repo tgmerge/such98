@@ -36,7 +36,7 @@ public class ShowBoardsActivity extends ActionBarActivity {
         // Set up the content.
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.add(R.id.container, BoardsFragment.newInstance(
-                getIntent().getIntExtra(INTENT_KEY_ID, BoardsFragment.ID_ROOT),
+                getIntent().getIntExtra(INTENT_KEY_ID, BoardsFragment.PARAM_ID_ROOT),
                 getIntent().getIntExtra(INTENT_KEY_START_POS, 0))
         );
         transaction.commit();

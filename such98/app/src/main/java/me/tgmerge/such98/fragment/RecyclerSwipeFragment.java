@@ -49,7 +49,7 @@ public abstract class RecyclerSwipeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mThisView = inflater.inflate(R.layout.fragment_posts, container, false);
+        mThisView = inflater.inflate(R.layout.fragment_recycler_swipe, container, false);
         return mThisView;
     }
 
@@ -89,7 +89,7 @@ public abstract class RecyclerSwipeFragment extends Fragment {
                 if (mHasPreviousPage) {
                     int firstChildTop = mRecyclerView.getChildAt(0).getTop();
                     int firstVisiblePos = mLayoutManager.findFirstVisibleItemPosition();
-                    if (firstChildTop > 0 && firstChildTop < SWIPE_ENABLE_RANGE && firstVisiblePos == 0) {
+                    if (firstChildTop >= 0 && firstChildTop < SWIPE_ENABLE_RANGE && firstVisiblePos == 0) {
                         // scrolled to top?
                         mSwipeLayout.setEnabled(true);
                         return;
