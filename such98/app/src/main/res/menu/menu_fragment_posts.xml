@@ -24,4 +24,9 @@
         android:title="Last page"
         app:showAsAction="never"
         android:orderInCategory="4"/>
+    <item
+        android:id="@+id/action_toFloor"
+        android:title="To floor..."
+        app:showAsAction="never"
+        android:orderInCategory="5"/>
 </menu>

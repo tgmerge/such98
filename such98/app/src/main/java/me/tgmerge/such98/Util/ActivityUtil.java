@@ -1,11 +1,15 @@
 package me.tgmerge.such98.util;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.text.InputType;
+import android.widget.EditText;
 
 import me.tgmerge.such98.activity.LoginActivity;
 import me.tgmerge.such98.activity.LoginPageActivity;
@@ -26,6 +30,7 @@ public final class ActivityUtil {
 
     public static final class Action {
 
+        // activity
         public static final void showHotTopics(Context ctx) { showHotTopics(ctx, false); }
         public static final void showHotTopics(Context ctx, boolean clearTask) {
             openShowTopicsActivity(ctx, TopicsFragment.ID_HOT, 0, clearTask);
@@ -73,34 +78,23 @@ public final class ActivityUtil {
             // todo
         }
 
-        public static final void postGotoFirstPage(Activity act, int containerId, int topicId) {
-            FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
-            transaction.replace(containerId, PostsFragment.newInstance(topicId,PostsFragment.PARAM_POS_BEGINNING));
-            transaction.commit();
+        // fragment
+        public static final void postFragmentFirstPage(Activity act, int containerId, int topicId) {
+            loadPostsFragment(act, containerId, topicId, PostsFragment.PARAM_POS_BEGINNING);
         }
 
-        public static final void postGotoLastPage(Activity act, int containerId, int topicId) {
-            FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
-            transaction.replace(containerId, PostsFragment.newInstance(topicId,PostsFragment.PARAM_POS_END));
-            transaction.commit();
+        public static final void postFragmentLastPage(Activity act, int containerId, int topicId) {
+            loadPostsFragment(act, containerId, topicId, PostsFragment.PARAM_POS_END);
         }
 
-        public static final void addPostFragment(Activity act, int containerId, int topicId, int startPos) {
-            FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
-            transaction.add(containerId, PostsFragment.newInstance(topicId, startPos));
-            transaction.commit();
+        public static final void postFragmentFloor(Activity act, int containerId, int topicId, int pos) {
+            loadPostsFragment(act, containerId, topicId, pos);
         }
 
-        public static final void reloadFragment(Activity act, int containerId) {
-            Fragment fg = act.getFragmentManager().findFragmentById(containerId);
-            FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
-            transaction.detach(fg);
-            transaction.attach(fg);
-            transaction.commit();
-        }
+
     }
 
-    // - - -
+    // activity
 
     public static final void openShowBoardsActivity(Context ctx, int id, int startPos, boolean clearTask) {
         logDebug("Starting ShowBoardsActivity, id=" + id + ", startPos=" + startPos);
@@ -153,6 +147,8 @@ public final class ActivityUtil {
         ctx.startActivity(intent);
     }
 
+    // dialog & dialog fragment
+
     public static final void openNewPostDialog(Context ctx, int topicId, String replyTitle, String replyContent) {
         logDebug("Starting NewPostFragment(FragmentDialog)");
         if (ctx instanceof Activity) {
@@ -163,6 +159,53 @@ public final class ActivityUtil {
         } else {
             HelperUtil.errorToast(ctx, "openNewPostDialog: Context" + ctx.toString() + " is not Activity");
         }
+    }
+
+    // ... and goto that floor
+    // maxPos is counted from 1(#1 floor, pos 0)
+    public static final void openGotoFloorDialog(final Activity act, final int containerId, final int topicId, final int maxFloor) {
+        logDebug("Opening 'goto floor' dialog, tID=" + topicId + ", maxFloor=" + maxFloor);
+        AlertDialog.Builder alert = new AlertDialog.Builder(act);
+        alert.setTitle("Jump to");
+        final EditText input = new EditText(act);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setHint("Floor (1-" + maxFloor + ")");
+        alert.setView(input);
+        alert.setPositiveButton("Jump", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    int floor = Integer.parseInt(input.getText().toString());
+                    if (floor > maxFloor || floor < 1) {
+                        throw new NumberFormatException("floor=" + floor + " is invalid");
+                    }
+                    loadPostsFragment(act, containerId, topicId, floor - 1);
+                } catch (NumberFormatException e) {
+                    HelperUtil.errorToast(act, "Wrong floor number");
+                    e.printStackTrace();
+                }
+            }
+        });
+        alert.show();
+    }
+
+    // fragment
+
+    public static final void reloadFragment(Activity act, int containerId) {
+        logDebug("Reload fragment, act=" + act.toString());
+        FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
+        Fragment fragment = act.getFragmentManager().findFragmentById(containerId);
+        transaction.detach(fragment);
+        transaction.attach(fragment);
+        transaction.commit();
+    }
+
+    public static final void loadPostsFragment(Activity act, int containerId, int topicId, int startPos) {
+        logDebug("Loading PostsFragment, id=" + topicId + ", pos=" + startPos);
+        FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
+        PostsFragment fragment = PostsFragment.newInstance(topicId, startPos);
+        transaction.replace(containerId, fragment);
+        transaction.commit();
     }
 
     // - - -

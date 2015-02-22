@@ -1,6 +1,7 @@
 package me.tgmerge.such98.fragment.posts;
 
 import android.app.Activity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,13 @@ class PostsAdapter extends RecyclerView.Adapter<PostViewHolder> {
     private XMLUtil.ArrayOf<XMLUtil.PostInfo> mData;
     private XMLUtil.TopicInfo mTopicInfo;
     private Activity mAct;
+
+    private boolean mIsNeverLoaded = true;
+    private SwipeRefreshLayout mSwipeLayout = null;
+
+    public final void setSwipeLayout(SwipeRefreshLayout swipeLayout) {
+        mSwipeLayout = swipeLayout;
+    }
 
     public final void appendData(XMLUtil.TopicInfo topicInfo, XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
         mTopicInfo = topicInfo;
@@ -57,12 +65,14 @@ class PostsAdapter extends RecyclerView.Adapter<PostViewHolder> {
 
     @Override
     public void onBindViewHolder(final PostViewHolder viewHolder, int position) {
-/*
-            if (!isLoaded) {
+
+        if (mIsNeverLoaded) {
+            if (mSwipeLayout != null) {
                 mSwipeLayout.setEnabled(true);
-                isLoaded = true;
             }
-*/
+            mIsNeverLoaded = false;
+        }
+
         final XMLUtil.PostInfo dataItem = mData.get(position);
 
         viewHolder.data_topicInfo = mTopicInfo;

@@ -5,6 +5,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Field;
@@ -457,7 +458,8 @@ public class XMLUtil {
     // 如果当前的tag name在defaults中，设置o的对应值
     // 如果成功设置，返回True
     // 否则返回False
-    private static final boolean setDefaultField(XmlPullParser xpp, XMLObj o, Set<String> defaults) throws Exception {
+    private static final boolean setDefaultField(XmlPullParser xpp, XMLObj o, Set<String> defaults)
+            throws IOException, XmlPullParserException, NoSuchFieldException, IllegalAccessException {
         if (defaults == null || o == null || xpp == null) {
             return false;
         }
@@ -474,8 +476,8 @@ public class XMLUtil {
                     field.set(o, Integer.parseInt(value));
                 } catch (NumberFormatException e) {
                     logError("NumberFormatException, xpp=" + xpp.getPositionDescription() + ", obj=" + o.toString());
+                    logError("    value=" + value + ", tag=" + tagName + ", field will be set to 0");
                     field.set(o, 0);
-                    e.printStackTrace();
                 }
             } else if (type == boolean.class || type == Boolean.class) {
                 field.set(o, Boolean.parseBoolean(value));
@@ -495,6 +497,6 @@ public class XMLUtil {
 
 
     private static final void logError(String msg) {
-        //HelperUtil.generalError("XMLUtil", msg);
+        HelperUtil.generalError("XMLUtil", msg);
     }
 }

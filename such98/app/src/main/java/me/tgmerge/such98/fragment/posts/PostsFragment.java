@@ -1,11 +1,15 @@
 package me.tgmerge.such98.fragment.posts;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -13,6 +17,7 @@ import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
@@ -26,13 +31,12 @@ public class PostsFragment extends Fragment {
     public static final int PARAM_POS_BEGINNING = 0;
     public static final int PARAM_POS_END = -1;
 
+    // should be bigger than top margin of recyclerView items
+    // TODO solve this
+    private static final int SWIPE_ENABLE_RANGE = 20;
+
     private int mParamId = 0;
     private int mParamPos = 0;
-
-    private final XMLUtil.TopicInfo mTopicInfo = new XMLUtil.TopicInfo();
-
-    // root view of this fragment
-    View thisView = null;
 
     /**
      * Use this factory method to create a new instance of
@@ -59,21 +63,32 @@ public class PostsFragment extends Fragment {
             mParamId = getArguments().getInt(ARG_PARAM_ID);
             mParamPos = getArguments().getInt(ARG_PARAM_POS);
         }
+        setHasOptionsMenu(true);
     }
 
+    // root view of this fragment
+    View mThisView = null;
+
     // onCreateView: inflate the layout for this fragment.
-    //               saving layout in thisView for further usage in class methods
+    //               saving layout in mThisView for further usage in class methods
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        thisView = inflater.inflate(R.layout.fragment_posts, container, false);
-        return thisView;
+        mThisView = inflater.inflate(R.layout.fragment_posts, container, false);
+        return mThisView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_fragment_posts, menu);
     }
 
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     SwipeRefreshLayout mSwipeLayout;
     PostsAdapter mAdapter;
+
+    private final XMLUtil.TopicInfo mTopicInfo = new XMLUtil.TopicInfo();
 
     // onActivityCreated: the activity has finished its "onCreated"
     //                    this will be also called when fragment replace happens.
@@ -82,20 +97,58 @@ public class PostsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        // config recycler view
-        mRecyclerView = (RecyclerView) thisView.findViewById(R.id.recyclerView);
-
+        mRecyclerView = (RecyclerView) mThisView.findViewById(R.id.recyclerView);
+        mSwipeLayout = (SwipeRefreshLayout) mThisView.findViewById(R.id.swipe_container);
         mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
         mAdapter = new PostsAdapter(getActivity(), null, null);
+
+        // config recycler view
+        mRecyclerView.setEnabled(false);
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy) {
+                if (mSwipeLayout.isRefreshing()) {
+                    return;
+                }
+
+                if (mHasPreviousPage) {
+                    int firstChildTop = mRecyclerView.getChildAt(0).getTop();
+                    int firstVisiblePos = mLayoutManager.findFirstVisibleItemPosition();
+                    if (firstChildTop > 0 && firstChildTop < SWIPE_ENABLE_RANGE && firstVisiblePos == 0) {
+                        // scrolled to top?
+                        mSwipeLayout.setEnabled(true);
+                        return;
+                    }
+                }
+
+                if (mHasNextPage) {
+                    int visibleItemCount = mLayoutManager.getChildCount();
+                    int totalItemCount = mLayoutManager.getItemCount();
+                    int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                        // scrolled to bottom?
+                        setProgressLoading();
+                        loadNextPage(mAdapter);
+                        return;
+                    }
+                }
+
+                // otherwise...
+                if (mSwipeLayout.isEnabled()) {
+                    mSwipeLayout.setEnabled(false);
+                }
+            }
+        });
+
+        // config adapter
+        mAdapter.setSwipeLayout(mSwipeLayout);
 
         // on refresh listener is only used to load previous page.
         // "load next page" is triggered by recycler view's "scroll to bottom" event,
         // in which indicator of swipeLayout is shown by isRefreshing(), then "load next page"
         // is called manually.
-        mSwipeLayout = (SwipeRefreshLayout) thisView.findViewById(R.id.swipe_container);
         mSwipeLayout.setEnabled(false);
         mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -118,49 +171,11 @@ public class PostsFragment extends Fragment {
                     onFailure(-1, headers, body, e);
                     return;
                 }
-                // set title
-                getActivity().setTitle(mTopicInfo.Title);
-
-                mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
-                    @Override
-                    public void onScrolled(RecyclerView view, int dx, int dy) {
-                        if (mSwipeLayout.isRefreshing()) {
-                            return;
-                        }
-
-                        // scrolled to top?
-                        if (mHasPreviousPage) {
-                            int firstChildTop = mRecyclerView.getChildAt(0).getTop();
-                            int firstVisiblePos = mLayoutManager.findFirstVisibleItemPosition();
-                            if (firstChildTop > 0 && firstChildTop < 20 && firstVisiblePos == 0) {
-                                // scrolled to top?
-                                mSwipeLayout.setEnabled(true);
-                                return;
-                            }
-                        }
-
-                        // scrolled to bottom?
-                        if (mHasNextPage) {
-                            int visibleItemCount = mLayoutManager.getChildCount();
-                            int totalItemCount = mLayoutManager.getItemCount();
-                            int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
-                            if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                                // scrolled to bottom?
-                                setProgressLoading();
-                                loadNextPage(mAdapter);
-                                return;
-                            }
-                        }
-
-                        // otherwise...
-                        mSwipeLayout.setEnabled(false);
-                    }
-                });
 
                 // loading topic info: finished
+                getActivity().setTitle(mTopicInfo.Title);
+                mRecyclerView.setEnabled(true);
                 setProgressFinished();
-
 
                 // first load
                 int maxPage = mTopicInfo.ReplyCount / ITEM_PER_PAGE;
@@ -179,6 +194,11 @@ public class PostsFragment extends Fragment {
                     mPreviousPage = mNextPage - 1;
                     loadNextPage(mAdapter);
                 }
+
+                if(!isLoaded) {
+                    mSwipeLayout.setEnabled(true);
+                    isLoaded = true;
+                }
             }
 
             @Override
@@ -188,18 +208,31 @@ public class PostsFragment extends Fragment {
         }).execute();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Activity activity = getActivity();
+        int containerId = ((View) mThisView.getParent()).getId();
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                ActivityUtil.reloadFragment(activity, containerId);
+                return true;
+            case R.id.action_reply:
+                ActivityUtil.openNewPostDialog(activity, containerId, "", "");
+                return true;
+            case R.id.action_toFirstPage:
+                ActivityUtil.Action.postFragmentFirstPage(activity, containerId, mParamId);
+                return true;
+            case R.id.action_toLastPage:
+                ActivityUtil.Action.postFragmentLastPage(activity, containerId, mParamId);
+                return true;
+            case R.id.action_toFloor:
+                ActivityUtil.openGotoFloorDialog(activity, containerId, mParamId, mTopicInfo.ReplyCount + 1);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     // - - -
-
-    private final void setProgressLoading() {
-        mSwipeLayout.setRefreshing(true);
-        mSwipeLayout.setEnabled(false);
-    }
-
-    private final void setProgressFinished() {
-        mSwipeLayout.setRefreshing(false);
-        mSwipeLayout.setEnabled(false);
-    }
 
     public static final int ITEM_PER_PAGE = 10;
 
@@ -211,6 +244,16 @@ public class PostsFragment extends Fragment {
 
     private boolean isLoaded = false;
 
+    private final void setProgressLoading() {
+        mSwipeLayout.setRefreshing(true);
+        mSwipeLayout.setEnabled(false);
+    }
+
+    private final void setProgressFinished() {
+        mSwipeLayout.setRefreshing(false);
+        mSwipeLayout.setEnabled(false);
+    }
+
     private final void loadNextPage(PostsAdapter adapter) {
         loadPage(false, adapter);
     }
@@ -219,8 +262,9 @@ public class PostsFragment extends Fragment {
         loadPage(true, adapter);
     }
 
-
-    // loadprevious true: previous false: next
+    // boolean loadPrevious:
+    // true: previous
+    // false: next
     private final void loadPage(final boolean loadPrevious, final PostsAdapter adapter) {
 
         final int posToLoad = (loadPrevious) ? mPreviousPage*ITEM_PER_PAGE : mNextPage*ITEM_PER_PAGE;
