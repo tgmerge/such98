@@ -1,20 +1,15 @@
 package me.tgmerge.such98.fragment;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.preference.DialogPreference;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import org.apache.http.Header;
 
@@ -83,7 +78,7 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
         getDialog().setCanceledOnTouchOutside(false);
 
         // Register on click listener
-        mThisView.findViewById(R.id.image_send).setOnClickListener(this);
+        mThisView.findViewById(R.id.new_post_send).setOnClickListener(this);
 
         return mThisView;
     }
@@ -93,13 +88,13 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
         super.onActivityCreated(savedInstanceState);
 
         if (mParamTitle != null) {
-            ((EditText) mThisView.findViewById(R.id.edit_title)).setText(mParamTitle);
+            ((EditText) mThisView.findViewById(R.id.new_post_title)).setText(mParamTitle);
         }
         if (mParamContent != null) {
-            ((EditText) mThisView.findViewById(R.id.edit_content)).setText(mParamContent);
+            ((EditText) mThisView.findViewById(R.id.new_post_content)).setText(mParamContent);
         }
 
-        final ImageView imgAvatar = (ImageView) mThisView.findViewById(R.id.image_icon);
+        final ImageView imgAvatar = (ImageView) mThisView.findViewById(R.id.new_post_avatar);
 
         new APIUtil.GetMe(getActivity(), new APIUtil.APICallback() {
             @Override
@@ -128,11 +123,11 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
 
     private final void setProgressLoading() {
         isLoading = true;
-        mThisView.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        mThisView.findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
     }
 
     private final void setProgressFinished() {
-        mThisView.findViewById(R.id.progressBar).setVisibility(View.GONE);
+        mThisView.findViewById(R.id.progress_bar).setVisibility(View.GONE);
         isLoading = false;
     }
 
@@ -148,8 +143,8 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
      *          set progress finished
      */
     private void sendPost() {
-        String postTitle = ((EditText) mThisView.findViewById(R.id.edit_title)).getText().toString();
-        String postContent = ((EditText) mThisView.findViewById(R.id.edit_content)).getText().toString();
+        String postTitle = ((EditText) mThisView.findViewById(R.id.new_post_title)).getText().toString();
+        String postContent = ((EditText) mThisView.findViewById(R.id.new_post_content)).getText().toString();
 
         if (postContent.equals("")) {
             HelperUtil.errorToast(getActivity(), "Post content cannot be empty");
@@ -190,7 +185,7 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.image_send:
+            case R.id.new_post_send:
                 sendPost();
         }
     }

@@ -470,7 +470,13 @@ public class XMLUtil {
             Field field = o.getClass().getField(tagName);
             Class<?> type = field.getType();
             if (type == int.class || type == Integer.class) {
-                field.set(o, Integer.parseInt(value));
+                try {
+                    field.set(o, Integer.parseInt(value));
+                } catch (NumberFormatException e) {
+                    logError("NumberFormatException, xpp=" + xpp.getPositionDescription() + ", obj=" + o.toString());
+                    field.set(o, 0);
+                    e.printStackTrace();
+                }
             } else if (type == boolean.class || type == Boolean.class) {
                 field.set(o, Boolean.parseBoolean(value));
             } else {

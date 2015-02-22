@@ -8,7 +8,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.PostsFragment;
+import me.tgmerge.such98.fragment.posts.PostsFragment;
 import me.tgmerge.such98.fragment.NavDrawerFragment;
 import me.tgmerge.such98.util.ActivityUtil;
 
@@ -29,7 +29,7 @@ public class ShowPostsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment_display);
+        setContentView(R.layout.activity_fragment_base);
 
         mNavigationDrawerFragment = (NavDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);

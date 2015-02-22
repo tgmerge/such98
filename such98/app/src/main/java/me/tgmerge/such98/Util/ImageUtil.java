@@ -57,8 +57,8 @@ public class ImageUtil {
     }
 
 
-    // Download image, load it on ImageView in a ViewHolder.
-    //   It's a async-task, so isRecyclable flag of ViewHolder should be set to false first,
+    // Download image, load it on ImageView in a PostViewHolder.
+    //   It's a async-task, so isRecyclable flag of PostViewHolder should be set to false first,
     //     to prevent problems from recycling viewHolder before image is downloaded and set.
     //   Once the image is set, or failed to load, the isRecyclable flag should be set to true.
     public static final void setViewHolderImage(Context ctx, final RecyclerView.ViewHolder viewHolder, final ImageView imgView, String url) {

@@ -1,7 +1,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_view"
+    android:id="@+id/drawer"
     android:layout_width="245dp"
     android:layout_height="match_parent"
     android:layout_gravity="start"
@@ -21,23 +21,23 @@
             android:paddingLeft="16dp">
 
             <ImageView
-                android:id="@+id/drawer_ava_circle"
+                android:id="@+id/drawer_avatar_circle"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:src="@drawable/ic_circle_grey600_48dp"/>
 
             <ImageView
-                android:id="@+id/drawer_ava"
+                android:id="@+id/drawer_avatar"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:padding="12dp"
                 android:src="@drawable/ic_account_outline_white_48dp"
                 android:layout_centerInParent="true"
-                android:layout_alignLeft="@id/drawer_ava_circle"
-                android:layout_alignTop="@id/drawer_ava_circle"/>
+                android:layout_alignLeft="@id/drawer_avatar_circle"
+                android:layout_alignTop="@id/drawer_avatar_circle"/>
 
             <TextView
-                android:id="@+id/drawer_username"
+                android:id="@+id/drawer_user_name"
                 android:text="Username Here"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -46,17 +46,17 @@
                 android:layout_height="28dp"
                 android:gravity="bottom"
                 android:paddingBottom="2dp"
-                android:layout_below="@id/drawer_ava_circle"/>
+                android:layout_below="@id/drawer_avatar_circle"/>
 
             <TextView
-                android:id="@+id/drawer_userinfo"
+                android:id="@+id/drawer_user_desc"
                 android:text="User description here"
                 android:textSize="16sp"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="28dp"
                 android:gravity="top"
-                android:layout_below="@id/drawer_username"/>
+                android:layout_below="@id/drawer_user_name"/>
 
         </RelativeLayout>
 

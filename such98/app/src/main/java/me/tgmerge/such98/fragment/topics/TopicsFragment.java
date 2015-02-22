@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment;
+package me.tgmerge.such98.fragment.topics;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -9,15 +9,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.util.APIUtil;
-import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
@@ -103,7 +99,7 @@ public class TopicsFragment extends Fragment {
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        final ShowTopicsAdapter adapter = new ShowTopicsAdapter(null);
+        final TopicsAdapter adapter = new TopicsAdapter(null);
         recyclerView.setAdapter(adapter);
 
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -172,15 +168,15 @@ public class TopicsFragment extends Fragment {
 
     private final void setProgressLoading() {
         isLoading = true;
-        thisView.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        thisView.findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
     }
 
     private final void setProgressFinished() {
-        thisView.findViewById(R.id.progressBar).setVisibility(View.GONE);
+        thisView.findViewById(R.id.progress_bar).setVisibility(View.GONE);
         isLoading = false;
     }
 
-    private final void loadAPage(final ShowTopicsAdapter adapter) {
+    private final void loadAPage(final TopicsAdapter adapter) {
         setProgressLoading();
 
         final int intentId = mParamId;
@@ -240,121 +236,4 @@ public class TopicsFragment extends Fragment {
     }
 
 
-    private class ShowTopicsAdapter extends RecyclerView.Adapter<ViewHolder> {
-
-        private XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> mData;
-        private Class mDataItemClass;
-
-        public final void setData(XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> data) {
-            Class itemClass = (data == null) ? null : data.getItemClass();
-            if (itemClass != null && itemClass != XMLUtil.HotTopicInfo.class && itemClass != XMLUtil.TopicInfo.class) {
-                return;
-            }
-            mDataItemClass = itemClass;
-            mData = data;
-            notifyDataSetChanged();
-        }
-
-        public final void appendData(XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> data) {
-            if (mData == null) {
-                setData(data);
-                return;
-            }
-
-            if (data.getItemClass() != mDataItemClass) {
-                return;
-            }
-
-            if (mDataItemClass == XMLUtil.HotTopicInfo.class) {
-                ((XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) mData).append((XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) data);
-            } else {
-                ((XMLUtil.ArrayOf<XMLUtil.TopicInfo>) mData).append((XMLUtil.ArrayOf<XMLUtil.TopicInfo>) data);
-            }
-
-            notifyDataSetChanged();
-        }
-
-        public ShowTopicsAdapter(XMLUtil.ArrayOf<? extends XMLUtil.XMLObj> data) {
-            Class itemClass = (data == null) ? null : data.getItemClass();
-            if (itemClass != null && itemClass != XMLUtil.HotTopicInfo.class && itemClass != XMLUtil.TopicInfo.class) {
-                return;
-            }
-            mDataItemClass = itemClass;
-            mData = data;
-        }
-
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_topic_card, parent, false);
-            return new ViewHolder(itemLayoutView);
-        }
-
-
-        @Override
-        public void onBindViewHolder(ViewHolder viewHolder, int position) {
-
-            if (mDataItemClass == XMLUtil.TopicInfo.class) {
-                XMLUtil.ArrayOf<XMLUtil.TopicInfo> thisData = (XMLUtil.ArrayOf<XMLUtil.TopicInfo>) mData;
-                XMLUtil.TopicInfo dataItem = thisData.get(position);
-
-                viewHolder.icon.setImageResource(dataItem.TopState.equals(XMLUtil.TopicInfo.TOPSTATE_NONE)
-                        ? R.drawable.ic_comment_text_outline_white_36dp
-                        : R.drawable.ic_comment_alert_outline_white_36dp);
-
-                viewHolder.title.setText(dataItem.Title);
-                viewHolder.authorInfo.setText(dataItem.AuthorName + " @ " + dataItem.CreateTime);
-                viewHolder.lastPostInfo.setText(dataItem.LastPostInfo.UserName + " @ " + dataItem.LastPostInfo.Time);
-
-                viewHolder.data_topicId = dataItem.Id;
-
-            } else {
-                XMLUtil.ArrayOf<XMLUtil.HotTopicInfo> thisData = (XMLUtil.ArrayOf<XMLUtil.HotTopicInfo>) mData;
-                XMLUtil.HotTopicInfo dataItem = thisData.get(position);
-
-                viewHolder.icon.setImageResource(R.drawable.ic_comment_fire_outline_white_36dp);
-
-                viewHolder.title.setText(dataItem.Title);
-                viewHolder.authorInfo.setText(dataItem.AuthorName + " @ " + dataItem.CreateTime);
-                viewHolder.lastPostInfo.setText(dataItem.BoardName + ", " + dataItem.ParticipantCount + "人参与");
-
-                viewHolder.data_topicId = dataItem.Id;
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return (mData == null) ? 0 : mData.size();
-        }
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public ImageView icon;
-        public TextView title;
-        public TextView authorInfo;
-        public TextView lastPostInfo;
-
-        public int data_topicId;
-
-        public ViewHolder(View itemLayoutView) {
-            super(itemLayoutView);
-            icon = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
-            title = (TextView) itemLayoutView.findViewById(R.id.text_title);
-            authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
-            lastPostInfo = (TextView) itemLayoutView.findViewById(R.id.text_lastPostInfo);
-
-            itemLayoutView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            HelperUtil.generalDebug("ShowTopicsFragment", "onClick! " + v.toString());
-            if (v instanceof RelativeLayout) {
-                // click on whole item
-                HelperUtil.generalDebug("ShowTopicsFragment", "Clicked: " + data_topicId);
-                ActivityUtil.openShowPostsActivity(v.getContext(), data_topicId, 0, false);
-            }
-        }
-    }
 }

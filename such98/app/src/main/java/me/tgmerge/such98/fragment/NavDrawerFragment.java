@@ -45,7 +45,7 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
         mThisView = inflater.inflate(R.layout.fragment_nav_drawer, container, false);
 
         // Register on click listener
-        mThisView.findViewById(R.id.drawer_ava_circle).setOnClickListener(this);
+        mThisView.findViewById(R.id.drawer_avatar_circle).setOnClickListener(this);
         mThisView.findViewById(R.id.drawer_function_root_board).setOnClickListener(this);
         mThisView.findViewById(R.id.drawer_function_custom_board).setOnClickListener(this);
         mThisView.findViewById(R.id.drawer_function_hot_topic).setOnClickListener(this);
@@ -168,7 +168,7 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.drawer_ava_circle:
+            case R.id.drawer_avatar_circle:
                 HelperUtil.debugToast(getActivity(), "Avatar clicked");
                 break;
             case R.id.drawer_function_root_board:
@@ -190,16 +190,16 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
                 ActivityUtil.Action.logout(getActivity(), true);
                 break;
         }
-        mThisView.findViewById(R.id.drawer_ava_circle).setOnClickListener(this);
+        mThisView.findViewById(R.id.drawer_avatar_circle).setOnClickListener(this);
     }
 
     // - - -
 
     private void setDrawer() {
         drawerIsLoading = true;
-        final ImageView imgView = (ImageView) mThisView.findViewById(R.id.drawer_ava);
-        final TextView textUserName = (TextView) mThisView.findViewById(R.id.drawer_username);
-        final TextView textUserInfo = (TextView) mThisView.findViewById(R.id.drawer_userinfo);
+        final ImageView imgView = (ImageView) mThisView.findViewById(R.id.drawer_avatar);
+        final TextView textUserName = (TextView) mThisView.findViewById(R.id.drawer_user_name);
+        final TextView textUserInfo = (TextView) mThisView.findViewById(R.id.drawer_user_desc);
         new APIUtil.GetMe(getActivity(), new APIUtil.APICallback() {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {

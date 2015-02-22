@@ -12,10 +12,10 @@ import me.tgmerge.such98.activity.LoginPageActivity;
 import me.tgmerge.such98.activity.ShowBoardsActivity;
 import me.tgmerge.such98.activity.ShowPostsActivity;
 import me.tgmerge.such98.activity.ShowTopicsActivity;
-import me.tgmerge.such98.fragment.BoardsFragment;
+import me.tgmerge.such98.fragment.boards.BoardsFragment;
 import me.tgmerge.such98.fragment.NewPostFragment;
-import me.tgmerge.such98.fragment.PostsFragment;
-import me.tgmerge.such98.fragment.TopicsFragment;
+import me.tgmerge.such98.fragment.posts.PostsFragment;
+import me.tgmerge.such98.fragment.topics.TopicsFragment;
 
 /**
  * Created by tgmerge on 2/15.

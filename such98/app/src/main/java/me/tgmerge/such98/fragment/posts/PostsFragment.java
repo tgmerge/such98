@@ -1,28 +1,19 @@
-package me.tgmerge.such98.fragment;
+package me.tgmerge.such98.fragment.posts;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.util.APIUtil;
-import me.tgmerge.such98.util.ActivityUtil;
-import me.tgmerge.such98.util.BBUtil;
-import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.HelperUtil;
-import me.tgmerge.such98.util.ImageUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
 
@@ -82,7 +73,7 @@ public class PostsFragment extends Fragment {
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     SwipeRefreshLayout mSwipeLayout;
-    ShowPostsAdapter mAdapter;
+    PostsAdapter mAdapter;
 
     // onActivityCreated: the activity has finished its "onCreated"
     //                    this will be also called when fragment replace happens.
@@ -97,7 +88,7 @@ public class PostsFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new ShowPostsAdapter(null);
+        mAdapter = new PostsAdapter(getActivity(), null, null);
         mRecyclerView.setAdapter(mAdapter);
 
         // on refresh listener is only used to load previous page.
@@ -220,17 +211,17 @@ public class PostsFragment extends Fragment {
 
     private boolean isLoaded = false;
 
-    private final void loadNextPage(ShowPostsAdapter adapter) {
+    private final void loadNextPage(PostsAdapter adapter) {
         loadPage(false, adapter);
     }
 
-    private final void loadPreviousPage(ShowPostsAdapter adapter) {
+    private final void loadPreviousPage(PostsAdapter adapter) {
         loadPage(true, adapter);
     }
 
 
     // loadprevious true: previous false: next
-    private final void loadPage(final boolean loadPrevious, final ShowPostsAdapter adapter) {
+    private final void loadPage(final boolean loadPrevious, final PostsAdapter adapter) {
 
         final int posToLoad = (loadPrevious) ? mPreviousPage*ITEM_PER_PAGE : mNextPage*ITEM_PER_PAGE;
         final int sizeToLoad = ITEM_PER_PAGE;
@@ -259,10 +250,10 @@ public class PostsFragment extends Fragment {
                     return;
                 }
                 if (loadPrevious) {
-                    adapter.appendDataFront(postsInfo);
+                    adapter.appendDataFront(mTopicInfo, postsInfo);
                     mPreviousPage --;
                 } else {
-                    adapter.appendData(postsInfo);
+                    adapter.appendData(mTopicInfo, postsInfo);
                     mNextPage ++;
                 }
                 setProgressFinished();
@@ -279,148 +270,4 @@ public class PostsFragment extends Fragment {
         HelperUtil.debugToast(getActivity(), "Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
         new APIUtil.GetTopicPost(getActivity(), mParamId, posToLoad, null, sizeToLoad, new Callback()).execute();
     }
-
-
-    private class ShowPostsAdapter extends RecyclerView.Adapter<ViewHolder> {
-
-        private XMLUtil.ArrayOf<XMLUtil.PostInfo> mData;
-
-        public final void appendData(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
-            if (mData == null) {
-                mData = data;
-            } else {
-                mData.append(data);
-            }
-            notifyDataSetChanged();
-        }
-
-        public final void appendDataFront(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
-            if (mData == null) {
-                mData = data;
-            } else {
-                mData.appendFront(data);
-            }
-            notifyItemRangeInserted(0, data.size());
-        }
-
-        public ShowPostsAdapter(XMLUtil.ArrayOf<XMLUtil.PostInfo> data) {
-            mData = data;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post_card, parent, false);
-            return new ViewHolder(itemLayoutView);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-
-            if (!isLoaded) {
-                mSwipeLayout.setEnabled(true);
-                isLoaded = true;
-            }
-
-            final XMLUtil.PostInfo dataItem = mData.get(position);
-
-            viewHolder.data_topicInfo = mTopicInfo;
-            viewHolder.data_postInfo = mData.get(position);
-
-            viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复 #" + dataItem.Floor : dataItem.Title);
-            viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
-            BBUtil.setBBcodeToTextView(viewHolder.content, dataItem.Content); // todo prevent to process every time
-
-            if (dataItem.Floor == 1) {
-                viewHolder.replyInfo.setVisibility(View.VISIBLE);
-                viewHolder.replyInfo.setText(viewHolder.data_topicInfo.HitCount + " 次点击, " + viewHolder.data_topicInfo.ReplyCount + " 次回复");
-            } else {
-                viewHolder.replyInfo.setVisibility(View.GONE);
-            }
-
-            // ViewHolder 异步加载图像： 加载之前设置viewHolder.setRecyclable(false)
-            //                         加载之后设置viewHolder.setRecyclable(true)
-            String avaUrl = CacheUtil.id_avaUrlCache.get(dataItem.UserId);
-            if (avaUrl != null) {
-                ImageUtil.setViewHolderImage(getActivity(), viewHolder, viewHolder.avatar, avaUrl);
-            } else {
-                viewHolder.setIsRecyclable(false); // todo pair with (true)
-                new APIUtil.GetIdUser(getActivity(), dataItem.UserId, new APIUtil.APICallback() {
-                    @Override
-                    public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                        XMLUtil.UserInfo info = new XMLUtil.UserInfo();
-                        try {
-                            info.parse(new String(body));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            onFailure(-1, headers, body, e);
-                            return;
-                        }
-                        String newAvaUrl = info.PortraitUrl.startsWith("http") ? info.PortraitUrl : ("http://www.cc98.org/" + info.PortraitUrl);
-                        CacheUtil.id_avaUrlCache.put(info.Id, newAvaUrl);
-                        ImageUtil.setViewHolderImage(getActivity(), viewHolder, viewHolder.avatar, newAvaUrl);
-                        viewHolder.setIsRecyclable(true);
-                    }
-
-                    @Override
-                    public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                        viewHolder.avatar.setImageResource(R.drawable.ic_close_white_36dp);
-                        viewHolder.setIsRecyclable(true);
-                    }
-                }).execute();
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return (mData == null) ? 0 : mData.size();
-        }
-    }
-
-
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public ImageView avatar;
-        public TextView title;
-        public TextView authorInfo;
-        public TextView replyInfo;
-        public TextView content;
-
-        public ImageView imgReply;
-        public ImageView imgQuote;
-
-        public XMLUtil.TopicInfo data_topicInfo;
-        public XMLUtil.PostInfo data_postInfo;
-
-        public ViewHolder(View itemLayoutView) {
-            super(itemLayoutView);
-            avatar = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
-            title = (TextView) itemLayoutView.findViewById(R.id.text_title);
-            authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
-            replyInfo = (TextView) itemLayoutView.findViewById(R.id.text_replyInfo);
-            content = (TextView) itemLayoutView.findViewById(R.id.text_content);
-            imgReply = (ImageView) itemLayoutView.findViewById(R.id.image_reply);
-            imgQuote = (ImageView) itemLayoutView.findViewById(R.id.image_quote);
-
-            // set item click listener
-            imgReply.setOnClickListener(this);
-            imgQuote.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            HelperUtil.generalDebug("PostsFragment", "onClick " + v.toString());
-            switch (v.getId()) {
-                case R.id.image_reply:
-                    String replyTitle = (data_postInfo.Floor == 1) ? "" : "回复 " + data_postInfo.UserName + "(#" + data_postInfo.Floor + ")";
-                    ActivityUtil.openNewPostDialog(v.getContext(), data_topicInfo.Id, replyTitle, "");
-                    break;
-                case R.id.image_quote:
-                    String quoteTitle = "回复 " + data_postInfo.UserName + "(#" + data_postInfo.Floor + ")";
-                    ActivityUtil.openNewPostDialog(v.getContext(), data_topicInfo.Id, quoteTitle,
-                            "[quotex][i]> " + data_postInfo.UserName + "@" + data_postInfo.Time + "(#" + data_postInfo.Floor + ")[/i]\n" +
-                                    data_postInfo.Content + "[/quotex]\n\n");
-            }
-        }
-    }
-
 }

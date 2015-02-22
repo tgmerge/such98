@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment;
+package me.tgmerge.such98.fragment.boards;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -9,9 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import org.apache.http.Header;
 
@@ -19,7 +16,6 @@ import java.util.Arrays;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.util.APIUtil;
-import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
@@ -108,7 +104,7 @@ public class BoardsFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         // RecyclerView's Adapter
-        final ShowBoardsAdapter adapter = new ShowBoardsAdapter(null);
+        final BoardsAdapter adapter = new BoardsAdapter(null);
         recyclerView.setAdapter(adapter);
 
         // RecyclerView's OnScrollListener
@@ -185,15 +181,15 @@ public class BoardsFragment extends Fragment {
 
     private final void setProgressLoading() {
         isLoading = true;
-        thisView.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        thisView.findViewById(R.id.progress_bar).setVisibility(View.VISIBLE);
     }
 
     private final void setProgressFinished() {
-        thisView.findViewById(R.id.progressBar).setVisibility(View.GONE);
+        thisView.findViewById(R.id.progress_bar).setVisibility(View.GONE);
         isLoading = false;
     }
 
-    private final void loadAPage(final ShowBoardsAdapter adapter) {
+    private final void loadAPage(final BoardsAdapter adapter) {
         // show "loading" circle
         setProgressLoading();
 
@@ -274,93 +270,4 @@ public class BoardsFragment extends Fragment {
         }
     }
 
-    private static class ShowBoardsAdapter extends RecyclerView.Adapter<ViewHolder> {
-
-        private XMLUtil.ArrayOf<XMLUtil.BoardInfo> mData;
-
-        public final void appendData(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
-            if (mData == null) {
-                mData = data;
-            } else {
-                mData.append(data);
-            }
-            notifyDataSetChanged();
-        }
-
-        public ShowBoardsAdapter(XMLUtil.ArrayOf<XMLUtil.BoardInfo> data) {
-            mData = data;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_board_card, parent, false);
-            return new ViewHolder(itemLayoutView);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder viewHolder, int position) {
-            XMLUtil.BoardInfo dataItem = mData.get(position);
-
-            viewHolder.icon.setImageResource(dataItem.IsCategory ? R.drawable.ic_folder_multiple_outline_white_36dp : R.drawable.ic_folder_outline_white_36dp);
-            viewHolder.name.setText(dataItem.Name);
-            viewHolder.isCategory.setText(dataItem.IsCategory ? "分类" : "");
-            viewHolder.description.setText(dataItem.Description);
-
-            viewHolder.data_boardId = dataItem.Id;
-            viewHolder.data_isCat = dataItem.IsCategory;
-
-            // todo API有问题，于是在所有“分类”版面下显示一个“强制按帖子版面打开”的选项……
-            viewHolder.openAsNotCat.setVisibility(dataItem.IsCategory ? View.VISIBLE : View.GONE);
-        }
-
-        @Override
-        public int getItemCount() {
-            return (mData == null) ? 0 : mData.size();
-        }
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        public ImageView icon;
-        public TextView name;
-        public TextView isCategory;
-        public TextView description;
-        public TextView openAsNotCat;
-
-        public int data_boardId;
-        public boolean data_isCat;
-
-        public ViewHolder(View itemLayoutView) {
-            super(itemLayoutView);
-            icon = (ImageView) itemLayoutView.findViewById(R.id.image_icon);
-            name = (TextView) itemLayoutView.findViewById(R.id.text_name);
-            isCategory = (TextView) itemLayoutView.findViewById(R.id.text_isCategory);
-            description = (TextView) itemLayoutView.findViewById(R.id.text_description);
-            openAsNotCat = (TextView) itemLayoutView.findViewById(R.id.text_openAsNotCat);
-
-            // set item & inner view click listener
-            itemLayoutView.setOnClickListener(this);
-            openAsNotCat.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            HelperUtil.generalDebug("ShowBoardsFragment", "onClick " + v.toString());
-            if (v instanceof TextView) {
-                // click on the text view, force show topics
-                HelperUtil.generalDebug("ShowBoardsFragment", "Force open as board: " + data_boardId + ", " + data_isCat);
-                ActivityUtil.openShowTopicsActivity(v.getContext(), data_boardId, 0, false);
-            } else if (v instanceof RelativeLayout) {
-                // click on whole item, starting new activity
-                HelperUtil.generalDebug("ShowBoardsFragment", "Clicked: " + data_boardId + ", " + data_isCat);
-                if (data_isCat) {
-                    // clicked board is a category, start ShowBoardsActivity
-                    ActivityUtil.openShowBoardsActivity(v.getContext(), data_boardId, 0, false);
-                } else {
-                    // clicked board has no sub-boards, start ShowTopicsActivity
-                    ActivityUtil.openShowTopicsActivity(v.getContext(), data_boardId, 0, false);
-                }
-            }
-        }
-    }
 }
