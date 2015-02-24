@@ -82,7 +82,7 @@ class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostViewHolder
 
         viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复 #" + dataItem.Floor : dataItem.Title);
         viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
-        BBUtil.setBBcodeToTextView(viewHolder.content, dataItem.Content); // todo prevent to process every time
+        BBUtil.setBBcodeToTextView(viewHolder.content, mAct, dataItem.Content); // todo prevent to process every time
 
         if (dataItem.Floor == 1) {
             viewHolder.replyInfo.setVisibility(View.VISIBLE);
@@ -95,7 +95,7 @@ class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostViewHolder
         //                         加载之后设置viewHolder.setRecyclable(true)
         String avaUrl = CacheUtil.id_avaUrlCache.get(dataItem.UserId);
         if (avaUrl != null) {
-            ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, avaUrl);
+            ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, avaUrl);
         } else {
             viewHolder.setIsRecyclable(false); // todo pair with (true)
             new APIUtil.GetIdUser(mAct, dataItem.UserId, new APIUtil.APICallback() {
@@ -111,7 +111,7 @@ class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostViewHolder
                     }
                     String newAvaUrl = info.PortraitUrl.startsWith("http") ? info.PortraitUrl : ("http://www.cc98.org/" + info.PortraitUrl);
                     CacheUtil.id_avaUrlCache.put(info.Id, newAvaUrl);
-                    ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, newAvaUrl);
+                    ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, newAvaUrl);
                     viewHolder.setIsRecyclable(true);
                 }
 

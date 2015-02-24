@@ -27,19 +27,11 @@ public class ImageUtil {
 
     public static final ImageLoader getImageLoader(Context ctx, int roundRadius) {
         if (!ImageLoader.getInstance().isInited()) {
-            DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
-                    .showImageOnFail(R.drawable.ic_close_white_48dp)
-                    .cacheInMemory(true)
-                    .cacheOnDisk(true)
-                    .displayer(new RoundedBitmapDisplayer(roundRadius))
-                    .build();
-
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(ctx.getApplicationContext())
                     .denyCacheImageMultipleSizesInMemory()
                     .threadPoolSize(2)
                     .memoryCacheSize(2 * 1024 * 1024)
                     .diskCacheFileCount(500)
-                    .defaultDisplayImageOptions(defaultOptions)
                     .build();
 
             ImageLoader.getInstance().init(config);
@@ -49,7 +41,14 @@ public class ImageUtil {
 
 
     public static final void setImage(Context ctx, final ImageView imgView, int roundRadius, String url) {
-        ImageUtil.getImageLoader(ctx, roundRadius).displayImage(url, imgView, new SimpleImageLoadingListener() {
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.ic_dots_horizontal_white_48dp)
+                .showImageOnFail(R.drawable.ic_close_white_48dp)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .displayer(new RoundedBitmapDisplayer(roundRadius))
+                .build();
+        ImageUtil.getImageLoader(ctx, roundRadius).displayImage(url, imgView, options, new SimpleImageLoadingListener() {
             public void onLoadingComplete(String uri, View view, Bitmap loadedImage) {
                 imgView.setPadding(0, 0, 0, 0);
             }
@@ -61,9 +60,16 @@ public class ImageUtil {
     //   It's a async-task, so isRecyclable flag of PostViewHolder should be set to false first,
     //     to prevent problems from recycling viewHolder before image is downloaded and set.
     //   Once the image is set, or failed to load, the isRecyclable flag should be set to true.
-    public static final void setViewHolderImage(Context ctx, final RecyclerView.ViewHolder viewHolder, final ImageView imgView, String url) {
+    public static final void setViewHolderImage(Context ctx, final RecyclerView.ViewHolder viewHolder, final ImageView imgView, int roundRadius, String url) {
         viewHolder.setIsRecyclable(false);
-        ImageUtil.getImageLoader(ctx).displayImage(url, imgView, new SimpleImageLoadingListener() {
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.ic_dots_horizontal_white_48dp)
+                .showImageOnFail(R.drawable.ic_close_white_48dp)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .displayer(new RoundedBitmapDisplayer(roundRadius))
+                .build();
+        ImageUtil.getImageLoader(ctx).displayImage(url, imgView, options, new SimpleImageLoadingListener() {
             public void onLoadingComplete(String uri, View view, Bitmap loadedImage) {
                 imgView.setPadding(0, 0, 0, 0);
                 viewHolder.setIsRecyclable(true);
