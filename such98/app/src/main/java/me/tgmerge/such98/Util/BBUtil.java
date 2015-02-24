@@ -3,6 +3,7 @@ package me.tgmerge.such98.util;
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.util.Pair;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ public class BBUtil {
          //todo  UILgetter not working
         Spanned spanned = Html.fromHtml(html, null, null);
         textView.setText(spanned);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private static final Vector<Pair<String, String>> bbMap = new Vector<>();

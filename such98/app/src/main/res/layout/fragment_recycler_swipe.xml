@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="me.tgmerge.such98.fragment.posts.PostsFragment">
 
-    <android.support.v7.widget.RecyclerView
+    <me.tgmerge.such98.NoChildFocusRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

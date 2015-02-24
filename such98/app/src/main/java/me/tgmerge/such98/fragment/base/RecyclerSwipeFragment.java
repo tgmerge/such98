@@ -8,9 +8,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import me.tgmerge.such98.NoChildFocusRecyclerView;
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.util.HelperUtil;
 
@@ -58,7 +60,7 @@ public abstract class RecyclerSwipeFragment extends Fragment {
         inflater.inflate(R.menu.menu_fragment_posts, menu);
     }
 
-    protected RecyclerView mRecyclerView;
+    protected NoChildFocusRecyclerView mRecyclerView;
     protected LinearLayoutManager mLayoutManager;
     protected SwipeRefreshLayout mSwipeLayout;
     protected RecyclerSwipeAdapter mAdapter;
@@ -70,7 +72,7 @@ public abstract class RecyclerSwipeFragment extends Fragment {
         mHasPreviousPage = true;
         mHasNextPage = true;
 
-        mRecyclerView = (RecyclerView) mThisView.findViewById(R.id.recyclerView);
+        mRecyclerView = (NoChildFocusRecyclerView) mThisView.findViewById(R.id.recyclerView);
         mSwipeLayout = (SwipeRefreshLayout) mThisView.findViewById(R.id.swipe_container);
         mLayoutManager = new LinearLayoutManager(getActivity());
         mAdapter = createAdapter();
