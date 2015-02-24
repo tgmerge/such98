@@ -87,12 +87,11 @@ class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostViewHolder
         if (dataItem.Floor == 1) {
             viewHolder.replyInfo.setVisibility(View.VISIBLE);
             viewHolder.replyInfo.setText(viewHolder.data_topicInfo.HitCount + " 次点击, " + viewHolder.data_topicInfo.ReplyCount + " 次回复");
-        } else {
-            viewHolder.replyInfo.setVisibility(View.GONE);
         }
 
         // PostViewHolder 异步加载图像： 加载之前设置viewHolder.setRecyclable(false)
         //                         加载之后设置viewHolder.setRecyclable(true)
+        viewHolder.avatar.setImageResource(R.drawable.ic_dots_horizontal_white_36dp);
         String avaUrl = CacheUtil.id_avaUrlCache.get(dataItem.UserId);
         if (avaUrl != null) {
             ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, avaUrl);
@@ -122,6 +121,10 @@ class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostViewHolder
                 }
             }).execute();
         }
+
+        // reset toolbar status
+        viewHolder.imgShowPostAction.setVisibility(View.VISIBLE);
+        viewHolder.postActionBar.setVisibility(View.GONE);
     }
 
     @Override

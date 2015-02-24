@@ -23,8 +23,7 @@ public final class HelperUtil {
         try {
             Toast.makeText(ctx, "ERROR:" + msg, Toast.LENGTH_LONG).show();
         } catch (NullPointerException e) {
-            generalError("HelperUtil", "NullPointerException, ctx=" + ctx + "msg=" + msg);
-            e.printStackTrace();
+            generalError("HelperUtil", "NullPointerException, ctx=" + ctx + " msg=" + msg);
         }
     }
 
