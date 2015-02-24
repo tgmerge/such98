@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import java.util.Vector;
 
+import me.tgmerge.such98.MultiTypeLinkMoveMentMethod;
+
 /**
  * Created by tgmerge on 2/17.
  * Provides methods to render BBCode(to html, on TextView, load images, etc)
@@ -21,7 +23,7 @@ public class BBUtil {
          //todo  UILgetter not working
         Spanned spanned = Html.fromHtml(html, null, null);
         textView.setText(spanned);
-        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        textView.setMovementMethod(MultiTypeLinkMoveMentMethod.getInstance());
     }
 
     private static final Vector<Pair<String, String>> bbMap = new Vector<>();
@@ -76,11 +78,11 @@ public class BBUtil {
         bbMap.add(new Pair<>("\\[email\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$1</a>"));
         bbMap.add(new Pair<>("\\[email=(.+?)\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$2</a>"));
 
-        bbMap.add(new Pair<>("\\[url\\](.+?)\\[/url\\]", "<a href='$1'>$1</a>"));
-        bbMap.add(new Pair<>("\\[url=(.+?)\\]", "<a href='$1'>"));
+        bbMap.add(new Pair<>("\\[url\\]([^\\[]+?)\\[/url\\]", "<a href='$1'>$1</a>"));
+        bbMap.add(new Pair<>("\\[url=([^\\[]+?)\\]", "<a href='$1'>"));
+
         bbMap.add(new Pair<>("\\[/url\\]", "</a>"));
 
-        // disabled: img, upload
         bbMap.add(new Pair<>("\\[img=(.+?),(.+?)\\](.+?)\\[/img\\]", "<img width='$1' height='$2' src='$3' />"));
         bbMap.add(new Pair<>("\\[upload(=bmp|=png|=gif|=jpg|=jpeg)?(,\\d)?\\](.+?)\\[/upload\\]", "<img src='$3' />"));
 
