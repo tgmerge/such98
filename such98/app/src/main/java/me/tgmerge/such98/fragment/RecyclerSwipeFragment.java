@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import me.tgmerge.such98.custom.NoChildFocusRecyclerView;
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.adapter.RecyclerSwipeAdapter;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.HelperUtil;
 
 public abstract class RecyclerSwipeFragment extends Fragment {
@@ -189,12 +190,12 @@ public abstract class RecyclerSwipeFragment extends Fragment {
         final int sizeToLoad = ITEM_PER_PAGE;
 
         if (loadPrevious && (!mHasPreviousPage || posToLoad < 0)) {
-            HelperUtil.debugToast("Already at first page");
+            HelperUtil.debugToast(SuchApp.getStr(R.string.fragment_recycler_swipe_already_first_page));
             mHasPreviousPage = false;
             setProgressFinished();
             return;
         } else if (!loadPrevious && (!mHasNextPage || posToLoad > getMaxPosToLoad())) {
-            HelperUtil.debugToast("Already at last page");
+            HelperUtil.debugToast(SuchApp.getStr(R.string.fragment_recycler_swipe_already_last_page));
             mHasNextPage = false;
             setProgressFinished();
             return;

@@ -7,19 +7,84 @@
     <string name="title_activity_login_page">LoginPageActivity</string>
 
     <!-- application config value -->
-    <string name="title_activity_display">DisplayActivity</string>
-    <string name="title_activity_show_board">ShowBoardActivity</string>
-    <string name="title_activity_show_boards">ShowBoardsActivity</string>
-    <string name="title_activity_show_topics">ShowTopicsActivity</string>
-    <string name="title_activity_show_posts">ShowPostsActivity</string>
+    <string name="title_activity_test">测试</string>
+    <string name="title_activity_show_boards">查看子版</string>
+    <string name="title_activity_show_topics">查看主题</string>
+    <string name="title_activity_show_posts">查看帖子</string>
 
-    <string name="open_drawer">Open Drawer</string>
-    <string name="close_drawer">Close Drawer</string>
-    <string name="title_activity_fragment_boards">Fragment showboards</string>
-    <string name="title_activity_new_post">NewPostActivity</string>
+    <string name="open_drawer">打开侧边栏</string>
+    <string name="close_drawer">关闭侧边栏</string>
 
-    <string name="hello_world">Hello world!</string>
+    <!-- LoginActivity -->
+    <string name="activity_login_no_token">没有登录信息</string>
+    <string name="activity_login_has_token">已经登录</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- LoginPageActivity -->
+    <string name="activity_login_page_login_success">登录成功(%s)</string>
+    <string name="activity_login_page_login_failure">登录失败</string>
+
+    <!-- ShowBoardsActivity -->
+
+    <!-- ShowPostsActivity -->
+
+    <!-- BoardsAdapter -->
+    <string name="adapter_boards_is_category">分类</string>
+    <string name="adapter_boards_is_not_category"> </string>
+
+    <!-- PostsAdapter -->
+    <string name="adapter_posts_default_title">回复 #%1$d</string>
+    <string name="adapter_posts_author_info">%1$s @ %2$s</string>
+    <string name="adapter_posts_reply_info">%1$d 次点击, %2$d 次回复</string>
+
+    <!-- TopicsAdapter -->
+    <string name="adapter_topics_author_info">%1$s @ %2$s</string>
+    <string name="adapter_topics_reply_info">%1$d 点击, %2$d 回复 (最近 %3$s)</string>
+    <string name="adapter_topics_reply_info_hot">%1$d 点击, %2$s 参与, %3$d 回复</string>
+
+    <!-- MultiTypeLinkMovementMethod -->
+    <string name="custom_MultiTypeLinkMovementMethod_cannot_load_link">无法打开链接</string>
+
+    <!-- BoardsFragment -->
+    <string name="fragment_boards_board_name_custom">个人定制</string>
+    <string name="fragment_boards_board_name_root">主版面</string>
+    <string name="fragment_boards_loading_item">正在加载版面 %1$d - %2$d …</string>
+
+    <!-- General -->
+    <string name="general_on_api_failure_toast_text">网络错误, code=%1$d, err=%2$s</string>
+
+    <!-- NewPostFragment -->
+    <string name="fragment_new_post_warning_empty_content">回复正文不能为空</string>
+    <string name="fragment_new_post_warning_invalid_topic_id">帖子ID(=%1$d)无效</string>
+    <string name="fragment_new_post_reply_sent">回复成功</string>
+    <string name="fragment_new_post_reply_failure_title">回复失败</string>
+    <string name="fragment_new_post_reply_failure_OK_button">确定</string>
+
+    <!-- PostsFragment -->
+    <string name="fragment_posts_loading_item">正在加载帖子 %1$d - %2$d …</string>
+
+    <!-- RecylerSwipeFragment -->
+    <string name="fragment_recycler_swipe_already_first_page">已经在第一页了</string>
+    <string name="fragment_recycler_swipe_already_last_page">已经在最后一页了</string>
+
+    <!-- TopicsFragment -->
+    <string name="fragment_topics_board_name_hot">热门主题</string>
+    <string name="fragment_topics_board_name_new">最新主题</string>
+    <string name="fragment_topics_loading_item">正在加载主题 %1$d - %2$d …</string>
+
+    <!-- ActivityUtil -->
+    <string name="util_activity_goto_floor_dialog_title">跳转到</string>
+    <string name="util_activity_goto_floor_dialog_hint">楼层数(1-%1$d)</string>
+    <string name="util_activity_goto_floor_dialog_button">确定</string>
+    <string name="util_activity_goto_floor_dialog_wrong_floor">楼层数错误</string>
+    <string name="util_activity_goto_topic_dialog_title">跳转到</string>
+    <string name="util_activity_goto_topic_dialog_hint">帖子数(1-%1$d)</string>
+    <string name="util_activity_goto_topic_dialog_button">确定</string>
+    <string name="util_activity_goto_topic_dialog_wrong_floor">帖子数错误</string>
+
+    <!-- PostViewHolder -->
+    <string name="view_holder_post_copied">帖子内容已经复制</string>
+    <string name="view_holder_post_reply_title">回复 %1$s (#%2$d)</string>
+    <string name="view_holder_post_quote_content"><![CDATA[[quotex][i][b]> %1$s @ %2$s (#%3$d)[/b][/i]\n%4$s[/quotex]\n\n]]></string>
+
+
 </resources>

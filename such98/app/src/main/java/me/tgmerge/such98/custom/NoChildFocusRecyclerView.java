@@ -13,7 +13,6 @@ import android.widget.Toast;
 public class NoChildFocusRecyclerView extends RecyclerView {
     public NoChildFocusRecyclerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        Toast.makeText(context, "I am created!", Toast.LENGTH_LONG).show();
     }
 
     public NoChildFocusRecyclerView(Context context) {

@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.HelperUtil;
@@ -114,7 +115,7 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast("NewPostFragment: Network error on fetching user info. code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
             }
         }).execute();
     }
@@ -147,12 +148,12 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
         String postContent = ((EditText) mThisView.findViewById(R.id.new_post_content)).getText().toString();
 
         if (postContent.equals("")) {
-            HelperUtil.errorToast("Post content cannot be empty");
+            HelperUtil.errorToast(SuchApp.getStr(R.string.fragment_new_post_warning_empty_content));
             return;
         }
 
         if (mParamTopicId <= 0) {
-            HelperUtil.errorToast("Invalid topic ID");
+            HelperUtil.errorToast(SuchApp.getStr(R.string.fragment_new_post_warning_invalid_topic_id, mParamTopicId));
             return;
         }
 
@@ -160,7 +161,7 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
         new APIUtil.PostTopicPost(getActivity(), mParamTopicId, postTitle, postContent, new APIUtil.APICallback() {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                HelperUtil.debugToast("Reply sent successful");
+                HelperUtil.debugToast(SuchApp.getStr(R.string.fragment_new_post_reply_sent));
                 // close dialog
                 dismiss();
             }
@@ -168,9 +169,9 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-                dialog.setTitle("Alert")
-                        .setMessage("Reply failure. stat=" + statCode + ", error=" + error.toString())
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                dialog.setTitle(SuchApp.getStr(R.string.fragment_new_post_reply_failure_title))
+                        .setMessage(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()))
+                        .setPositiveButton(SuchApp.getStr(R.string.fragment_new_post_reply_failure_OK_button), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 

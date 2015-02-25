@@ -10,6 +10,7 @@ import org.apache.http.Header;
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.adapter.RecyclerSwipeAdapter;
 import me.tgmerge.such98.adapter.TopicsAdapter;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
@@ -42,7 +43,7 @@ public class TopicsFragment extends RecyclerSwipeFragment {
 
         if (mParamId == PARAM_ID_HOT) {
             mBoardInfo.Id = PARAM_ID_HOT;
-            mBoardInfo.Name = "热门主题";
+            mBoardInfo.Name = SuchApp.getStr(R.string.fragment_topics_board_name_hot);
             mBoardInfo.TotalTopicCount = 10;
             getActivity().setTitle(mBoardInfo.Name);
             mPreviousPage = -1;
@@ -50,7 +51,7 @@ public class TopicsFragment extends RecyclerSwipeFragment {
             loadNextPage(topicsAdapter);
         } else if (mParamId == PARAM_ID_NEW) {
             mBoardInfo.Id = PARAM_ID_NEW;
-            mBoardInfo.Name = "最新主题";
+            mBoardInfo.Name = SuchApp.getStr(R.string.fragment_topics_board_name_new);
             mBoardInfo.TotalTopicCount = 500; // todo verify
             getActivity().setTitle(mBoardInfo.Name);
             mPreviousPage = -1;
@@ -104,7 +105,7 @@ public class TopicsFragment extends RecyclerSwipeFragment {
 
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    HelperUtil.errorToast("Error: " + "code=" + statCode + ", error=" + error.toString());
+                    HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
                 }
             }).execute();
         }
@@ -182,11 +183,11 @@ public class TopicsFragment extends RecyclerSwipeFragment {
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 setProgressFinished();
-                HelperUtil.errorToast("Error, code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
             }
         }
 
-        HelperUtil.debugToast("Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
+        HelperUtil.debugToast(SuchApp.getStr(R.string.fragment_topics_loading_item, posToLoad, posToLoad + sizeToLoad));
         if (mParamId == PARAM_ID_NEW) {
             // Show new topics
             new APIUtil.GetNewTopic(getActivity(), posToLoad, null, sizeToLoad, new Callback()).execute();

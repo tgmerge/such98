@@ -11,11 +11,13 @@ import android.content.Intent;
 import android.text.InputType;
 import android.widget.EditText;
 
+import me.tgmerge.such98.R;
 import me.tgmerge.such98.activity.LoginActivity;
 import me.tgmerge.such98.activity.LoginPageActivity;
 import me.tgmerge.such98.activity.ShowBoardsActivity;
 import me.tgmerge.such98.activity.ShowPostsActivity;
 import me.tgmerge.such98.activity.ShowTopicsActivity;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.fragment.BoardsFragment;
 import me.tgmerge.such98.fragment.NewPostFragment;
 import me.tgmerge.such98.fragment.PostsFragment;
@@ -178,12 +180,12 @@ public final class ActivityUtil {
     public static final void openGotoFloorDialog(final Activity act, final int containerId, final int topicId, final int maxFloor) {
         logDebug("Opening 'goto floor' dialog, tID=" + topicId + ", maxFloor=" + maxFloor);
         AlertDialog.Builder alert = new AlertDialog.Builder(act);
-        alert.setTitle("Jump to");
+        alert.setTitle(SuchApp.getStr(R.string.util_activity_goto_floor_dialog_title));
         final EditText input = new EditText(act);
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setHint("Floor (1-" + maxFloor + ")");
+        input.setHint(SuchApp.getStr(R.string.util_activity_goto_floor_dialog_hint, maxFloor));
         alert.setView(input);
-        alert.setPositiveButton("Jump", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(SuchApp.getStr(R.string.util_activity_goto_floor_dialog_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
@@ -193,7 +195,7 @@ public final class ActivityUtil {
                     }
                     loadPostsFragment(act, containerId, topicId, floor - 1);
                 } catch (NumberFormatException e) {
-                    HelperUtil.errorToast("Wrong floor number");
+                    HelperUtil.errorToast(SuchApp.getStr(R.string.util_activity_goto_floor_dialog_wrong_floor));
                     e.printStackTrace();
                 }
             }
@@ -204,12 +206,12 @@ public final class ActivityUtil {
     public static final void openGotoTopicItemDialog(final Activity act, final int containerId, final int boardId, final int itemNum) {
         logDebug("Opening 'goto topic item' dialog, bID=" + boardId + ", itemNum=" + itemNum);
         AlertDialog.Builder alert = new AlertDialog.Builder(act);
-        alert.setTitle("Jump to");
+        alert.setTitle(SuchApp.getStr(R.string.util_activity_goto_topic_dialog_title));
         final EditText input = new EditText(act);
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setHint("Topic (1-" + itemNum + ")");
+        input.setHint(SuchApp.getStr(R.string.util_activity_goto_topic_dialog_hint, itemNum));
         alert.setView(input);
-        alert.setPositiveButton("Jump", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(SuchApp.getStr(R.string.util_activity_goto_topic_dialog_button), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
@@ -219,7 +221,7 @@ public final class ActivityUtil {
                     }
                     loadTopicsFragment(act, containerId, boardId, floor - 1);
                 } catch (NumberFormatException e) {
-                    HelperUtil.errorToast("Wrong item number");
+                    HelperUtil.errorToast(SuchApp.getStr(R.string.util_activity_goto_topic_dialog_wrong_floor));
                     e.printStackTrace();
                 }
             }

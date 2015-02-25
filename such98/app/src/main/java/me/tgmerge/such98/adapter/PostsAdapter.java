@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.viewholder.PostViewHolder;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.BBUtil;
@@ -80,13 +81,13 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
         viewHolder.data_topicInfo = mTopicInfo;
         viewHolder.data_postInfo = mData.get(position);
 
-        viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? "回复 #" + dataItem.Floor : dataItem.Title);
-        viewHolder.authorInfo.setText(dataItem.UserName + " @ " + dataItem.Time);
+        viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? SuchApp.getStr(R.string.adapter_posts_default_title, dataItem.Floor) : dataItem.Title);
+        viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_posts_author_info, dataItem.UserName, dataItem.Time));
         BBUtil.setBBcodeToTextView(viewHolder.content, mAct, dataItem.Content); // todo prevent to process every time
 
         if (dataItem.Floor == 1) {
             viewHolder.replyInfo.setVisibility(View.VISIBLE);
-            viewHolder.replyInfo.setText(viewHolder.data_topicInfo.HitCount + " 次点击, " + viewHolder.data_topicInfo.ReplyCount + " 次回复");
+            viewHolder.replyInfo.setText(SuchApp.getStr(R.string.adapter_posts_reply_info, viewHolder.data_topicInfo.HitCount, viewHolder.data_topicInfo.ReplyCount));
         }
 
         // PostViewHolder 异步加载图像： 加载之前设置viewHolder.setRecyclable(false)

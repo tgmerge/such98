@@ -18,6 +18,7 @@ import android.widget.TextView;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.CacheUtil;
@@ -222,7 +223,7 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 drawerIsLoading = false;
-                HelperUtil.errorToast("Error: " + "code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
             }
         }).execute();
     }

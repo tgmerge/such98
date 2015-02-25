@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;
@@ -61,17 +62,15 @@ public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                 ClipboardManager clipboard = (ClipboardManager) v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("Post", data_postInfo.Title + "\n" + data_postInfo.Content);
                 clipboard.setPrimaryClip(clip);
-                HelperUtil.debugToast("Post content copied");
+                HelperUtil.debugToast(SuchApp.getStr(R.string.view_holder_post_copied));
                 break;
             case R.id.image_reply:
-                String replyTitle = (data_postInfo.Floor == 1) ? "" : "回复 " + data_postInfo.UserName + "(#" + data_postInfo.Floor + ")";
+                String replyTitle = (data_postInfo.Floor == 1) ? "" : SuchApp.getStr(R.string.view_holder_post_reply_title, data_postInfo.UserName, data_postInfo.Floor);
                 ActivityUtil.openNewPostDialog(v.getContext(), data_topicInfo.Id, replyTitle, "");
                 break;
             case R.id.image_quote:
-                String quoteTitle = "回复 " + data_postInfo.UserName + "(#" + data_postInfo.Floor + ")";
-                ActivityUtil.openNewPostDialog(v.getContext(), data_topicInfo.Id, quoteTitle,
-                        "[quotex][i]> " + data_postInfo.UserName + "@" + data_postInfo.Time + "(#" + data_postInfo.Floor + ")[/i]\n" +
-                                data_postInfo.Content + "[/quotex]\n\n");
+                String quoteTitle = SuchApp.getStr(R.string.view_holder_post_reply_title, data_postInfo.UserName, data_postInfo.Floor);
+                ActivityUtil.openNewPostDialog(v.getContext(), data_topicInfo.Id, quoteTitle, SuchApp.getStr(R.string.view_holder_post_quote_content, data_postInfo.UserName, data_postInfo.Time, data_postInfo.Floor, data_postInfo.Content));
                 break;
             case R.id.show_post_action:
                 imgShowPostAction.setVisibility(View.GONE);

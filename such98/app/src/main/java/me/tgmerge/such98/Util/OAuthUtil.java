@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.custom.SuchApplication;
+import me.tgmerge.such98.custom.SuchApp;
 
 /**
  * Usage:
@@ -276,7 +276,7 @@ public class OAuthUtil {
     private static final void setToken(String accessToken, String refreshToken) {
         logDebug("setToken: access = " + (accessToken.length() > 10 ? accessToken.substring(0, 10) : accessToken));
         logDebug("setToken: refresh = " + (refreshToken.length() > 10 ? refreshToken.substring(0, 10) : refreshToken));
-        SharedPreferences.Editor editor = SuchApplication.getContext().getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = SuchApp.getContext().getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE).edit();
         editor.putString(KEY_ACCESS_TOKEN, accessToken);
         editor.putString(KEY_REFRESH_TOKEN, refreshToken);
         editor.apply();
@@ -284,7 +284,7 @@ public class OAuthUtil {
 
 
     public static final String getAccessToken() {
-        SharedPreferences pref = SuchApplication.getContext().getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences pref = SuchApp.getContext().getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
         String accessToken = pref.getString(KEY_ACCESS_TOKEN, "");
         logDebug("getAccessToken: " + accessToken.substring(0, accessToken.length() > 10 ? 10 : accessToken.length() / 2));
         return accessToken;
@@ -292,7 +292,7 @@ public class OAuthUtil {
 
 
     private static final String getRefreshToken() {
-        SharedPreferences pref = SuchApplication.getContext().getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences pref = SuchApp.getContext().getSharedPreferences(FILE_KEY, Context.MODE_PRIVATE);
         String refreshToken = pref.getString(KEY_REFRESH_TOKEN, "");
         logDebug("getRefreshToken: " + refreshToken.substring(0, refreshToken.length() > 10 ? 10 : refreshToken.length() / 2));
         return refreshToken;

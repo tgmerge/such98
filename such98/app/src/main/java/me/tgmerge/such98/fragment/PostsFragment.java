@@ -10,6 +10,7 @@ import org.apache.http.Header;
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.adapter.PostsAdapter;
 import me.tgmerge.such98.adapter.RecyclerSwipeAdapter;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
@@ -85,7 +86,7 @@ public class PostsFragment extends RecyclerSwipeFragment {
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast("Error: " + "code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
             }
         }).execute();
     }
@@ -147,13 +148,13 @@ public class PostsFragment extends RecyclerSwipeFragment {
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast("Error, code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
                 setProgressFinished();
             }
         }
 
         setProgressLoading();
-        HelperUtil.debugToast("Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
+        HelperUtil.debugToast(SuchApp.getStr(R.string.fragment_posts_loading_item, posToLoad, posToLoad + sizeToLoad));
         new APIUtil.GetTopicPost(getActivity(), mParamId, posToLoad, null, sizeToLoad, new Callback()).execute();
 
     }

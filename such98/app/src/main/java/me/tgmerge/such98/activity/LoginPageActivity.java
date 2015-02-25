@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.webkit.WebView;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.OAuthUtil;
@@ -29,13 +30,13 @@ public class LoginPageActivity extends ActionBarActivity {
             @Override
             public void onSuccess() {
                 String token = OAuthUtil.getAccessToken();
-                HelperUtil.debugToast("Login success, token=" + (token.length() > 10 ? token.substring(0, 10) : token));
+                HelperUtil.debugToast(SuchApp.getStr(R.string.activity_login_page_login_success, (token.length() > 10 ? token.substring(0, 10) : token)));
                 ActivityUtil.Action.showCustomBoards(that, true);
             }
 
             @Override
             public void onFailure() {
-                HelperUtil.errorToast("Login failed");
+                HelperUtil.errorToast(SuchApp.getStr(R.string.activity_login_page_login_failure));
                 startActivity(new Intent(that, LoginActivity.class));
             }
         });

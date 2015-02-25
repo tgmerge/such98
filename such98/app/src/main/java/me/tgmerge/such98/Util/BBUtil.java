@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import java.util.Vector;
 
-import me.tgmerge.such98.custom.MultiTypeLinkMoveMentMethod;
+import me.tgmerge.such98.custom.MultiTypeLinkMovementMethod;
 
 /**
  * Created by tgmerge on 2/17.
@@ -22,7 +22,7 @@ public class BBUtil {
          //todo  UILgetter not working
         Spanned spanned = Html.fromHtml(html, null, null);
         textView.setText(spanned);
-        textView.setMovementMethod(MultiTypeLinkMoveMentMethod.getInstance());
+        textView.setMovementMethod(MultiTypeLinkMovementMethod.getInstance());
     }
 
     private static final Vector<Pair<String, String>> bbMap = new Vector<>();

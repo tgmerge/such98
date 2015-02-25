@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.viewholder.TopicViewHolder;
 import me.tgmerge.such98.util.XMLUtil;
 
@@ -65,14 +66,15 @@ public class TopicsAdapter extends RecyclerSwipeAdapter<XMLUtil.TopicInfo, Topic
         XMLUtil.TopicInfo dataItem = mData.get(position);
 
         viewHolder.title.setText(dataItem.Title);
-        viewHolder.authorInfo.setText(dataItem.AuthorName + " @ " + dataItem.CreateTime);
+        viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_topics_author_info, dataItem.AuthorName, dataItem.CreateTime));
         viewHolder.data_topicId = dataItem.Id;
 
         if (dataItem instanceof XMLUtil.HotTopicInfo) {
             viewHolder.icon.setImageResource(R.drawable.ic_comment_fire_outline_white_36dp);
-            viewHolder.lastPostInfo.setText(((XMLUtil.HotTopicInfo) dataItem).BoardName + ", " + ((XMLUtil.HotTopicInfo) dataItem).ParticipantCount + "人参与");
+            XMLUtil.HotTopicInfo hotItem = (XMLUtil.HotTopicInfo) dataItem;
+            viewHolder.lastPostInfo.setText(SuchApp.getStr(R.string.adapter_topics_reply_info_hot, hotItem.HitCount, hotItem.ParticipantCount, hotItem.ReplyCount));
         } else {
-            viewHolder.lastPostInfo.setText(dataItem.LastPostInfo.UserName + " @ " + dataItem.LastPostInfo.Time);
+            viewHolder.lastPostInfo.setText(SuchApp.getStr(R.string.adapter_topics_reply_info, dataItem.HitCount, dataItem.ReplyCount, dataItem.LastPostInfo.UserName));
             viewHolder.icon.setImageResource(dataItem.TopState.equals(XMLUtil.TopicInfo.TOPSTATE_NONE)
                     ? R.drawable.ic_comment_text_outline_white_36dp
                     : R.drawable.ic_comment_alert_outline_white_36dp);

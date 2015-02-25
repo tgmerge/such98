@@ -7,8 +7,10 @@ import org.apache.http.Header;
 
 import java.util.Arrays;
 
+import me.tgmerge.such98.R;
 import me.tgmerge.such98.adapter.BoardsAdapter;
 import me.tgmerge.such98.adapter.RecyclerSwipeAdapter;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;
@@ -50,7 +52,7 @@ public class BoardsFragment extends RecyclerSwipeFragment {
         if (mParamId == PARAM_ID_CUSTOM) {
             mBoardInfo.Id = PARAM_ID_CUSTOM;
             mBoardInfo.ChildBoardCount = 1000;
-            mBoardInfo.Name = "个人定制";
+            mBoardInfo.Name = SuchApp.getStr(R.string.fragment_boards_board_name_custom);
             getActivity().setTitle(mBoardInfo.Name);
             mPreviousPage = -1;
             mNextPage = 0;
@@ -58,7 +60,7 @@ public class BoardsFragment extends RecyclerSwipeFragment {
         } else if (mParamId == PARAM_ID_ROOT) {
             mBoardInfo.Id = PARAM_ID_ROOT;
             mBoardInfo.ChildBoardCount = 1000;
-            mBoardInfo.Name = "主版面";
+            mBoardInfo.Name = SuchApp.getStr(R.string.fragment_boards_board_name_root);
             getActivity().setTitle(mBoardInfo.Name);
             mPreviousPage = -1;
             mNextPage = 0;
@@ -109,7 +111,7 @@ public class BoardsFragment extends RecyclerSwipeFragment {
 
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    HelperUtil.errorToast("Error: " + "code=" + statCode + ", error=" + error.toString());
+                    HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
                 }
             }).execute();
         }
@@ -161,11 +163,11 @@ public class BoardsFragment extends RecyclerSwipeFragment {
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 setProgressFinished();
-                HelperUtil.errorToast("Error, code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
             }
         }
 
-        HelperUtil.debugToast("Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
+        HelperUtil.debugToast(SuchApp.getStr(R.string.fragment_boards_loading_item, posToLoad, posToLoad + sizeToLoad));
         if (mParamId == PARAM_ID_ROOT) {
             // Show root board
             new APIUtil.GetRootBoard(getActivity(), posToLoad, null, sizeToLoad, new Callback()).execute();
@@ -196,7 +198,7 @@ public class BoardsFragment extends RecyclerSwipeFragment {
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                     setProgressFinished();
-                    HelperUtil.errorToast("Error, code=" + statCode + ", error=" + error.toString());
+                    HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
                 }
             }).execute();
 

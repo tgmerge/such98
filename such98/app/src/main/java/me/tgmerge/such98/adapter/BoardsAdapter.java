@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.viewholder.BoardViewHolder;
 import me.tgmerge.such98.util.XMLUtil;
 
@@ -69,7 +70,7 @@ public class BoardsAdapter extends RecyclerSwipeAdapter<XMLUtil.BoardInfo, Board
 
         viewHolder.icon.setImageResource(dataItem.IsCategory ? R.drawable.ic_folder_multiple_outline_white_36dp : R.drawable.ic_folder_outline_white_36dp);
         viewHolder.name.setText(dataItem.Name);
-        viewHolder.isCategory.setText(dataItem.IsCategory ? "分类" : "");
+        viewHolder.isCategory.setText(dataItem.IsCategory ? SuchApp.getStr(R.string.adapter_boards_is_category) : SuchApp.getStr(R.string.adapter_boards_is_not_category));
         viewHolder.description.setText(dataItem.Description);
 
         viewHolder.data_boardId = dataItem.Id;

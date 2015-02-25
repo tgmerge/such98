@@ -5,9 +5,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
-import javax.xml.parsers.SAXParser;
-
-import me.tgmerge.such98.custom.SuchApplication;
+import me.tgmerge.such98.custom.SuchApp;
 
 /**
  * Created by tgmerge on 2/13.
@@ -24,17 +22,17 @@ public final class HelperUtil {
 
     public static final void errorToast(CharSequence msg) {
         generalError("HelperUtil", "errorToast: " + msg);
-        Context context = SuchApplication.getContext();
+        Context context = SuchApp.getContext();
         if (context != null) {
-            Toast.makeText(SuchApplication.getContext(), "ERROR:" + msg, Toast.LENGTH_LONG).show();
+            Toast.makeText(SuchApp.getContext(), "错误:" + msg, Toast.LENGTH_LONG).show();
         }
     }
 
     public static final void debugToast(CharSequence msg) {
         generalDebug("HelperUtil", "debugToast: " + msg);
-        Context context = SuchApplication.getContext();
+        Context context = SuchApp.getContext();
         if (context != null) {
-            Toast.makeText(SuchApplication.getContext(), "INFO:" + msg, Toast.LENGTH_LONG).show();
+            Toast.makeText(SuchApp.getContext(), msg, Toast.LENGTH_LONG).show();
         }
     }
 }

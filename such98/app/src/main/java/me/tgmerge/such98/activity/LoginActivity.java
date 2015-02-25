@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 
 import me.tgmerge.such98.R;
+import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.OAuthUtil;
@@ -22,10 +23,10 @@ public class LoginActivity extends ActionBarActivity {
 
     public void onLoginButtonClicked(View view) {
         if (OAuthUtil.getAccessToken().equals("")) {
-            HelperUtil.debugToast("LoginActivity: no token");
+            HelperUtil.debugToast(SuchApp.getStr(R.string.activity_login_no_token));
             startActivity(new Intent(this, LoginPageActivity.class));
         } else {
-            HelperUtil.debugToast("LoginActivity: token exists");
+            HelperUtil.debugToast(SuchApp.getStr(R.string.activity_login_has_token));
             ActivityUtil.Action.showCustomBoards(this, true);
         }
     }
