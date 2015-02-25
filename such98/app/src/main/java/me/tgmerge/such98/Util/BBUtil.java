@@ -82,8 +82,12 @@ public class BBUtil {
 
         bbMap.add(new Pair<>("\\[/url\\]", "</a>"));
 
-        bbMap.add(new Pair<>("\\[img=(.+?),(.+?)\\](.+?)\\[/img\\]", "<img width='$1' height='$2' src='$3' />"));
-        bbMap.add(new Pair<>("\\[upload(=bmp|=png|=gif|=jpg|=jpeg)?(,\\d)?\\](.+?)\\[/upload\\]", "<img src='$3' />"));
+        //bbMap.add(new Pair<>("\\[img=(.+?),(.+?)\\](.+?)\\[/img\\]", "<img width='$1' height='$2' src='$3' />"));
+        //bbMap.add(new Pair<>("\\[upload=?(bmp|png|gif|jpg|jpeg|jpe|tif|tiff)?(,\\d)?\\](.+?)\\[/upload\\]", "<img src='$3' />"));
+
+        // convert img tags to image links before in-app image viewer is ready...
+        bbMap.add(new Pair<>("\\[img=(.+?),(.+?)\\](.+?)\\[/img\\]", "<a href='$3'>[点击查看图片]</a>"));
+        bbMap.add(new Pair<>("\\[upload=?(bmp|png|gif|jpg|jpeg|jpe|tif|tiff)?(,\\d)?\\](.+?)\\[/upload\\]", "<a href='$3'>[点击查看图片]</a>"));
 
         bbMap.add(new Pair<>("\\[em\\d+\\]", "[喵]"));
     }
