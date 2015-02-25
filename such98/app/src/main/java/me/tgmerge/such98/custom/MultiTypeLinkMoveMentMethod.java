@@ -1,4 +1,4 @@
-package me.tgmerge.such98;
+package me.tgmerge.such98.custom;
 
 import android.content.ActivityNotFoundException;
 import android.text.Spannable;

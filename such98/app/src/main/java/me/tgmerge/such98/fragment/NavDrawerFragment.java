@@ -42,7 +42,7 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mThisView = inflater.inflate(R.layout.fragment_nav_drawer, container, false);
+        mThisView = inflater.inflate(R.layout.fragment_drawer, container, false);
 
         // Register on click listener
         mThisView.findViewById(R.id.drawer_avatar_circle).setOnClickListener(this);

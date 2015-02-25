@@ -4,9 +4,9 @@
     android:id="@+id/swipe_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="me.tgmerge.such98.fragment.posts.PostsFragment">
+    tools:context="me.tgmerge.such98.fragment.PostsFragment">
 
-    <me.tgmerge.such98.NoChildFocusRecyclerView
+    <me.tgmerge.such98.custom.NoChildFocusRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

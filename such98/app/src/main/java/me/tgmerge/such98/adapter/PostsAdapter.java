@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment.posts;
+package me.tgmerge.such98.adapter;
 
 import android.app.Activity;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,14 +9,14 @@ import android.view.ViewGroup;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.base.RecyclerSwipeAdapter;
+import me.tgmerge.such98.viewholder.PostViewHolder;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.BBUtil;
 import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.ImageUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
-class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostViewHolder> {
+public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostViewHolder> {
 
     private XMLUtil.ArrayOf<XMLUtil.PostInfo> mData;
     private XMLUtil.TopicInfo mTopicInfo;
@@ -61,7 +61,7 @@ class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostViewHolder
 
     @Override
     public PostViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post_card, parent, false);
+        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
         return new PostViewHolder(itemLayoutView);
     }
 

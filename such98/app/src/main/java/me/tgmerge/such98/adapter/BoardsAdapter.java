@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment.boards;
+package me.tgmerge.such98.adapter;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -6,13 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.base.RecyclerSwipeAdapter;
+import me.tgmerge.such98.viewholder.BoardViewHolder;
 import me.tgmerge.such98.util.XMLUtil;
 
 /**
 * Created by tgmerge on 2/22.
 */
-class BoardsAdapter extends RecyclerSwipeAdapter<XMLUtil.BoardInfo, BoardViewHolder> {
+public class BoardsAdapter extends RecyclerSwipeAdapter<XMLUtil.BoardInfo, BoardViewHolder> {
 
     private XMLUtil.ArrayOf<XMLUtil.BoardInfo> mData;
 
@@ -51,7 +51,7 @@ class BoardsAdapter extends RecyclerSwipeAdapter<XMLUtil.BoardInfo, BoardViewHol
 
     @Override
     public BoardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_board_card, parent, false);
+        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_board, parent, false);
         return new BoardViewHolder(itemLayoutView);
     }
 

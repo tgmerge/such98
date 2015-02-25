@@ -3,13 +3,12 @@ package me.tgmerge.such98.util;
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
 import android.util.Pair;
 import android.widget.TextView;
 
 import java.util.Vector;
 
-import me.tgmerge.such98.MultiTypeLinkMoveMentMethod;
+import me.tgmerge.such98.custom.MultiTypeLinkMoveMentMethod;
 
 /**
  * Created by tgmerge on 2/17.

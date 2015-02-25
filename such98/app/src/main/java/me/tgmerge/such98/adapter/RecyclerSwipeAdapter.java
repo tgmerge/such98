@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment.base;
+package me.tgmerge.such98.adapter;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;

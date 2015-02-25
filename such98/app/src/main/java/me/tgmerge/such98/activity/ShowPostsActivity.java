@@ -5,7 +5,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.posts.PostsFragment;
+import me.tgmerge.such98.fragment.PostsFragment;
 import me.tgmerge.such98.fragment.NavDrawerFragment;
 import me.tgmerge.such98.util.ActivityUtil;
 
@@ -23,7 +23,7 @@ public class ShowPostsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment_drawer);
+        setContentView(R.layout.activity_base_fragment_drawer);
 
         mNavDrawerFragment = (NavDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);

@@ -1,4 +1,4 @@
-package me.tgmerge.such98.util;
+package me.tgmerge.such98.custom;
 
 import android.content.Context;
 import android.content.res.Resources;

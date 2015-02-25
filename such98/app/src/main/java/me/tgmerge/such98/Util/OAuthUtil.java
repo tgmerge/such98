@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.SuchApplication;
+import me.tgmerge.such98.custom.SuchApplication;
 
 /**
  * Usage:

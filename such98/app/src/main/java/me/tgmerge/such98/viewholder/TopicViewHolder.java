@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment.topics;
+package me.tgmerge.such98.viewholder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -10,7 +10,7 @@ import me.tgmerge.such98.R;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 
-class TopicViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class TopicViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     public ImageView icon;
     public TextView title;

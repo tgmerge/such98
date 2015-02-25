@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment.topics;
+package me.tgmerge.such98.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,8 +8,8 @@ import android.view.View;
 import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.base.RecyclerSwipeAdapter;
-import me.tgmerge.such98.fragment.base.RecyclerSwipeFragment;
+import me.tgmerge.such98.adapter.RecyclerSwipeAdapter;
+import me.tgmerge.such98.adapter.TopicsAdapter;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;

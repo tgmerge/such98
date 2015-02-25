@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment.posts;
+package me.tgmerge.such98.viewholder;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -14,7 +14,7 @@ import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
-class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     public ImageView avatar;
     public TextView title;

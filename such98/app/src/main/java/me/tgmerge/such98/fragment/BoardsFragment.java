@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment.boards;
+package me.tgmerge.such98.fragment;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -7,8 +7,8 @@ import org.apache.http.Header;
 
 import java.util.Arrays;
 
-import me.tgmerge.such98.fragment.base.RecyclerSwipeAdapter;
-import me.tgmerge.such98.fragment.base.RecyclerSwipeFragment;
+import me.tgmerge.such98.adapter.BoardsAdapter;
+import me.tgmerge.such98.adapter.RecyclerSwipeAdapter;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.XMLUtil;

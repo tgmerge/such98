@@ -1,4 +1,4 @@
-package me.tgmerge.such98.fragment.topics;
+package me.tgmerge.such98.adapter;
 
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -6,10 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.base.RecyclerSwipeAdapter;
+import me.tgmerge.such98.viewholder.TopicViewHolder;
 import me.tgmerge.such98.util.XMLUtil;
 
-class TopicsAdapter extends RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> {
+public class TopicsAdapter extends RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHolder> {
 
     private XMLUtil.ArrayOf<XMLUtil.TopicInfo> mData;
 
@@ -47,7 +47,7 @@ class TopicsAdapter extends RecyclerSwipeAdapter<XMLUtil.TopicInfo, TopicViewHol
 
     @Override
     public TopicViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_topic_card, parent, false);
+        View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_topic, parent, false);
         return new TopicViewHolder(itemLayoutView);
     }
 
