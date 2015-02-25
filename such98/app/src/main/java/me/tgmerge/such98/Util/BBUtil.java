@@ -74,11 +74,11 @@ public class BBUtil {
         bbMap.add(new Pair<>("\\[color=(.+?)\\]", "<font color=$1>"));
         bbMap.add(new Pair<>("\\[/color\\]", "</font>"));
 
-        bbMap.add(new Pair<>("\\[email\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$1</a>"));
-        bbMap.add(new Pair<>("\\[email=(.+?)\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$2</a>"));
+        //bbMap.add(new Pair<>("\\[email\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$1</a>"));
+        //bbMap.add(new Pair<>("\\[email=(.+?)\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$2</a>"));
 
-        bbMap.add(new Pair<>("\\[url\\]([^\\[]+?)\\[/url\\]", "<a href='$1'>$1</a>"));
-        bbMap.add(new Pair<>("\\[url=([^\\[]+?)\\]", "<a href='$1'>"));
+        bbMap.add(new Pair<>("\\[url\\]([^\\[]+?)\\[/url\\]", "<a href='such98://$1'>$1</a>"));
+        bbMap.add(new Pair<>("\\[url=([^\\[]+?)\\]", "<a href='such98://$1'>"));
 
         bbMap.add(new Pair<>("\\[/url\\]", "</a>"));
 

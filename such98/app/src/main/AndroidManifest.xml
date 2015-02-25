@@ -42,6 +42,16 @@
             android:name=".activity.ShowPostsActivity"
             android:label="@string/title_activity_show_posts" >
         </activity>
+        <activity
+            android:name=".activity.IntentFilterActivity"
+            android:label="@string/title_activity_intent_filter"
+            android:noHistory="true">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="such98" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
