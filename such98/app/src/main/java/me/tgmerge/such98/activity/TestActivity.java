@@ -99,11 +99,11 @@ public class TestActivity extends ActionBarActivity {
         textToken.setText(OAuthUtil.getAccessToken());
 
         if (testNo < tests.size()) {
-            HelperUtil.debugToast(that, "Test #" + testNo + ", " + tests.get(testNo).getClass().getName());
+            HelperUtil.debugToast("Test #" + testNo + ", " + tests.get(testNo).getClass().getName());
             tests.get(testNo).execute();
             testNo++;
         } else {
-            HelperUtil.debugToast(that, "Test all done");
+            HelperUtil.debugToast("Test all done");
         }
     }
 
@@ -114,17 +114,17 @@ public class TestActivity extends ActionBarActivity {
     public void onRefreshTokenButtonClicked(View view) {
         final OAuthUtil.OAuthManager oam = OAuthUtil.newOAuthManager(this);
         String token = OAuthUtil.getAccessToken();
-        HelperUtil.debugToast(this, "Old token: " + (token.length() > 10 ? token.substring(0, 10) : token));
+        HelperUtil.debugToast("Old token: " + (token.length() > 10 ? token.substring(0, 10) : token));
         oam.refreshToken(new OAuthUtil.OAuthManager.OAuthCallback() {
             @Override
             public void onSuccess() {
                 String newToken = OAuthUtil.getAccessToken();
-                HelperUtil.debugToast(that, "New token:" + (newToken.length() > 10 ? newToken.substring(0, 10) : newToken));
+                HelperUtil.debugToast("New token:" + (newToken.length() > 10 ? newToken.substring(0, 10) : newToken));
             }
 
             @Override
             public void onFailure() {
-                HelperUtil.errorToast(that, "refresh token failed");
+                HelperUtil.errorToast("refresh token failed");
             }
         });
     }

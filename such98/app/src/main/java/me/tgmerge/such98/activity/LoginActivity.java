@@ -22,10 +22,10 @@ public class LoginActivity extends ActionBarActivity {
 
     public void onLoginButtonClicked(View view) {
         if (OAuthUtil.getAccessToken().equals("")) {
-            HelperUtil.debugToast(this, "LoginActivity: no token");
+            HelperUtil.debugToast("LoginActivity: no token");
             startActivity(new Intent(this, LoginPageActivity.class));
         } else {
-            HelperUtil.debugToast(this, "LoginActivity: token exists");
+            HelperUtil.debugToast("LoginActivity: token exists");
             ActivityUtil.Action.showCustomBoards(this, true);
         }
     }

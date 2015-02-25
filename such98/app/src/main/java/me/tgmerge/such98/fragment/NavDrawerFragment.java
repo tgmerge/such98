@@ -169,7 +169,7 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.drawer_avatar_circle:
-                HelperUtil.debugToast(getActivity(), "Avatar clicked");
+                HelperUtil.debugToast("Avatar clicked");
                 break;
             case R.id.drawer_function_root_board:
                 ActivityUtil.Action.showRootBoard(getActivity(), true);
@@ -222,7 +222,7 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 drawerIsLoading = false;
-                HelperUtil.errorToast(getActivity(), "Error: " + "code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast("Error: " + "code=" + statCode + ", error=" + error.toString());
             }
         }).execute();
     }

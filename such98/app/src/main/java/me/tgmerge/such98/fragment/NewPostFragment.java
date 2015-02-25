@@ -114,7 +114,7 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast(getActivity(), "NewPostFragment: Network error on fetching user info. code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast("NewPostFragment: Network error on fetching user info. code=" + statCode + ", error=" + error.toString());
             }
         }).execute();
     }
@@ -147,12 +147,12 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
         String postContent = ((EditText) mThisView.findViewById(R.id.new_post_content)).getText().toString();
 
         if (postContent.equals("")) {
-            HelperUtil.errorToast(getActivity(), "Post content cannot be empty");
+            HelperUtil.errorToast("Post content cannot be empty");
             return;
         }
 
         if (mParamTopicId <= 0) {
-            HelperUtil.errorToast(getActivity(), "Invalid topic ID");
+            HelperUtil.errorToast("Invalid topic ID");
             return;
         }
 
@@ -160,7 +160,7 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
         new APIUtil.PostTopicPost(getActivity(), mParamTopicId, postTitle, postContent, new APIUtil.APICallback() {
             @Override
             public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                HelperUtil.debugToast(getActivity(), "Reply sent successful");
+                HelperUtil.debugToast("Reply sent successful");
                 // close dialog
                 dismiss();
             }

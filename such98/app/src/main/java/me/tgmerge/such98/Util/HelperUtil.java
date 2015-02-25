@@ -5,6 +5,10 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
+import javax.xml.parsers.SAXParser;
+
+import me.tgmerge.such98.custom.SuchApplication;
+
 /**
  * Created by tgmerge on 2/13.
  * Some misc utility methods
@@ -18,17 +22,19 @@ public final class HelperUtil {
         Log.e(cat, ((Looper.getMainLooper().equals(Looper.myLooper())) ? "[UI]" : "[notUI]") + msg);
     }
 
-    public static final void errorToast(Context ctx, CharSequence msg) {
+    public static final void errorToast(CharSequence msg) {
         generalError("HelperUtil", "errorToast: " + msg);
-        try {
-            Toast.makeText(ctx, "ERROR:" + msg, Toast.LENGTH_LONG).show();
-        } catch (NullPointerException e) {
-            generalError("HelperUtil", "NullPointerException, ctx=" + ctx + " msg=" + msg);
+        Context context = SuchApplication.getContext();
+        if (context != null) {
+            Toast.makeText(SuchApplication.getContext(), "ERROR:" + msg, Toast.LENGTH_LONG).show();
         }
     }
 
-    public static final void debugToast(Context ctx, CharSequence msg) {
+    public static final void debugToast(CharSequence msg) {
         generalDebug("HelperUtil", "debugToast: " + msg);
-        Toast.makeText(ctx, "INFO:" + msg, Toast.LENGTH_LONG).show();
+        Context context = SuchApplication.getContext();
+        if (context != null) {
+            Toast.makeText(SuchApplication.getContext(), "INFO:" + msg, Toast.LENGTH_LONG).show();
+        }
     }
 }

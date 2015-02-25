@@ -61,7 +61,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                 ClipboardManager clipboard = (ClipboardManager) v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("Post", data_postInfo.Title + "\n" + data_postInfo.Content);
                 clipboard.setPrimaryClip(clip);
-                HelperUtil.debugToast(v.getContext(), "Post content copied");
+                HelperUtil.debugToast("Post content copied");
                 break;
             case R.id.image_reply:
                 String replyTitle = (data_postInfo.Floor == 1) ? "" : "回复 " + data_postInfo.UserName + "(#" + data_postInfo.Floor + ")";

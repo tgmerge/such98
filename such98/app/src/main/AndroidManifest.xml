@@ -42,10 +42,6 @@
             android:name=".activity.ShowPostsActivity"
             android:label="@string/title_activity_show_posts" >
         </activity>
-        <activity
-            android:name=".activity.NewPostActivity"
-            android:label="@string/title_activity_new_post" >
-        </activity>
     </application>
 
 </manifest>

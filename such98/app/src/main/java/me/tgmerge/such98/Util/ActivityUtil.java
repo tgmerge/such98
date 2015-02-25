@@ -169,7 +169,7 @@ public final class ActivityUtil {
             DialogFragment newFragment = NewPostFragment.newInstance(topicId, replyTitle, replyContent);
             newFragment.show(ft, "NewPostFragment");
         } else {
-            HelperUtil.errorToast(ctx, "openNewPostDialog: Context" + ctx.toString() + " is not Activity");
+            HelperUtil.errorToast("openNewPostDialog: Context" + ctx.toString() + " is not Activity");
         }
     }
 
@@ -193,7 +193,7 @@ public final class ActivityUtil {
                     }
                     loadPostsFragment(act, containerId, topicId, floor - 1);
                 } catch (NumberFormatException e) {
-                    HelperUtil.errorToast(act, "Wrong floor number");
+                    HelperUtil.errorToast("Wrong floor number");
                     e.printStackTrace();
                 }
             }
@@ -219,7 +219,7 @@ public final class ActivityUtil {
                     }
                     loadTopicsFragment(act, containerId, boardId, floor - 1);
                 } catch (NumberFormatException e) {
-                    HelperUtil.errorToast(act, "Wrong item number");
+                    HelperUtil.errorToast("Wrong item number");
                     e.printStackTrace();
                 }
             }

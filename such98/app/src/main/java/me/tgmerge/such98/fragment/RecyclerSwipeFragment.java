@@ -189,12 +189,12 @@ public abstract class RecyclerSwipeFragment extends Fragment {
         final int sizeToLoad = ITEM_PER_PAGE;
 
         if (loadPrevious && (!mHasPreviousPage || posToLoad < 0)) {
-            HelperUtil.debugToast(getActivity(), "Already at first page");
+            HelperUtil.debugToast("Already at first page");
             mHasPreviousPage = false;
             setProgressFinished();
             return;
         } else if (!loadPrevious && (!mHasNextPage || posToLoad > getMaxPosToLoad())) {
-            HelperUtil.debugToast(getActivity(), "Already at last page");
+            HelperUtil.debugToast("Already at last page");
             mHasNextPage = false;
             setProgressFinished();
             return;

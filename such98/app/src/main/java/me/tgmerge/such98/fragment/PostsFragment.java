@@ -85,7 +85,7 @@ public class PostsFragment extends RecyclerSwipeFragment {
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast(getActivity(), "Error: " + "code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast("Error: " + "code=" + statCode + ", error=" + error.toString());
             }
         }).execute();
     }
@@ -147,13 +147,13 @@ public class PostsFragment extends RecyclerSwipeFragment {
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast(getActivity(), "Error, code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast("Error, code=" + statCode + ", error=" + error.toString());
                 setProgressFinished();
             }
         }
 
         setProgressLoading();
-        HelperUtil.debugToast(getActivity(), "Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
+        HelperUtil.debugToast("Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
         new APIUtil.GetTopicPost(getActivity(), mParamId, posToLoad, null, sizeToLoad, new Callback()).execute();
 
     }

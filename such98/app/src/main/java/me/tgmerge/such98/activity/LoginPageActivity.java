@@ -29,13 +29,13 @@ public class LoginPageActivity extends ActionBarActivity {
             @Override
             public void onSuccess() {
                 String token = OAuthUtil.getAccessToken();
-                HelperUtil.debugToast(that, "Login success, token=" + (token.length() > 10 ? token.substring(0, 10) : token));
+                HelperUtil.debugToast("Login success, token=" + (token.length() > 10 ? token.substring(0, 10) : token));
                 ActivityUtil.Action.showCustomBoards(that, true);
             }
 
             @Override
             public void onFailure() {
-                HelperUtil.errorToast(that, "Login failed");
+                HelperUtil.errorToast("Login failed");
                 startActivity(new Intent(that, LoginActivity.class));
             }
         });

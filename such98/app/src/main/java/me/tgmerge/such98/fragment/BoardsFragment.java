@@ -109,7 +109,7 @@ public class BoardsFragment extends RecyclerSwipeFragment {
 
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    HelperUtil.errorToast(getActivity(), "Error: " + "code=" + statCode + ", error=" + error.toString());
+                    HelperUtil.errorToast("Error: " + "code=" + statCode + ", error=" + error.toString());
                 }
             }).execute();
         }
@@ -161,11 +161,11 @@ public class BoardsFragment extends RecyclerSwipeFragment {
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                 setProgressFinished();
-                HelperUtil.errorToast(getActivity(), "Error, code=" + statCode + ", error=" + error.toString());
+                HelperUtil.errorToast("Error, code=" + statCode + ", error=" + error.toString());
             }
         }
 
-        HelperUtil.debugToast(getActivity(), "Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
+        HelperUtil.debugToast("Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
         if (mParamId == PARAM_ID_ROOT) {
             // Show root board
             new APIUtil.GetRootBoard(getActivity(), posToLoad, null, sizeToLoad, new Callback()).execute();
@@ -196,7 +196,7 @@ public class BoardsFragment extends RecyclerSwipeFragment {
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                     setProgressFinished();
-                    HelperUtil.errorToast(getActivity(), "Error, code=" + statCode + ", error=" + error.toString());
+                    HelperUtil.errorToast("Error, code=" + statCode + ", error=" + error.toString());
                 }
             }).execute();
 
