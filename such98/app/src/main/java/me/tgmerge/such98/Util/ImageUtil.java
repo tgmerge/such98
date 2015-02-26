@@ -60,8 +60,10 @@ public class ImageUtil {
     //   It's a async-task, so isRecyclable flag of PostViewHolder should be set to false first,
     //     to prevent problems from recycling viewHolder before image is downloaded and set.
     //   Once the image is set, or failed to load, the isRecyclable flag should be set to true.
-    public static final void setViewHolderImage(Context ctx, final RecyclerView.ViewHolder viewHolder, final ImageView imgView, int roundRadius, String url) {
-        viewHolder.setIsRecyclable(false);
+    public static final void setViewHolderImage(Context ctx, final RecyclerView.ViewHolder viewHolder, final ImageView imgView, int roundRadius, String url, final boolean handleRecyclable) {
+        if (handleRecyclable) {
+            viewHolder.setIsRecyclable(false);
+        }
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.ic_dots_horizontal_white_48dp)
                 .showImageOnFail(R.drawable.ic_close_white_48dp)
@@ -72,15 +74,21 @@ public class ImageUtil {
         ImageUtil.getImageLoader(ctx).displayImage(url, imgView, options, new SimpleImageLoadingListener() {
             public void onLoadingComplete(String uri, View view, Bitmap loadedImage) {
                 imgView.setPadding(0, 0, 0, 0);
-                viewHolder.setIsRecyclable(true);
+                if (handleRecyclable) {
+                    viewHolder.setIsRecyclable(true);
+                }
             }
 
             public void onLoadingFailed(String uri, View view, FailReason reason) {
-                viewHolder.setIsRecyclable(true);
+                if (handleRecyclable) {
+                    viewHolder.setIsRecyclable(true);
+                }
             }
 
             public void onLoadingCancelled(String uri, View view) {
-                viewHolder.setIsRecyclable(true);
+                if (handleRecyclable) {
+                    viewHolder.setIsRecyclable(true);
+                }
             }
         });
     }
