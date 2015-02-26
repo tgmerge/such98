@@ -29,30 +29,53 @@ public class IntentFilterActivity extends Activity {
         // Return if not a such98:// URI
         String uriStr = uri.toString();
         if (!uriStr.startsWith("such98://")) {
-            HelperUtil.errorToast("未知格式的URI: " + uriStr);
+            HelperUtil.errorToast("未知类型的URI: " + uri.toString());
             return;
         }
 
         // Remove such98:// protocol in the beginning
         uriStr = uriStr.replaceFirst("such98://", "");
 
-        // URI without protocol? Add "http://www.cc98.org/" to the beginning
-        uriStr = uriStr.replaceFirst("^(?!(.+?)://)/?", "http://www.cc98.org/");
+        if (uriStr.startsWith("url/")) {
+            uriStr = uriStr.replaceFirst("^url/", "");
+            HelperUtil.generalDebug("IntentFilterActivity", "type is url, " + uriStr);
+            processUri_url(uriStr);
+            return;
+        }
+
+        if (uriStr.startsWith("img/")) {
+            uriStr = uriStr.replaceFirst("^img/", "");
+            HelperUtil.generalDebug("IntentFilterActivity", "type is img, " + uriStr);
+            processUri_img(uriStr);
+            return;
+        }
+
+        HelperUtil.errorToast("解析错误的URI: " + uri.toString());
+    }
+
+    private void processUri_img(String url) {
+        String urlStr = completeUrl(url);
+
+        ActivityUtil.openViewImageActivity(this, urlStr);
+    }
+
+    private void processUri_url(String url) {
+        String urlStr = completeUrl(url);
 
         // Case 1
-        // URI, point to a highlighted post in a topic:
+        // URL point to a highlighted post in a topic:
         //      http://www.cc98.org/dispbbs.asp?boardid=537&id=4485771&star=252#7
         //      /dispbbs.asp?boardid=537&id=4485771&star=252#7
         //      dispbbs.asp?boardid=537&id=4485771&star=252#7
         // find id=xxx, star=xxx, #xxx
         // (at least 'id')
         // will be processed in app, opening new ShowPostsActivity
-        if (uriStr.matches("http://www\\.cc98\\.org/dispbbs\\.asp\\?.*")) {
-            Matcher idMatcher = Pattern.compile("\\Wid=(\\d+)").matcher(uriStr);
+        if (urlStr.matches("http://www\\.cc98\\.org/dispbbs\\.asp\\?.*")) {
+            Matcher idMatcher = Pattern.compile("\\Wid=(\\d+)").matcher(urlStr);
             Integer id = idMatcher.find() ? Integer.parseInt(idMatcher.group(1)) : null;
-            Matcher starMatcher = Pattern.compile("\\Wstar=(\\d+)").matcher(uriStr);
+            Matcher starMatcher = Pattern.compile("\\Wstar=(\\d+)").matcher(urlStr);
             Integer star = starMatcher.find() ? Integer.parseInt(starMatcher.group(1)) : 1;
-            Matcher hashMatcher = Pattern.compile("#(\\d+)").matcher(uriStr);
+            Matcher hashMatcher = Pattern.compile("#(\\d+)").matcher(urlStr);
             Integer hash = hashMatcher.find() ? Integer.parseInt(hashMatcher.group(1)) : 1;
 
             if (id != null) {
@@ -64,13 +87,13 @@ public class IntentFilterActivity extends Activity {
         }
 
         // Case 2:
-        // Other http/https URI:
+        // Other http/https URL:
         //      http://www.baidu.com
         //      https://www.baidu.com
         // Start a new intent and throw it out
-        if (uriStr.matches("(http|https)://.*")) {
+        if (urlStr.matches("(http|https)://.*")) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(uriStr));
+            intent.setData(Uri.parse(urlStr));
             startActivity(intent);
             return;
         }
@@ -81,7 +104,28 @@ public class IntentFilterActivity extends Activity {
         //      3p://localhost
         //      ://://
         // Will be dropped, showing an error toast
-        HelperUtil.debugToast("未知的URI: " + uriStr);
+        HelperUtil.debugToast("未知的URI: " + urlStr);
         return;
+    }
+
+    // * no domain&protocol?   www.cc98.org/
+    // * no protocol?          http://
+    private static final String completeUrl(String str) {
+
+        if (str.matches("/.*")) {
+            str = str.replaceFirst("/", "");
+        }
+
+        if (str.matches("(?![^.]+?://\\w+\\.).*")) {
+            // no domain&protocol
+            str = "www.cc98.org/" + str;
+        }
+
+        if (str.matches("(?![^.]+?://).*")) {
+            // no protocol
+            str = "http://" + str;
+        }
+
+        return str;
     }
 }

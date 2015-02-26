@@ -74,8 +74,8 @@ public class BBUtil {
         //bbMap.add(new Pair<>("\\[email\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$1</a>"));
         //bbMap.add(new Pair<>("\\[email=(.+?)\\](.+?)\\[/email\\]", "<a href='mailto:$1'>$2</a>"));
 
-        bbMap.add(new Pair<>("\\[url\\]([^\\[]+?)\\[/url\\]", "<a href='such98://$1'>$1</a>"));
-        bbMap.add(new Pair<>("\\[url=([^\\[]+?)\\]", "<a href='such98://$1'>"));
+        bbMap.add(new Pair<>("\\[url\\]([^\\[]+?)\\[/url\\]", "<a href='such98://url/$1'>$1</a>"));
+        bbMap.add(new Pair<>("\\[url=([^\\[]+?)\\]", "<a href='such98://url/$1'>"));
 
         bbMap.add(new Pair<>("\\[/url\\]", "</a>"));
 
@@ -83,8 +83,8 @@ public class BBUtil {
         //bbMap.add(new Pair<>("\\[upload=?(bmp|png|gif|jpg|jpeg|jpe|tif|tiff)?(,\\d)?\\](.+?)\\[/upload\\]", "<img src='$3' />"));
 
         // convert img tags to image links before in-app image viewer is ready...
-        bbMap.add(new Pair<>("\\[img=(.+?),(.+?)\\](.+?)\\[/img\\]", "<a href='$3'>[点击查看图片]</a>"));
-        bbMap.add(new Pair<>("\\[upload=?(bmp|png|gif|jpg|jpeg|jpe|tif|tiff)?(,\\d)?\\](.+?)\\[/upload\\]", "<a href='$3'>[点击查看图片]</a>"));
+        bbMap.add(new Pair<>("\\[img=(.+?),(.+?)\\](.+?)\\[/img\\]", "<a href='such98://img/$3'>[点击查看图片]</a>"));
+        bbMap.add(new Pair<>("\\[upload=?(bmp|png|gif|jpg|jpeg|jpe|tif|tiff)?(,\\d)?\\](.+?)\\[/upload\\]", "<a href='such98://img/$3'>[点击查看图片]</a>"));
 
         bbMap.add(new Pair<>("\\[em\\d+\\]", "[喵]"));
     }

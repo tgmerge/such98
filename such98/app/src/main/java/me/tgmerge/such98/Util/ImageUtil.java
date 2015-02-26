@@ -11,6 +11,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.display.SimpleBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import me.tgmerge.such98.R;
@@ -40,17 +41,24 @@ public class ImageUtil {
     }
 
 
-    public static final void setImage(Context ctx, final ImageView imgView, int roundRadius, String url) {
+    public static final void setImage(Context ctx, final ImageView imgView, String url) {
+        setImage(ctx, imgView, 0, url);
+    }
+
+
+    public static final void setImage(Context ctx, final ImageView imgView, final int roundRadius, String url) {
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .showImageOnLoading(R.drawable.ic_dots_horizontal_white_48dp)
                 .showImageOnFail(R.drawable.ic_close_white_48dp)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
-                .displayer(new RoundedBitmapDisplayer(roundRadius))
+                .displayer(roundRadius > 0 ? new RoundedBitmapDisplayer(roundRadius) : new SimpleBitmapDisplayer())
                 .build();
         ImageUtil.getImageLoader(ctx, roundRadius).displayImage(url, imgView, options, new SimpleImageLoadingListener() {
             public void onLoadingComplete(String uri, View view, Bitmap loadedImage) {
-                imgView.setPadding(0, 0, 0, 0);
+                if (roundRadius > 0) {
+                    imgView.setPadding(0, 0, 0, 0);
+                }
             }
         });
     }

@@ -17,6 +17,7 @@ import me.tgmerge.such98.activity.LoginPageActivity;
 import me.tgmerge.such98.activity.ShowBoardsActivity;
 import me.tgmerge.such98.activity.ShowPostsActivity;
 import me.tgmerge.such98.activity.ShowTopicsActivity;
+import me.tgmerge.such98.activity.ViewImageActivity;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.fragment.BoardsFragment;
 import me.tgmerge.such98.fragment.NewPostFragment;
@@ -158,6 +159,13 @@ public final class ActivityUtil {
         if (clearTask) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         }
+        ctx.startActivity(intent);
+    }
+
+    public static final void openViewImageActivity(Context ctx, String url) {
+        logDebug("Starting ViewImageActivity");
+        Intent intent = new Intent(ctx, ViewImageActivity.class);
+        intent.putExtra(ViewImageActivity.INTENT_KEY_URL, url);
         ctx.startActivity(intent);
     }
 
