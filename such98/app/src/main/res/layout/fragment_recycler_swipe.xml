@@ -1,16 +1,32 @@
-<android.support.v4.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/swipe_container"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
-    tools:context="me.tgmerge.such98.fragment.PostsFragment">
+    android:layout_width="match_parent"
+    android:orientation="vertical">
 
-    <me.tgmerge.such98.custom.NoChildFocusRecyclerView
-        android:id="@+id/recyclerView"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="55dp"
+        android:background="@color/indigo_500"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:titleTextAppearance="@style/Toolbar_Title"
+        />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:background="@color/container_background"/>
+        tools:context="me.tgmerge.such98.fragment.PostsFragment">
 
-</android.support.v4.widget.SwipeRefreshLayout>
+        <me.tgmerge.such98.custom.NoChildFocusRecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:background="@color/container_background"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>

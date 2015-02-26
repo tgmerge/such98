@@ -1,10 +1,13 @@
 package me.tgmerge.such98.fragment;
 
 import android.app.Fragment;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,6 +56,11 @@ public abstract class RecyclerSwipeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mThisView = inflater.inflate(R.layout.fragment_recycler_swipe, container, false);
+        Toolbar toolbar = (Toolbar) mThisView.findViewById(R.id.toolbar);
+        ActionBarActivity activity = (ActionBarActivity) getActivity();
+        activity.setSupportActionBar(toolbar);
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        activity.getSupportActionBar().setHomeButtonEnabled(true);
         return mThisView;
     }
 
