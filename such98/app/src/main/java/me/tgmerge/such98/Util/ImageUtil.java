@@ -23,10 +23,6 @@ import me.tgmerge.such98.R;
 public class ImageUtil {
 
     public static final ImageLoader getImageLoader(Context ctx) {
-        return getImageLoader(ctx, 80);
-    }
-
-    public static final ImageLoader getImageLoader(Context ctx, int roundRadius) {
         if (!ImageLoader.getInstance().isInited()) {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(ctx.getApplicationContext())
                     .denyCacheImageMultipleSizesInMemory()
@@ -54,7 +50,7 @@ public class ImageUtil {
                 .cacheOnDisk(true)
                 .displayer(roundRadius > 0 ? new RoundedBitmapDisplayer(roundRadius) : new SimpleBitmapDisplayer())
                 .build();
-        ImageUtil.getImageLoader(ctx, roundRadius).displayImage(url, imgView, options, new SimpleImageLoadingListener() {
+        ImageUtil.getImageLoader(ctx).displayImage(url, imgView, options, new SimpleImageLoadingListener() {
             public void onLoadingComplete(String uri, View view, Bitmap loadedImage) {
                 if (roundRadius > 0) {
                     imgView.setPadding(0, 0, 0, 0);
