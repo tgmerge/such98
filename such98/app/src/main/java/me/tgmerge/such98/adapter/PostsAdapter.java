@@ -86,9 +86,6 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
         viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_posts_author_info, dataItem.UserName, dataItem.Time));
         BBUtil.setBBcodeToTextView(viewHolder.content, mAct, dataItem.Content); // todo prevent to process every time
 
-        // todo brute way to solve:
-        //      some of the viewHolder.content is not selectable
-        viewHolder.setIsRecyclable(false);
         viewHolder.content.setMovementMethod(LinkMovementMethod.getInstance());
 
         if (dataItem.Floor == 1) {
@@ -101,7 +98,7 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
         viewHolder.avatar.setImageResource(R.drawable.ic_dots_horizontal_white_36dp);
         String avaUrl = CacheUtil.id_avaUrlCache.get(dataItem.UserId);
         if (avaUrl != null) {
-            ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, avaUrl, false);
+            ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, avaUrl, true);
         } else {
             //viewHolder.setIsRecyclable(false); // todo pair with (true)
             new APIUtil.GetIdUser(mAct, dataItem.UserId, new APIUtil.APICallback() {
@@ -118,13 +115,13 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
                     String newAvaUrl = info.PortraitUrl.startsWith("http") ? info.PortraitUrl : ("http://www.cc98.org/" + info.PortraitUrl);
                     CacheUtil.id_avaUrlCache.put(info.Id, newAvaUrl);
                     ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, newAvaUrl, false);
-                    //viewHolder.setIsRecyclable(true);
+                    viewHolder.setIsRecyclable(true);
                 }
 
                 @Override
                 public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
                     viewHolder.avatar.setImageResource(R.drawable.ic_close_white_36dp);
-                    //viewHolder.setIsRecyclable(true);
+                    viewHolder.setIsRecyclable(true);
                 }
             }).execute();
         }
