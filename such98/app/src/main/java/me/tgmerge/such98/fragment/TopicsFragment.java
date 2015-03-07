@@ -120,7 +120,7 @@ public class TopicsFragment extends RecyclerSwipeFragment {
                 ActivityUtil.reloadFragment(activity, containerId);
                 return true;
             case R.id.action_new:
-                //ActivityUtil.openNewTopicDialog(activity, containerId, "", "");
+                ActivityUtil.openNewTopicDialog(activity, mParamId, "", "");
                 return true;
             case R.id.action_toFirstPage:
                 ActivityUtil.Action.topicFragmentFirstPage(activity, containerId, mParamId);

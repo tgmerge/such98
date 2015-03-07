@@ -21,6 +21,7 @@ import me.tgmerge.such98.activity.ViewImageActivity;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.fragment.BoardsFragment;
 import me.tgmerge.such98.fragment.NewPostFragment;
+import me.tgmerge.such98.fragment.NewTopicFragment;
 import me.tgmerge.such98.fragment.PostsFragment;
 import me.tgmerge.such98.fragment.TopicsFragment;
 
@@ -180,6 +181,18 @@ public final class ActivityUtil {
             newFragment.show(ft, "NewPostFragment");
         } else {
             HelperUtil.errorToast("openNewPostDialog: Context" + ctx.toString() + " is not Activity");
+        }
+    }
+
+    public static final void openNewTopicDialog(Context ctx, int boardId, String title, String content) {
+        logDebug("Starting NewTopicFragment(FragmentDialog)");
+        if (ctx instanceof Activity) {
+            FragmentTransaction ft = ((Activity) ctx).getFragmentManager().beginTransaction();
+            ft.addToBackStack(null);
+            DialogFragment newFragment = NewTopicFragment.newInstance(boardId, title, content);
+            newFragment.show(ft, "NewTopicFragment");
+        } else {
+            HelperUtil.errorToast("openNewTopicDialog: Context" + ctx.toString() + " is not Activity");
         }
     }
 
