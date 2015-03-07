@@ -142,6 +142,7 @@
             android:paddingTop="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:alpha="0.2"
             android:src="@drawable/ic_menu_grey600_18dp"/>
 
     </LinearLayout>
