@@ -65,7 +65,7 @@ public class ImageUtil {
     //     to prevent problems from recycling viewHolder before image is downloaded and set.
     //   Once the image is set, or failed to load, the isRecyclable flag should be set to true.
     public static final void setViewHolderImage(Context ctx, final RecyclerView.ViewHolder viewHolder, final ImageView imgView, int roundRadius, String url, final boolean handleRecyclable) {
-        if (handleRecyclable) {
+        if (handleRecyclable && viewHolder.isRecyclable()) {
             viewHolder.setIsRecyclable(false);
         }
         DisplayImageOptions options = new DisplayImageOptions.Builder()

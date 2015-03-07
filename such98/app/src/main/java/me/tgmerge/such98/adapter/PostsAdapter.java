@@ -100,7 +100,7 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
         if (avaUrl != null) {
             ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, avaUrl, true);
         } else {
-            //viewHolder.setIsRecyclable(false); // todo pair with (true)
+            viewHolder.setIsRecyclable(false); // pair with true
             new APIUtil.GetIdUser(mAct, dataItem.UserId, new APIUtil.APICallback() {
                 @Override
                 public void onSuccess(int statCode, Header[] headers, byte[] body) {
