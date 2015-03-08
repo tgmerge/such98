@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context="me.tgmerge.such98.activity.ViewImageActivity"
     android:background="@color/item_background"
-    android:gravity="center_horizontal">
+    android:gravity="center_vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -18,14 +18,10 @@
         app:titleTextAppearance="@style/Toolbar_Title"
         />
 
-
-    <ImageView
+    <WebView
         android:id="@+id/image"
-        android:src="@drawable/ic_circle_grey600_24dp"
-        android:layout_width="match_parent"
-        android:scaleType="center"
         android:layout_weight="1"
         android:layout_height="0dp"
-        android:layout_gravity="center"/>
+        android:layout_width="match_parent"/>
 
 </LinearLayout>

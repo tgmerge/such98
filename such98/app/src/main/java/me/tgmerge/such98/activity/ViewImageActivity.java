@@ -1,8 +1,6 @@
 package me.tgmerge.such98.activity;
 
-import android.app.Activity;
 import android.app.DownloadManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
@@ -11,25 +9,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.URLUtil;
-import android.widget.ImageView;
-
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.util.ActivityUtil;
-import me.tgmerge.such98.util.ImageUtil;
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class ViewImageActivity extends ActionBarActivity {
 
     public static final String INTENT_KEY_URL = "url";
 
     String mIntentUrl;
-    ImageView mImageView;
-    PhotoViewAttacher mAttacher;
+    WebView mWebView;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -50,19 +41,16 @@ public class ViewImageActivity extends ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
 
         mIntentUrl = getIntent().getStringExtra(INTENT_KEY_URL);
-        mImageView = (ImageView) findViewById(R.id.image);
+        mWebView = (WebView) findViewById(R.id.image);
 
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.ic_dots_horizontal_grey600_48dp)
-                .showImageOnFail(R.drawable.ic_close_grey600_48dp)
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .build();
-        ImageUtil.getImageLoader(this).displayImage(mIntentUrl, mImageView, options, new SimpleImageLoadingListener() {
-            public void onLoadingComplete(String uri, View view, Bitmap loadedImage) {
-                mAttacher = new PhotoViewAttacher(mImageView);
-            }
-        });
+        WebSettings settings = mWebView.getSettings();
+        settings.setSupportZoom(true);
+        settings.setBuiltInZoomControls(true);
+        settings.setDisplayZoomControls(false);
+        settings.setLoadWithOverviewMode(true);
+        settings.setUseWideViewPort(true);
+
+        mWebView.loadUrl(mIntentUrl);
     }
 
 
