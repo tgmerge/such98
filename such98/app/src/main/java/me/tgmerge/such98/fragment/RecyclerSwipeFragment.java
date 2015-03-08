@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -214,6 +215,13 @@ public abstract class RecyclerSwipeFragment extends Fragment {
 
         HelperUtil.generalDebug("RecyclerSwipeFragment", "Loading #" + posToLoad + " - #" + (posToLoad + sizeToLoad) + "...");
         load(loadPrevious, adapter, posToLoad, sizeToLoad);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem)
+    {
+        getActivity().onBackPressed();
+        return true;
     }
 
     abstract protected int getMaxPosToLoad();
