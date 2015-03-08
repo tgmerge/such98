@@ -71,7 +71,7 @@
     <string name="fragment_posts_loading_item">正在加载帖子 %1$d - %2$d …</string>
 
     <!-- RecylerSwipeFragment -->
-    <string name="fragment_recycler_swipe_already_first_page">已经在第一页了</string>
+    <string name="fragment_recycler_swipe_already_first_page">已经在第一页了，重新加载中</string>
     <string name="fragment_recycler_swipe_already_last_page">已经在最后一页了</string>
 
     <!-- TopicsFragment -->
