@@ -16,6 +16,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="16dp"
         android:src="@drawable/ic_circle_grey600_48dp"
+        android:alpha="0.6"
         android:layout_centerInParent="true"/>
 
     <ImageView

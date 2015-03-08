@@ -12,7 +12,8 @@
         android:layout_height="128dp"
         android:layout_marginTop="32dp"
         android:layout_marginBottom="96dp"
-        android:src="@drawable/ic_circle_grey600_48dp"/>
+        android:src="@drawable/ic_circle_grey600_48dp"
+        android:alpha="0.6"/>
 
     <View
         android:layout_width="match_parent"
