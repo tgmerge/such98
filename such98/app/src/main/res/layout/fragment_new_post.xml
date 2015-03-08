@@ -72,7 +72,7 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.5dp"
             android:background="@color/text_dividers"
             android:layout_below="@id/new_post_header"/>
 
