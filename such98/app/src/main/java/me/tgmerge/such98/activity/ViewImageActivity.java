@@ -50,7 +50,24 @@ public class ViewImageActivity extends ActionBarActivity {
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
 
-        mWebView.loadUrl(mIntentUrl);
+        mWebView.loadDataWithBaseURL(null,
+                "<style>\n" +
+                "  div {\n" +
+                "    position: relative;\n" +
+                "    width: 100%;\n" +
+                "    height: 100%;\n" +
+                "  }\n" +
+                "  img {\n" +
+                "    position: absolute;\n" +
+                "    margin: auto;\n" +
+                "    top: 0;\n" +
+                "    left: 0;\n" +
+                "    right: 0;\n" +
+                "    bottom: 0;\n" +
+                "  }\n" +
+                "</style>\n" +
+                "<div><img src='" + mIntentUrl + "'/></div>",
+        "text/html", "UTF-8", null);
     }
 
 
