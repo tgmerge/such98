@@ -75,9 +75,6 @@ public class BoardsAdapter extends RecyclerSwipeAdapter<XMLUtil.BoardInfo, Board
 
         viewHolder.data_boardId = dataItem.Id;
         viewHolder.data_isCat = dataItem.IsCategory;
-
-        // todo API有问题，于是在所有“分类”版面下显示一个“强制按帖子版面打开”的选项……
-        viewHolder.openAsNotCat.setVisibility(dataItem.IsCategory ? View.VISIBLE : View.GONE);
     }
 
     @Override

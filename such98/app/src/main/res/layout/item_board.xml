@@ -64,7 +64,7 @@
         android:layout_below="@id/text_name"/>
 
     <TextView
-        android:visibility="visible"
+        android:visibility="gone"
         android:id="@+id/text_openAsNotCat"
         android:text="作为帖子版面打开"
         android:textSize="14sp"
