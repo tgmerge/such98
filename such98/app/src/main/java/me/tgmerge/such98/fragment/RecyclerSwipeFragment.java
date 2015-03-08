@@ -1,7 +1,6 @@
 package me.tgmerge.such98.fragment;
 
 import android.app.Fragment;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -220,8 +219,12 @@ public abstract class RecyclerSwipeFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem)
     {
-        getActivity().onBackPressed();
-        return true;
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 
     abstract protected int getMaxPosToLoad();

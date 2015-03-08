@@ -46,6 +46,9 @@ public class ViewImageActivity extends ActionBarActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
         mIntentUrl = getIntent().getStringExtra(INTENT_KEY_URL);
         mImageView = (ImageView) findViewById(R.id.image);
 
@@ -73,6 +76,9 @@ public class ViewImageActivity extends ActionBarActivity {
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES, URLUtil.guessFileName(mIntentUrl, null, null));
                 DownloadManager manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                 manager.enqueue(request);
+                return true;
+            case android.R.id.home:
+                onBackPressed();
                 return true;
         }
         return super.onOptionsItemSelected(item);
