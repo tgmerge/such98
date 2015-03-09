@@ -70,10 +70,10 @@ public class IntentFilterActivity extends Activity {
         // find id=xxx, star=xxx, #xxx
         // (at least 'id')
         // will be processed in app, opening new ShowPostsActivity
-        if (urlStr.matches("http://www\\.cc98\\.org/dispbbs\\.asp\\?.*")) {
-            Matcher idMatcher = Pattern.compile("\\Wid=(\\d+)").matcher(urlStr);
+        if (urlStr.matches("(?i)http://www\\.cc98\\.org/dispbbs\\.asp\\?.*")) {
+            Matcher idMatcher = Pattern.compile("(?i)\\Wid=(\\d+)").matcher(urlStr);
             Integer id = idMatcher.find() ? Integer.parseInt(idMatcher.group(1)) : null;
-            Matcher starMatcher = Pattern.compile("\\Wstar=(\\d+)").matcher(urlStr);
+            Matcher starMatcher = Pattern.compile("(?i)\\Wstar=(\\d+)").matcher(urlStr);
             Integer star = starMatcher.find() ? Integer.parseInt(starMatcher.group(1)) : 1;
             Matcher hashMatcher = Pattern.compile("#(\\d+)").matcher(urlStr);
             Integer hash = hashMatcher.find() ? Integer.parseInt(hashMatcher.group(1)) : 1;
@@ -91,7 +91,7 @@ public class IntentFilterActivity extends Activity {
         //      http://www.baidu.com
         //      https://www.baidu.com
         // Start a new intent and throw it out
-        if (urlStr.matches("(http|https)://.*")) {
+        if (urlStr.matches("(?i)(http|https)://.*")) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(urlStr));
             startActivity(intent);
