@@ -15,11 +15,14 @@ import me.tgmerge.such98.R;
 import me.tgmerge.such98.activity.LoginActivity;
 import me.tgmerge.such98.activity.LoginPageActivity;
 import me.tgmerge.such98.activity.ShowBoardsActivity;
+import me.tgmerge.such98.activity.ShowMessagesActivity;
 import me.tgmerge.such98.activity.ShowPostsActivity;
 import me.tgmerge.such98.activity.ShowTopicsActivity;
 import me.tgmerge.such98.activity.ViewImageActivity;
+import me.tgmerge.such98.adapter.MessagesAdapter;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.fragment.BoardsFragment;
+import me.tgmerge.such98.fragment.MessagesFragment;
 import me.tgmerge.such98.fragment.NewPostFragment;
 import me.tgmerge.such98.fragment.NewTopicFragment;
 import me.tgmerge.such98.fragment.PostsFragment;
@@ -74,7 +77,7 @@ public final class ActivityUtil {
 
         public static final void showMessages(Context ctx) { showMessages(ctx, false); }
         public static final void showMessages(Context ctx, boolean clearTask) {
-            // todo
+            openShowMessagesActivity(ctx, MessagesFragment.PARAM_FILTER_BOTH, 0, clearTask);
         }
 
         public static final void setting(Context ctx) { setting(ctx, false); }
@@ -111,6 +114,17 @@ public final class ActivityUtil {
     }
 
     // activity
+
+    public static final void openShowMessagesActivity(Context ctx, int filter, int startPos, boolean clearTask) {
+        logDebug("Starting ShowMessagesActivity, filter=" + filter + ", startPos=" + startPos);
+        Intent intent = new Intent(ctx, ShowMessagesActivity.class);
+        intent.putExtra(ShowMessagesActivity.INTENT_KEY_FILTER, filter);
+        intent.putExtra(ShowMessagesActivity.INTENT_KEY_START_POS, startPos);
+        if (clearTask) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        }
+        ctx.startActivity(intent);
+    }
 
     public static final void openShowBoardsActivity(Context ctx, int id, int startPos, boolean clearTask) {
         logDebug("Starting ShowBoardsActivity, id=" + id + ", startPos=" + startPos);
@@ -284,6 +298,16 @@ public final class ActivityUtil {
         transaction.replace(containerId, fragment);
         transaction.commit();
     }
+
+
+    public static void loadMessagesFragment(Activity act, int containerId, int filter, int startPos) {
+        logDebug("Loading MessagesFragment, filter=" + filter + ", pos=" + startPos);
+        FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
+        MessagesFragment fragment = MessagesFragment.newInstance(filter, startPos);
+        transaction.replace(containerId, fragment);
+        transaction.commit();
+    }
+
 
     // - - -
 

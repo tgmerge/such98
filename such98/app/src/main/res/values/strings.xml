@@ -12,6 +12,8 @@
     <string name="title_activity_show_topics">查看主题</string>
     <string name="title_activity_show_posts">查看帖子</string>
     <string name="title_activity_view_image">查看图片</string>
+    <string name="title_activity_intent_filter">Intent Filter</string>
+    <string name="title_activity_show_messages">查看消息</string>
 
     <string name="open_drawer">打开侧边栏</string>
     <string name="close_drawer">关闭侧边栏</string>
@@ -93,6 +95,5 @@
     <string name="view_holder_post_copied">帖子内容已经复制</string>
     <string name="view_holder_post_reply_title">回复 %1$s (#%2$d)</string>
     <string name="view_holder_post_quote_content"><![CDATA[[quotex][i][b]> %1$s @ %2$s (#%3$d)[/b][/i]\n%4$s[/quotex]\n\n]]></string>
-    <string name="title_activity_intent_filter">Intent Filter</string>
 
 </resources>

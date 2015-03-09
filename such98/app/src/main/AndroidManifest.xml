@@ -45,16 +45,22 @@
         <activity
             android:name=".activity.IntentFilterActivity"
             android:label="@string/title_activity_intent_filter"
-            android:noHistory="true">
+            android:noHistory="true" >
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <action android:name="android.intent.action.VIEW" />
+
                 <data android:scheme="such98" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.ViewImageActivity"
             android:label="@string/title_activity_view_image" >
+        </activity>
+        <activity
+            android:name=".activity.ShowMessagesActivity"
+            android:label="@string/title_activity_show_messages" >
         </activity>
     </application>
 

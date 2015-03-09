@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="72dp"
+    android:paddingTop="16dp"
+    android:background="@drawable/background_touch_selector">
+
+    <ImageView
+        android:id="@+id/img_circle"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="3dp"
+        android:src="@drawable/ic_circle_grey600_48dp"
+        android:alpha="0.6"/>
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_quote_white_48dp"
+        android:layout_alignLeft="@id/img_circle"
+        android:layout_alignTop="@id/img_circle"/>
+
+    <TextView
+        android:id="@+id/text_title"
+        android:text="Message title"
+        android:textSize="16sp"
+        android:textColor="@color/text_text"
+        android:paddingBottom="3dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="16dp"/>
+
+    <TextView
+        android:id="@+id/text_type"
+        android:text="isSend, isDraft, isRead"
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"/>
+
+    <TextView
+        android:id="@+id/text_content"
+        android:text="Message content..."
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="16dp"
+        android:layout_below="@id/text_title"/>
+
+    <Space
+        android:layout_height="15dp"
+        android:layout_width="match_parent"
+        android:layout_below="@id/text_openAsNotCat" />
+
+    <View
+        android:id="@+id/view_divider_content"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/text_dividers"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="72dp"/>
+
+</RelativeLayout>
