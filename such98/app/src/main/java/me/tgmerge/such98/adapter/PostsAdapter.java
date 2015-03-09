@@ -83,7 +83,7 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
         viewHolder.data_postInfo = mData.get(position);
 
         viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? SuchApp.getStr(R.string.adapter_posts_default_title, dataItem.Floor) : dataItem.Title);
-        viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_posts_author_info, dataItem.UserName, dataItem.Time));
+        viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_posts_author_info, dataItem.UserId == 0 ? "匿名" : dataItem.UserName, dataItem.Time));
         BBUtil.setBBcodeToTextView(viewHolder.content, mAct, dataItem.Content); // todo prevent to process every time
 
         viewHolder.content.setMovementMethod(LinkMovementMethod.getInstance());
@@ -93,37 +93,42 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
             viewHolder.replyInfo.setText(SuchApp.getStr(R.string.adapter_posts_reply_info, viewHolder.data_topicInfo.HitCount, viewHolder.data_topicInfo.ReplyCount));
         }
 
-        // PostViewHolder 异步加载图像： 加载之前设置viewHolder.setRecyclable(false)
-        //                         加载之后设置viewHolder.setRecyclable(true)
-        viewHolder.avatar.setImageResource(R.drawable.ic_dots_horizontal_white_36dp);
-        String avaUrl = CacheUtil.id_avaUrlCache.get(dataItem.UserId);
-        if (avaUrl != null) {
-            ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, avaUrl, true);
+        if (dataItem.UserId == 0) {
+            // 匿名用户
+            viewHolder.avatar.setImageResource(R.drawable.ic_close_white_36dp); // todo add avatar for anonymous user
         } else {
-            viewHolder.setIsRecyclable(false); // pair with true
-            new APIUtil.GetIdUser(mAct, dataItem.UserId, new APIUtil.APICallback() {
-                @Override
-                public void onSuccess(int statCode, Header[] headers, byte[] body) {
-                    XMLUtil.UserInfo info = new XMLUtil.UserInfo();
-                    try {
-                        info.parse(new String(body));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        onFailure(-1, headers, body, e);
-                        return;
+            // PostViewHolder 异步加载图像： 加载之前设置viewHolder.setRecyclable(false)
+            //                         加载之后设置viewHolder.setRecyclable(true)
+            viewHolder.avatar.setImageResource(R.drawable.ic_dots_horizontal_white_36dp);
+            String avaUrl = CacheUtil.id_avaUrlCache.get(dataItem.UserId);
+            if (avaUrl != null) {
+                ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, avaUrl, true);
+            } else {
+                viewHolder.setIsRecyclable(false); // pair with true
+                new APIUtil.GetIdUser(mAct, dataItem.UserId, new APIUtil.APICallback() {
+                    @Override
+                    public void onSuccess(int statCode, Header[] headers, byte[] body) {
+                        XMLUtil.UserInfo info = new XMLUtil.UserInfo();
+                        try {
+                            info.parse(new String(body));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            onFailure(-1, headers, body, e);
+                            return;
+                        }
+                        String newAvaUrl = info.PortraitUrl.startsWith("http") ? info.PortraitUrl : ("http://www.cc98.org/" + info.PortraitUrl);
+                        CacheUtil.id_avaUrlCache.put(info.Id, newAvaUrl);
+                        ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, newAvaUrl, false);
+                        viewHolder.setIsRecyclable(true);
                     }
-                    String newAvaUrl = info.PortraitUrl.startsWith("http") ? info.PortraitUrl : ("http://www.cc98.org/" + info.PortraitUrl);
-                    CacheUtil.id_avaUrlCache.put(info.Id, newAvaUrl);
-                    ImageUtil.setViewHolderImage(mAct, viewHolder, viewHolder.avatar, 80, newAvaUrl, false);
-                    viewHolder.setIsRecyclable(true);
-                }
 
-                @Override
-                public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                    viewHolder.avatar.setImageResource(R.drawable.ic_close_white_36dp);
-                    viewHolder.setIsRecyclable(true);
-                }
-            }).execute();
+                    @Override
+                    public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
+                        viewHolder.avatar.setImageResource(R.drawable.ic_close_white_36dp);
+                        viewHolder.setIsRecyclable(true);
+                    }
+                }).execute();
+            }
         }
 
         // reset toolbar status
