@@ -19,7 +19,6 @@ import me.tgmerge.such98.activity.ShowMessagesActivity;
 import me.tgmerge.such98.activity.ShowPostsActivity;
 import me.tgmerge.such98.activity.ShowTopicsActivity;
 import me.tgmerge.such98.activity.ViewImageActivity;
-import me.tgmerge.such98.adapter.MessagesAdapter;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.fragment.BoardsFragment;
 import me.tgmerge.such98.fragment.MessagesFragment;
@@ -75,9 +74,19 @@ public final class ActivityUtil {
             // todo
         }
 
-        public static final void showMessages(Context ctx) { showMessages(ctx, false); }
-        public static final void showMessages(Context ctx, boolean clearTask) {
+        public static final void showMessagesAll(Context ctx) { showMessagesAll(ctx, false); }
+        public static final void showMessagesAll(Context ctx, boolean clearTask) {
             openShowMessagesActivity(ctx, MessagesFragment.PARAM_FILTER_BOTH, 0, clearTask);
+        }
+
+        public static final void showMessagesReceive(Context ctx) { showMessagesReceive(ctx, false); }
+        public static final void showMessagesReceive(Context ctx, boolean clearTask) {
+            openShowMessagesActivity(ctx, MessagesFragment.PARAM_FILTER_RECEIVE, 0, clearTask);
+        }
+
+        public static final void showMessagesSend(Context ctx) { showMessagesSend(ctx, false); }
+        public static final void showMessagesSend(Context ctx, boolean clearTask) {
+            openShowMessagesActivity(ctx, MessagesFragment.PARAM_FILTER_SEND, 0, clearTask);
         }
 
         public static final void setting(Context ctx) { setting(ctx, false); }

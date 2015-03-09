@@ -1,15 +1,10 @@
 package me.tgmerge.such98.fragment;
 
 import android.app.Fragment;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -51,7 +46,9 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
         mThisView.findViewById(R.id.drawer_function_custom_board).setOnClickListener(this);
         mThisView.findViewById(R.id.drawer_function_hot_topic).setOnClickListener(this);
         mThisView.findViewById(R.id.drawer_function_new_topic).setOnClickListener(this);
-        mThisView.findViewById(R.id.drawer_function_message).setOnClickListener(this);
+        mThisView.findViewById(R.id.drawer_function_message_all).setOnClickListener(this);
+        mThisView.findViewById(R.id.drawer_function_message_send).setOnClickListener(this);
+        mThisView.findViewById(R.id.drawer_function_message_receive).setOnClickListener(this);
         mThisView.findViewById(R.id.drawer_function_logout).setOnClickListener(this);
 
         return mThisView;
@@ -99,8 +96,14 @@ public class NavDrawerFragment extends Fragment implements View.OnClickListener 
             case R.id.drawer_function_new_topic:
                 ActivityUtil.Action.showNewTopics(getActivity(), true);
                 break;
-            case R.id.drawer_function_message:
-                ActivityUtil.Action.showMessages(getActivity(), false);
+            case R.id.drawer_function_message_all:
+                ActivityUtil.Action.showMessagesAll(getActivity(), false);
+                break;
+            case R.id.drawer_function_message_receive:
+                ActivityUtil.Action.showMessagesReceive(getActivity(), false);
+                break;
+            case R.id.drawer_function_message_send:
+                ActivityUtil.Action.showMessagesSend(getActivity(), false);
                 break;
             case R.id.drawer_function_logout:
                 ActivityUtil.Action.logout(getActivity(), true);
