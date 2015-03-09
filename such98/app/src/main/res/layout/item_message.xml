@@ -65,7 +65,7 @@
     <Space
         android:layout_height="15dp"
         android:layout_width="match_parent"
-        android:layout_below="@id/text_openAsNotCat" />
+        android:layout_below="@id/text_content" />
 
     <View
         android:id="@+id/view_divider_content"
