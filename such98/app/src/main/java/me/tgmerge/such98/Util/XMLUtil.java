@@ -70,6 +70,29 @@ public class XMLUtil {
 
     // - - - XMLObj - - -
 
+    @SuppressWarnings("unused")
+    public static final class MessageInfo extends XMLObj {
+        public String SenderName;
+        public String ReceiverName;
+        public String Title;
+        public String Content;
+        public boolean IsDraft;
+        public boolean IsRead;
+        public String SendTime;
+
+        private static final HashSet<String> mDefaults =
+                newHashSet("SenderName", "ReceiverName", "Title", "Content", "IsDraft", "IsRead", "SendTime");
+
+        @Override
+        public Set<String> getDefaultFields() {
+            return mDefaults;
+        }
+
+        @Override
+        public void processSpecialTags(XmlPullParser xpp) throws Exception {
+        }
+    }
+
 
     @SuppressWarnings("unused")
     public static final class BoardLastPostInfo extends XMLObj {
