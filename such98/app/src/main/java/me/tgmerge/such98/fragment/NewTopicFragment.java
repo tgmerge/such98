@@ -68,7 +68,7 @@ public class NewTopicFragment extends DialogFragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mThisView = inflater.inflate(R.layout.fragment_new_post, container, false);
+        mThisView = inflater.inflate(R.layout.fragment_new_topic, container, false);
 
         // clicking outside won't close dialog
         getDialog().setCanceledOnTouchOutside(false);
