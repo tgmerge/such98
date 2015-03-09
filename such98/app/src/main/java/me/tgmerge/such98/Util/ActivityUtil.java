@@ -277,6 +277,14 @@ public final class ActivityUtil {
         transaction.commit();
     }
 
+    public static final void loadBoardsFragment(Activity act, int containerId, int boardId, int startPos) {
+        logDebug("Loading BoardsFragment, id=" + boardId + ", pos=" + startPos);
+        FragmentTransaction transaction = act.getFragmentManager().beginTransaction();
+        BoardsFragment fragment = BoardsFragment.newInstance(boardId, startPos);
+        transaction.replace(containerId, fragment);
+        transaction.commit();
+    }
+
     // - - -
 
     private static final void logDebug(String msg) {
