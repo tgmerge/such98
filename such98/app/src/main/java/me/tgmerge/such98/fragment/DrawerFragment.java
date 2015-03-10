@@ -1,10 +1,15 @@
 package me.tgmerge.such98.fragment;
 
 import android.app.Fragment;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -60,6 +65,7 @@ public class DrawerFragment extends Fragment implements View.OnClickListener {
     private boolean drawerIsSet = false;
 
     private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -76,6 +82,86 @@ public class DrawerFragment extends Fragment implements View.OnClickListener {
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
+
+        if (ActivityUtil.checkActivityIsRoot(getActivity())) {
+            setHomeButtonOpenDrawer();
+        }
+    }
+
+    private final void setHomeButtonOpenDrawer() {
+
+        setHasOptionsMenu(true);
+
+        ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
+
+        mDrawerToggle = new ActionBarDrawerToggle(
+                getActivity(),
+                mDrawerLayout,
+                R.string.open_drawer,
+                R.string.close_drawer
+        ) {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                if (!isAdded()) {
+                    return;
+                }
+
+                getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                if (!isAdded()) {
+                    return;
+                }
+
+                getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+
+                // if drawer(avatar, etc) is not set, try again to set
+                if (!drawerIsLoading && !drawerIsSet) {
+                    setDrawer();
+                }
+            }
+        };
+
+        // Defer code dependent on restoration of previous instance state.
+        mDrawerLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mDrawerToggle.syncState();
+            }
+        });
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // open drawer if activity is the last in the stack
+        if (ActivityUtil.checkActivityIsRoot(getActivity()) && item.getItemId() == android.R.id.home) {
+            if (mDrawerLayout.isDrawerOpen(mThisView)) {
+                mDrawerLayout.closeDrawer(mThisView);
+            } else {
+                mDrawerLayout.openDrawer(mThisView);
+            }
+            return true;
+        }
+
+        // "default" action(finish activity) if activity is not the last in the stack
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Forward the new configuration the drawer toggle component.
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override

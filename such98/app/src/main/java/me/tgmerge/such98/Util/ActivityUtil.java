@@ -132,6 +132,8 @@ public final class ActivityUtil {
         intent.putExtra(ShowMessagesActivity.INTENT_KEY_START_POS, startPos);
         if (clearTask) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        } else {
+            markIntentAsNotRoot(intent);
         }
         ctx.startActivity(intent);
     }
@@ -143,6 +145,8 @@ public final class ActivityUtil {
         intent.putExtra(ShowBoardsActivity.INTENT_KEY_START_POS, startPos);
         if (clearTask) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        } else {
+            markIntentAsNotRoot(intent);
         }
         ctx.startActivity(intent);
     }
@@ -154,6 +158,8 @@ public final class ActivityUtil {
         intent.putExtra(ShowTopicsActivity.INTENT_KEY_START_POS, startPos);
         if (clearTask) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        } else {
+            markIntentAsNotRoot(intent);
         }
         ctx.startActivity(intent);
     }
@@ -165,6 +171,8 @@ public final class ActivityUtil {
         intent.putExtra(ShowPostsActivity.INTENT_KEY_START_POS, startPos);
         if (clearTask) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        } else {
+            markIntentAsNotRoot(intent);
         }
         ctx.startActivity(intent);
     }
@@ -174,6 +182,8 @@ public final class ActivityUtil {
         Intent intent = new Intent(ctx, LoginPageActivity.class);
         if (clearTask) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        } else {
+            markIntentAsNotRoot(intent);
         }
         ctx.startActivity(intent);
     }
@@ -183,6 +193,8 @@ public final class ActivityUtil {
         Intent intent = new Intent(ctx, LoginActivity.class);
         if (clearTask) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        } else {
+            markIntentAsNotRoot(intent);
         }
         ctx.startActivity(intent);
     }
@@ -191,6 +203,7 @@ public final class ActivityUtil {
         logDebug("Starting ViewImageActivity");
         Intent intent = new Intent(ctx, ViewImageActivity.class);
         intent.putExtra(ViewImageActivity.INTENT_KEY_URL, url);
+        markIntentAsNotRoot(intent);
         ctx.startActivity(intent);
     }
 
@@ -332,6 +345,16 @@ public final class ActivityUtil {
 
 
     // - - -
+
+    private static final String ARG_INTENT_NOT_ROOT = "notRoot";
+
+    private static final void markIntentAsNotRoot(Intent intent) {
+        intent.putExtra(ARG_INTENT_NOT_ROOT, 0);
+    }
+
+    public static final boolean checkActivityIsRoot(Activity act) {
+        return !(act.getIntent().hasExtra(ARG_INTENT_NOT_ROOT));
+    }
 
     private static final void logDebug(String msg) {
         HelperUtil.generalDebug("ActivityUtil", msg);
