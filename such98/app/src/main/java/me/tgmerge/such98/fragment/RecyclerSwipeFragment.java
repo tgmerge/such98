@@ -143,7 +143,13 @@ public abstract class RecyclerSwipeFragment extends Fragment {
         mSwipeLayout.setColorSchemeResources(R.color.swipe_refresh_1, R.color.swipe_refresh_2, R.color.swipe_refresh_3);
 
         // loading topic info...
-        setProgressLoading();
+        // use post() to prevent "call setRefreshing before measuring layout" bug
+        mSwipeLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                setProgressLoading();
+            }
+        });
 
         initialLoad();
     }
@@ -173,12 +179,7 @@ public abstract class RecyclerSwipeFragment extends Fragment {
 
     protected final void setProgressLoading() {
         mSwipeLayout.setEnabled(true);
-        mSwipeLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mSwipeLayout.setRefreshing(true);
-            }
-        });
+        mSwipeLayout.setRefreshing(true);
     }
 
     protected final void setProgressFinished() {
