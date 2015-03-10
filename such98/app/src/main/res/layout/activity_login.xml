@@ -35,7 +35,6 @@
         android:textColor="@color/text_disabled"
         style="?android:attr/borderlessButtonStyle"
         android:background="@drawable/background_transparent_touch_selector"
-        android:onClick="onTestButtonClicked"/>
-
+        android:longClickable="true"/>
 
 </LinearLayout>
