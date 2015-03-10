@@ -77,7 +77,7 @@ public class TopicsFragment extends RecyclerSwipeFragment {
                     // loading topic info: finished
                     getActivity().setTitle(mBoardInfo.Name);
                     mRecyclerView.setEnabled(true);
-                    setProgressFinished();
+                    //setProgressFinished();
 
                     // first load
                     int maxPage = mBoardInfo.TotalTopicCount / ITEM_PER_PAGE;

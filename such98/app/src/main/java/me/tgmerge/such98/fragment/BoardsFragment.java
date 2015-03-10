@@ -84,7 +84,7 @@ public class BoardsFragment extends RecyclerSwipeFragment {
 
                     getActivity().setTitle(mBoardInfo.Name);
                     mRecyclerView.setEnabled(true);
-                    setProgressFinished();
+                    //setProgressFinished();
 
                     int maxPage = mBoardInfo.ChildBoardCount / ITEM_PER_PAGE;
 

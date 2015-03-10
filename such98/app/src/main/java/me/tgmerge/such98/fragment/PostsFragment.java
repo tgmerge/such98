@@ -58,7 +58,7 @@ public class PostsFragment extends RecyclerSwipeFragment {
                     ((PostsAdapter) mAdapter).setTopicInfo(mTopicInfo);
                 }
                 mRecyclerView.setEnabled(true);
-                setProgressFinished();
+                //setProgressFinished();
 
                 // first load
                 int maxPage = mTopicInfo.ReplyCount / ITEM_PER_PAGE;
