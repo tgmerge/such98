@@ -80,9 +80,10 @@ public class MessagesAdapter extends RecyclerSwipeAdapter<XMLUtil.MessageInfo, M
         }
         viewHolder.type.setText(type);
 
-        viewHolder.content.setText(dataItem.SenderName + " -> " + dataItem.ReceiverName);
+        viewHolder.content.setText(dataItem.SenderName + " to " + dataItem.ReceiverName);
 
         viewHolder.data_messageId = 0; // todo not supported by API
+        viewHolder.data_messageInfo = dataItem;
     }
 
     @Override

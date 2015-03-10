@@ -21,6 +21,7 @@ import me.tgmerge.such98.activity.ShowTopicsActivity;
 import me.tgmerge.such98.activity.ViewImageActivity;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.fragment.BoardsFragment;
+import me.tgmerge.such98.fragment.MessageDialogFragment;
 import me.tgmerge.such98.fragment.MessagesFragment;
 import me.tgmerge.such98.fragment.NewPostDialogFragment;
 import me.tgmerge.such98.fragment.NewTopicDialogFragment;
@@ -194,6 +195,18 @@ public final class ActivityUtil {
     }
 
     // dialog & dialog fragment
+
+    public static final void openMessageDialog(Context ctx, String senderName, String receiverName, String title, String content, boolean isDraft, boolean isRead, String sendTime) {
+        logDebug("Starting MessageDialogFragment(FragmentDialog)");
+        if (ctx instanceof Activity) {
+            FragmentTransaction ft = ((Activity) ctx).getFragmentManager().beginTransaction();
+            ft.addToBackStack(null);
+            DialogFragment newFragment = MessageDialogFragment.newInstance(senderName, receiverName, title, content, isDraft, isRead, sendTime);
+            newFragment.show(ft, "MessageDialogFragment");
+        } else {
+            HelperUtil.errorToast("openMessageDialog: Context" + ctx.toString() + " is not Activity");
+        }
+    }
 
     public static final void openNewPostDialog(Context ctx, int topicId, String replyTitle, String replyContent) {
         logDebug("Starting NewPostDialogFragment(FragmentDialog)");

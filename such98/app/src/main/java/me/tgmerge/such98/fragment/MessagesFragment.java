@@ -46,11 +46,11 @@ public class MessagesFragment extends RecyclerSwipeFragment {
         String actTitle = "";
 
         if (mParamFilter == PARAM_FILTER_SEND) {
-            actTitle = "Sent msg";
+            actTitle = "发件箱";
         } else if (mParamFilter == PARAM_FILTER_RECEIVE) {
-            actTitle = "Received msg";
+            actTitle = "收件箱";
         } else if (mParamFilter == PARAM_FILTER_BOTH) {
-            actTitle = "All msg";
+            actTitle = "所有消息";
         } else {
             actTitle = "? msg";
         }
