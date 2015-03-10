@@ -12,8 +12,7 @@
         android:layout_height="128dp"
         android:layout_marginTop="32dp"
         android:layout_marginBottom="96dp"
-        android:src="@drawable/ic_circle_grey600_48dp"
-        android:alpha="0.6"/>
+        android:src="@drawable/login_img"/>
 
     <View
         android:layout_width="match_parent"
