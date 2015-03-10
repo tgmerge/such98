@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -142,14 +143,10 @@ public abstract class RecyclerSwipeFragment extends Fragment {
         });
         mSwipeLayout.setColorSchemeResources(R.color.swipe_refresh_1, R.color.swipe_refresh_2, R.color.swipe_refresh_3);
 
-        // loading topic info...
-        // use post() to prevent "call setRefreshing before measuring layout" bug
-        mSwipeLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                setProgressLoading();
-            }
-        });
+        // todo workaround for "not showing loading indicator before load"
+        mSwipeLayout.setProgressViewOffset(false, 0,
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
+        setProgressLoading();
 
         initialLoad();
     }
