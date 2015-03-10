@@ -24,7 +24,7 @@ import me.tgmerge.such98.util.XMLUtil;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class NewPostFragment extends DialogFragment implements View.OnClickListener {
+public class NewPostDialogFragment extends DialogFragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM_TOPIC_ID = "topicId";
@@ -44,8 +44,8 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
      *
      */
     // TODO: Rename and change types and number of parameters
-    public static NewPostFragment newInstance(int paramTopicId, String paramTitle, String paramContent) {
-        NewPostFragment fragment = new NewPostFragment();
+    public static NewPostDialogFragment newInstance(int paramTopicId, String paramTitle, String paramContent) {
+        NewPostDialogFragment fragment = new NewPostDialogFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM_TOPIC_ID, paramTopicId);
         args.putString(ARG_PARAM_TITLE, paramTitle);
@@ -54,7 +54,7 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
         return fragment;
     }
 
-    public NewPostFragment() {
+    public NewPostDialogFragment() {
         // Required empty public constructor
     }
 
@@ -73,7 +73,7 @@ public class NewPostFragment extends DialogFragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mThisView = inflater.inflate(R.layout.fragment_new_post, container, false);
+        mThisView = inflater.inflate(R.layout.dialog_fragment_new_post, container, false);
 
         // clicking outside won't close dialog
         getDialog().setCanceledOnTouchOutside(false);

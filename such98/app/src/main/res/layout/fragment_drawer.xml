@@ -5,7 +5,7 @@
     android:layout_width="245dp"
     android:layout_height="match_parent"
     android:layout_gravity="start"
-    tools:context="me.tgmerge.such98.fragment.NavDrawerFragment">
+    tools:context="me.tgmerge.such98.fragment.DrawerFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:minWidth="1000dp"
     android:layout_margin="16dp"
-    tools:context="me.tgmerge.such98.fragment.NewTopicFragment"
+    tools:context="me.tgmerge.such98.fragment.NewPostDialogFragment"
     android:background="@android:color/transparent">
 
     <RelativeLayout
@@ -52,7 +52,7 @@
                 android:paddingRight="16dp"
                 android:textSize="16sp"
                 android:textColor="@color/text_text"
-                android:hint="新帖标题"
+                android:hint="回复标题"
                 android:background="@android:color/transparent"/>
 
 

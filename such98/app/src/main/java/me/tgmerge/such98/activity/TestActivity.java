@@ -13,7 +13,7 @@ import org.apache.http.Header;
 import java.util.Vector;
 
 import me.tgmerge.such98.R;
-import me.tgmerge.such98.fragment.NewPostFragment;
+import me.tgmerge.such98.fragment.NewPostDialogFragment;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
@@ -173,7 +173,7 @@ public class TestActivity extends ActionBarActivity {
     public void act7Clicked(View view) {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.addToBackStack(null);
-        DialogFragment newFragment = NewPostFragment.newInstance(2803718, "Reply title", "Reply content");
+        DialogFragment newFragment = NewPostDialogFragment.newInstance(2803718, "Reply title", "Reply content");
         newFragment.show(ft, "dialog");
     }
 

@@ -7,14 +7,14 @@ import android.support.v7.app.ActionBarActivity;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.fragment.TopicsFragment;
-import me.tgmerge.such98.fragment.NavDrawerFragment;
+import me.tgmerge.such98.fragment.DrawerFragment;
 
 public class ShowTopicsActivity extends ActionBarActivity {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
-    private NavDrawerFragment mNavigationDrawerFragment;
+    private DrawerFragment mNavigationDrawerFragment;
 
     public static final String INTENT_KEY_ID = "id";
     public static final String INTENT_KEY_START_POS = "pos";
@@ -22,9 +22,9 @@ public class ShowTopicsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_base_fragment_drawer);
+        setContentView(R.layout.activity_fragment_and_drawer);
 
-        mNavigationDrawerFragment = (NavDrawerFragment)
+        mNavigationDrawerFragment = (DrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
         // Set up the drawer.

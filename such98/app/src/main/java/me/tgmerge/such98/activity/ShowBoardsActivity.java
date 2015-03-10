@@ -6,12 +6,12 @@ import android.support.v7.app.ActionBarActivity;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.fragment.BoardsFragment;
-import me.tgmerge.such98.fragment.NavDrawerFragment;
+import me.tgmerge.such98.fragment.DrawerFragment;
 import me.tgmerge.such98.util.ActivityUtil;
 
 public class ShowBoardsActivity extends ActionBarActivity {
 
-    private NavDrawerFragment mNavigationDrawerFragment;
+    private DrawerFragment mNavigationDrawerFragment;
 
     public static final String INTENT_KEY_ID = "id";
     public static final String INTENT_KEY_START_POS = "pos";
@@ -23,9 +23,9 @@ public class ShowBoardsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_base_fragment_drawer);
+        setContentView(R.layout.activity_fragment_and_drawer);
 
-        mNavigationDrawerFragment = (NavDrawerFragment)
+        mNavigationDrawerFragment = (DrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
         mIntentId = getIntent().getIntExtra(INTENT_KEY_ID, 0);

@@ -55,14 +55,14 @@
     <!-- General -->
     <string name="general_on_api_failure_toast_text">网络错误, code=%1$d, err=%2$s</string>
 
-    <!-- NewPostFragment -->
+    <!-- NewPostDialogFragment -->
     <string name="fragment_new_post_warning_empty_content">回复正文不能为空</string>
     <string name="fragment_new_post_warning_invalid_topic_id">帖子ID(=%1$d)无效</string>
     <string name="fragment_new_post_reply_sent">回复成功</string>
     <string name="fragment_new_post_reply_failure_title">回复失败</string>
     <string name="fragment_new_post_reply_failure_OK_button">确定</string>
 
-    <!-- NewTopicFragment -->
+    <!-- NewTopicDialogFragment -->
     <string name="fragment_new_topic_warning_empty_content_or_title">帖子标题和正文不能为空</string>
     <string name="fragment_new_topic_warning_invalid_board_id">版面ID(=%1$d)无效</string>
     <string name="fragment_new_topic_sent">发表成功</string>

@@ -24,7 +24,7 @@ import me.tgmerge.such98.util.XMLUtil;
 /**
  * Nav drawer fragment.
  */
-public class NavDrawerFragment extends Fragment implements View.OnClickListener {
+public class DrawerFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
