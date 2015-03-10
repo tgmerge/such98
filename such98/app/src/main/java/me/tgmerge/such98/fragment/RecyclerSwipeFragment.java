@@ -173,7 +173,12 @@ public abstract class RecyclerSwipeFragment extends Fragment {
 
     protected final void setProgressLoading() {
         mSwipeLayout.setEnabled(true);
-        mSwipeLayout.setRefreshing(true);
+        mSwipeLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeLayout.setRefreshing(true);
+            }
+        });
     }
 
     protected final void setProgressFinished() {
