@@ -12,7 +12,15 @@ import java.util.Vector;
  * Created by tgmerge on 2/17.
  * Provides methods to render BBCode(to html, on TextView, load images, etc)
  */
-public class BBUtil {
+public class TextUtil {
+
+    public static final String longTimeString(String datetimeFromApi) {
+        return datetimeFromApi.replaceFirst("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})", "$1-$2-$3 $4:$5");
+    }
+
+    public static final String shortTimeString(String datetimeFromApi) {
+        return datetimeFromApi.replaceFirst("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})", "$2-$3 $4:$5");
+    }
 
     public static final void setBBcodeToTextView(TextView textView, Context ctx, String bb) {
         String html = bb2html(bb);
@@ -21,6 +29,8 @@ public class BBUtil {
         Spanned spanned = Html.fromHtml(html, null, null);
         textView.setText(spanned);
     }
+
+    // - - - private for ubb - - -
 
     private static final Vector<Pair<String, String>> bbMap = new Vector<>();
 

@@ -11,9 +11,10 @@ import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.custom.SuchApp;
+import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.viewholder.PostViewHolder;
 import me.tgmerge.such98.util.APIUtil;
-import me.tgmerge.such98.util.BBUtil;
+import me.tgmerge.such98.util.TextUtil;
 import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.ImageUtil;
 import me.tgmerge.such98.util.XMLUtil;
@@ -83,8 +84,8 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
         viewHolder.data_postInfo = mData.get(position);
 
         viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? SuchApp.getStr(R.string.adapter_posts_default_title, dataItem.Floor) : dataItem.Title);
-        viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_posts_author_info, dataItem.UserId == 0 ? "匿名" : dataItem.UserName, dataItem.Time));
-        BBUtil.setBBcodeToTextView(viewHolder.content, mAct, dataItem.Content); // todo prevent to process every time
+        viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_posts_author_info, dataItem.UserId == 0 ? "匿名" : dataItem.UserName, TextUtil.longTimeString(dataItem.Time)));
+        TextUtil.setBBcodeToTextView(viewHolder.content, mAct, dataItem.Content); // todo prevent to process every time
 
         viewHolder.content.setMovementMethod(LinkMovementMethod.getInstance());
 

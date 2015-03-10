@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.custom.SuchApp;
+import me.tgmerge.such98.util.TextUtil;
 import me.tgmerge.such98.viewholder.TopicViewHolder;
 import me.tgmerge.such98.util.XMLUtil;
 
@@ -66,7 +67,7 @@ public class TopicsAdapter extends RecyclerSwipeAdapter<XMLUtil.TopicInfo, Topic
         XMLUtil.TopicInfo dataItem = mData.get(position);
 
         viewHolder.title.setText(dataItem.Title);
-        viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_topics_author_info, dataItem.AuthorName, dataItem.CreateTime));
+        viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_topics_author_info, dataItem.AuthorName, TextUtil.longTimeString(dataItem.CreateTime)));
         viewHolder.data_topicId = dataItem.Id;
 
         if (dataItem instanceof XMLUtil.HotTopicInfo) {

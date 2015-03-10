@@ -1,15 +1,11 @@
 package me.tgmerge.such98.fragment;
 
-import android.app.Activity;
 import android.app.DialogFragment;
-import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,7 +14,7 @@ import org.apache.http.Header;
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.APIUtil;
-import me.tgmerge.such98.util.BBUtil;
+import me.tgmerge.such98.util.TextUtil;
 import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.ImageUtil;
@@ -99,7 +95,7 @@ public class MessageDialogFragment extends DialogFragment implements View.OnClic
         }
         if (mParamContent != null) {
             TextView contentTextView = (TextView) mThisView.findViewById(R.id.text_msg_content);
-            BBUtil.setBBcodeToTextView(contentTextView, getActivity(), mParamContent);
+            TextUtil.setBBcodeToTextView(contentTextView, getActivity(), mParamContent);
             contentTextView.setMovementMethod(LinkMovementMethod.getInstance());
         }
         if (mParamSenderName != null) {
@@ -135,7 +131,7 @@ public class MessageDialogFragment extends DialogFragment implements View.OnClic
             ((TextView) mThisView.findViewById(R.id.text_msg_receiver)).setText("to " + mParamReceiverName);
         }
         if (mParamSendTime != null) {
-            ((TextView) mThisView.findViewById(R.id.text_msg_time)).setText(mParamSendTime);
+            ((TextView) mThisView.findViewById(R.id.text_msg_time)).setText(TextUtil.longTimeString(mParamSendTime));
         }
 
     }
