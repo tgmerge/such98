@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 /**
  * Created by tgmerge on 2/24.
+ * The class is created to prevent auto scrolling to middle of TextView when clicked in PostsFragments
  */
 public class NoChildFocusRecyclerView extends RecyclerView {
     public NoChildFocusRecyclerView(Context context, AttributeSet attrs, int defStyle) {

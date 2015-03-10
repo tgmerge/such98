@@ -18,8 +18,7 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="me.tgmerge.such98.fragment.PostsFragment">
+        android:layout_height="match_parent">
 
         <me.tgmerge.such98.custom.NoChildFocusRecyclerView
             android:id="@+id/recyclerView"
