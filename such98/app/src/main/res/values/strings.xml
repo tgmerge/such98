@@ -42,7 +42,7 @@
     <!-- TopicsAdapter -->
     <string name="adapter_topics_author_info">%1$s @ %2$s</string>
     <string name="adapter_topics_reply_info">%1$d 点击, %2$d 回复 (最近 %3$s)</string>
-    <string name="adapter_topics_reply_info_hot">%1$d 点击, %2$s 参与, %3$d 回复</string>
+    <string name="adapter_topics_reply_info_hot">%1$s, %2$d 点击, %3$s 参与, %4$d 回复</string>
 
     <!-- MultiTypeLinkMovementMethod -->
     <string name="custom_MultiTypeLinkMovementMethod_cannot_load_link">无法打开链接</string>

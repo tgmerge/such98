@@ -94,7 +94,7 @@ public class TextUtil {
 
         // convert img tags to image links before in-app image viewer is ready...
         bbMap.add(new Pair<>("\\[img(=.+?)?\\](.+?)\\[/img\\]", "<a href='such98://img/$2'>[点击查看图片]</a>"));
-        bbMap.add(new Pair<>("\\[upload=?(bmp|png|gif|jpg|jpeg|jpe|tif|tiff)?(,\\d)?\\](.+?)\\[/upload\\]", "<a href='such98://img/$3'>[点击查看图片]</a>"));
+        bbMap.add(new Pair<>("(?i)\\[upload=?(bmp|png|gif|jpg|jpeg|jpe|tif|tiff)?(,\\d)?\\](.+?)\\[/upload\\]", "<a href='such98://img/$3'>[点击查看图片]</a>"));
 
         bbMap.add(new Pair<>("\\[em\\d+\\]", "[喵]"));
     }

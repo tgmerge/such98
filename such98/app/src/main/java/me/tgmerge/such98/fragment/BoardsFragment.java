@@ -1,6 +1,8 @@
 package me.tgmerge.such98.fragment;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import org.apache.http.Header;
@@ -43,6 +45,11 @@ public class BoardsFragment extends RecyclerSwipeFragment {
 
     protected RecyclerSwipeAdapter createAdapter() {
         return new BoardsAdapter(null);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // workaround, todo
     }
 
     protected void initialLoad() {

@@ -73,7 +73,7 @@ public class TopicsAdapter extends RecyclerSwipeAdapter<XMLUtil.TopicInfo, Topic
         if (dataItem instanceof XMLUtil.HotTopicInfo) {
             viewHolder.icon.setImageResource(R.drawable.ic_comment_fire_outline_white_36dp);
             XMLUtil.HotTopicInfo hotItem = (XMLUtil.HotTopicInfo) dataItem;
-            viewHolder.lastPostInfo.setText(SuchApp.getStr(R.string.adapter_topics_reply_info_hot, hotItem.HitCount, hotItem.ParticipantCount, hotItem.ReplyCount));
+            viewHolder.lastPostInfo.setText(SuchApp.getStr(R.string.adapter_topics_reply_info_hot, hotItem.BoardName, hotItem.HitCount, hotItem.ParticipantCount, hotItem.ReplyCount));
         } else {
             viewHolder.lastPostInfo.setText(SuchApp.getStr(R.string.adapter_topics_reply_info, dataItem.HitCount, dataItem.ReplyCount, dataItem.LastPostInfo.UserName));
             viewHolder.icon.setImageResource(dataItem.TopState.equals(XMLUtil.TopicInfo.TOPSTATE_NONE)

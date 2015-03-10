@@ -53,7 +53,7 @@ public class ViewImageActivity extends ActionBarActivity {
         mWebView.loadDataWithBaseURL(null,
                         "<div style='height: 100%; width: 100%; text-align: center; white-space: nowrap'>\n" +
                         "    <span style='display: inline-block; height: 100%; vertical-align: middle'></span>\n" +
-                        "    <img style='vertical-align: middle;' src='" + mIntentUrl + "' />\n" +
+                        "    <img style='max-height: 100%; max-width: 100%; vertical-align: middle;' src='" + mIntentUrl + "' />\n" +
                         "</div>",
         "text/html", "UTF-8", null);
     }
