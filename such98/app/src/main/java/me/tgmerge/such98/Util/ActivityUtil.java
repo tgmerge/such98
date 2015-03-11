@@ -27,6 +27,7 @@ import me.tgmerge.such98.fragment.NewPostDialogFragment;
 import me.tgmerge.such98.fragment.NewTopicDialogFragment;
 import me.tgmerge.such98.fragment.PostsFragment;
 import me.tgmerge.such98.fragment.TopicsFragment;
+import me.tgmerge.such98.fragment.UserInfoDialogFragment;
 
 /**
  * Created by tgmerge on 2/15.
@@ -208,6 +209,30 @@ public final class ActivityUtil {
     }
 
     // dialog & dialog fragment
+
+    public static final void openUserInfoDialog(Context ctx, String userName) {
+        logDebug("Starting UserInfoDialog(FragmentDialog), userName=" + userName);
+        if (ctx instanceof Activity) {
+            FragmentTransaction ft = ((Activity) ctx).getFragmentManager().beginTransaction();
+            ft.addToBackStack(null);
+            DialogFragment newFragment = UserInfoDialogFragment.newInstance(userName);
+            newFragment.show(ft, "UserInfoDialogFragment");
+        } else {
+            HelperUtil.errorToast("openMessageDialog: Context" + ctx.toString() + " is not Activity");
+        }
+    }
+
+    public static final void openUserInfoDialog(Context ctx, int userId) {
+        logDebug("Starting UserInfoDialog(FragmentDialog), userId=" + userId);
+        if (ctx instanceof Activity) {
+            FragmentTransaction ft = ((Activity) ctx).getFragmentManager().beginTransaction();
+            ft.addToBackStack(null);
+            DialogFragment newFragment = UserInfoDialogFragment.newInstance(userId);
+            newFragment.show(ft, "UserInfoDialogFragment");
+        } else {
+            HelperUtil.errorToast("openMessageDialog: Context" + ctx.toString() + " is not Activity");
+        }
+    }
 
     public static final void openMessageDialog(Context ctx, String senderName, String receiverName, String title, String content, boolean isDraft, boolean isRead, String sendTime) {
         logDebug("Starting MessageDialogFragment(FragmentDialog)");
