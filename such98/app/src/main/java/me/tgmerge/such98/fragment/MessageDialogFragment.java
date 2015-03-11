@@ -14,6 +14,7 @@ import org.apache.http.Header;
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.TextUtil;
 import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.HelperUtil;
@@ -80,6 +81,7 @@ public class MessageDialogFragment extends DialogFragment implements View.OnClic
         getDialog().setCanceledOnTouchOutside(false);
 
         mThisView.findViewById(R.id.img_msg_reply).setOnClickListener(this);
+        mThisView.findViewById(R.id.msg_avatar).setOnClickListener(this);
 
         return mThisView;
     }
@@ -157,6 +159,9 @@ public class MessageDialogFragment extends DialogFragment implements View.OnClic
         switch (v.getId()) {
             case R.id.img_msg_reply:
                 replyMsg();
+                break;
+            case R.id.msg_avatar:
+                ActivityUtil.openUserInfoDialog(getActivity(), mParamSenderName);
                 break;
         }
     }

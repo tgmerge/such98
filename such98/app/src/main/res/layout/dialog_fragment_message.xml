@@ -38,7 +38,8 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:padding="8dp"
-                    android:src="@drawable/ic_account_outline_white_48dp"/>
+                    android:src="@drawable/ic_account_outline_white_48dp"
+                    android:background="@drawable/background_transparent_touch_selector"/>
 
             </FrameLayout>
 
@@ -108,7 +109,7 @@
             android:paddingRight="16dp"
             android:textSize="16sp"
             android:textColor="@color/text_text"
-            android:text="回复标题"
+            android:text="Message Title"
             android:textStyle="bold"
             android:background="@android:color/transparent"
             android:layout_below="@id/view_divider_header"/>
