@@ -93,7 +93,7 @@
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="34229435"/>
+                android:text="0"/>
         </LinearLayout>
 
         <LinearLayout
@@ -133,8 +133,7 @@
                 android:id="@+id/user_info_title"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="title"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -153,8 +152,7 @@
                 android:id="@+id/user_info_fraction"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="fraction"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -173,8 +171,7 @@
                 android:id="@+id/user_info_groupname"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="groupname"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -193,8 +190,7 @@
                 android:id="@+id/user_info_gender"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Gender"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -213,8 +209,7 @@
                 android:id="@+id/user_info_birthday"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1999-01-01"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -233,8 +228,7 @@
                 android:id="@+id/user_info_is_online"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="No"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <TextView
@@ -262,8 +256,7 @@
                 android:id="@+id/user_info_register_name"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2000-01-01"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -282,8 +275,7 @@
                 android:id="@+id/user_info_last_logon_time"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2010-01-01"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -302,8 +294,7 @@
                 android:id="@+id/user_info_post_count"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="100"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -322,8 +313,7 @@
                 android:id="@+id/user_info_level"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="5"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -342,8 +332,7 @@
                 android:id="@+id/user_info_prestige"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Some"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <TextView
@@ -371,8 +360,7 @@
                 android:id="@+id/user_info_email_address"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="me@me.com"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -391,8 +379,7 @@
                 android:id="@+id/user_info_homepage_url"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="https://me.com"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -411,8 +398,7 @@
                 android:id="@+id/user_info_qq"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="485849204"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <LinearLayout
@@ -431,8 +417,7 @@
                 android:id="@+id/user_info_msn"
                 android:textColor="@color/text_secondary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="me@me.com"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <TextView
@@ -450,8 +435,7 @@
             android:layout_height="wrap_content"
             android:linksClickable="true"
             android:textIsSelectable="true"
-            android:clickable="true"
-            android:text="- - - Signature - - -"/>
+            android:clickable="true"/>
     </LinearLayout>
 
 </ScrollView>
