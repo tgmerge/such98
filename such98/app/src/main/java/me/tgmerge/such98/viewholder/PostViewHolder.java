@@ -48,6 +48,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         imgShowPostAction = (ImageView) itemLayoutView.findViewById(R.id.show_post_action);
 
         // set item click listener
+        avatar.setOnClickListener(this);
         imgCopy.setOnClickListener(this);
         imgReply.setOnClickListener(this);
         imgQuote.setOnClickListener(this);
@@ -58,6 +59,9 @@ public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     public void onClick(View v) {
         HelperUtil.generalDebug("PostsFragment", "onClick " + v.toString());
         switch (v.getId()) {
+            case R.id.img:
+                ActivityUtil.openUserInfoDialog(v.getContext(), data_postInfo.UserId);
+                break;
             case R.id.image_copy:
                 ClipboardManager clipboard = (ClipboardManager) v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("Post", data_postInfo.Title + "\n" + data_postInfo.Content);
