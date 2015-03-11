@@ -32,7 +32,7 @@ public final class HelperUtil {
         generalDebug("HelperUtil", "debugToast: " + msg);
         Context context = SuchApp.getContext();
         if (context != null) {
-            Toast.makeText(SuchApp.getContext(), msg, Toast.LENGTH_LONG).show();
+            Toast.makeText(SuchApp.getContext(), msg, Toast.LENGTH_SHORT).show();
         }
     }
 }
