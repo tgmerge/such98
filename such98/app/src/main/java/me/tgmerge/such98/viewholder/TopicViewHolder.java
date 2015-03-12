@@ -14,8 +14,10 @@ public class TopicViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
     public ImageView icon;
     public TextView title;
-    public TextView authorInfo;
-    public TextView lastPostInfo;
+    public TextView authorName;
+    public TextView boardName;
+    public TextView postTime;
+    public TextView replyInfo;
 
     public int data_topicId;
 
@@ -23,8 +25,10 @@ public class TopicViewHolder extends RecyclerView.ViewHolder implements View.OnC
         super(itemLayoutView);
         icon = (ImageView) itemLayoutView.findViewById(R.id.img);
         title = (TextView) itemLayoutView.findViewById(R.id.text_title);
-        authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
-        lastPostInfo = (TextView) itemLayoutView.findViewById(R.id.text_lastPostInfo);
+        authorName = (TextView) itemLayoutView.findViewById(R.id.text_author_name);
+        boardName = (TextView) itemLayoutView.findViewById(R.id.text_board_name);
+        postTime = (TextView) itemLayoutView.findViewById(R.id.text_post_time);
+        replyInfo = (TextView) itemLayoutView.findViewById(R.id.text_reply_info);
 
         itemLayoutView.setOnClickListener(this);
     }

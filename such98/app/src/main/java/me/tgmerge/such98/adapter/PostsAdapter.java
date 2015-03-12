@@ -11,7 +11,6 @@ import org.apache.http.Header;
 
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.custom.SuchApp;
-import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.viewholder.PostViewHolder;
 import me.tgmerge.such98.util.APIUtil;
 import me.tgmerge.such98.util.TextUtil;
@@ -84,7 +83,8 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
         viewHolder.data_postInfo = mData.get(position);
 
         viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? SuchApp.getStr(R.string.adapter_posts_default_title, dataItem.Floor) : dataItem.Title);
-        viewHolder.authorInfo.setText(SuchApp.getStr(R.string.adapter_posts_author_info, dataItem.UserId == 0 ? "匿名" : dataItem.UserName, TextUtil.longTimeString(dataItem.Time)));
+        viewHolder.authorName.setText(dataItem.UserId == 0 ? "匿名" : dataItem.UserName);
+        viewHolder.postTime.setText(" - " + TextUtil.longTimeString(dataItem.Time));
         TextUtil.setBBcodeToTextView(viewHolder.content, mAct, dataItem.Content); // todo prevent to process every time
 
         viewHolder.content.setMovementMethod(LinkMovementMethod.getInstance());
@@ -92,6 +92,8 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
         if (dataItem.Floor == 1) {
             viewHolder.replyInfo.setVisibility(View.VISIBLE);
             viewHolder.replyInfo.setText(SuchApp.getStr(R.string.adapter_posts_reply_info, viewHolder.data_topicInfo.HitCount, viewHolder.data_topicInfo.ReplyCount));
+        } else {
+            viewHolder.replyInfo.setVisibility(View.GONE);
         }
 
         if (dataItem.UserId == 0) {

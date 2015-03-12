@@ -34,7 +34,7 @@
                 android:layout_marginTop="3dp"
                 android:layout_alignParentLeft="true"
                 android:src="@drawable/ic_circle_grey600_48dp"
-                android:alpha="0.6"/>
+                android:alpha="0.4"/>
 
             <ImageView
                 android:id="@+id/img"
@@ -59,18 +59,29 @@
                 android:layout_marginLeft="52dp"/>
 
             <TextView
-                android:id="@+id/text_authorInfo"
-                android:text="Authorname @ 2015-04-12 12:04"
+                android:id="@+id/text_author_name"
+                android:text="Authorname"
                 android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:paddingBottom="3dp"
-                android:layout_width="match_parent"
+                android:textColor="@color/text_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/text_title"
-                android:layout_marginLeft="52dp"/>
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="52dp"
+                android:paddingBottom="3dp"
+                android:layout_below="@id/text_title"/>
 
             <TextView
-                android:visibility="gone"
+                android:id="@+id/text_post_time"
+                android:text=" - 2015-03-01 12:12"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:layout_alignBaseline="@id/text_author_name"
+                android:layout_toRightOf="@id/text_author_name"/>
+
+            <TextView
                 android:id="@+id/text_replyInfo"
                 android:text="34 Clicked, 12 Replies"
                 android:textSize="14sp"
@@ -78,7 +89,7 @@
                 android:paddingBottom="3dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/text_authorInfo"
+                android:layout_below="@id/text_author_name"
                 android:layout_marginLeft="52dp"/>
 
         </RelativeLayout>

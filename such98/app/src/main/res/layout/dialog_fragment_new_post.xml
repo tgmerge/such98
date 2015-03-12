@@ -32,7 +32,7 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_circle_grey600_48dp"
-                    android:alpha="0.6"/>
+                    android:alpha="0.4"/>
 
                 <ImageView
                     android:id="@+id/new_post_avatar"

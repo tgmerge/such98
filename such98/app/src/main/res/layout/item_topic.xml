@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="88dp"
+    android:minHeight="72dp"
     android:paddingTop="13dp"
     android:background="@drawable/background_touch_selector">
 
@@ -16,7 +16,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="16dp"
         android:src="@drawable/ic_circle_grey600_48dp"
-        android:alpha="0.6"/>
+        android:alpha="0.4"/>
 
     <ImageView
         android:id="@+id/img"
@@ -29,7 +29,7 @@
 
     <TextView
         android:id="@+id/text_title"
-        android:text="Three-line item"
+        android:text="Topic title"
         android:textSize="16sp"
         android:textColor="@color/text_text"
         android:paddingBottom="3dp"
@@ -40,34 +40,52 @@
         android:layout_marginRight="16dp"/>
 
     <TextView
-        android:id="@+id/text_authorInfo"
-        android:text="Secondary text lorem ipsum"
-        android:textSize="14sp"
-        android:textColor="@color/text_secondary"
-        android:paddingBottom="3dp"
+        android:visibility="gone"
+        android:id="@+id/text_board_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="BoardName"
+        android:textSize="14sp"
+        android:textColor="@color/text_text"
+        android:paddingBottom="3dp"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="72dp"
         android:layout_marginRight="16dp"
         android:layout_below="@id/text_title"/>
 
     <TextView
-        android:id="@+id/text_lastPostInfo"
-        android:text="amet, consectetur adipiscing"
+        android:id="@+id/text_author_name"
+        android:text="Authorname"
         android:textSize="14sp"
-        android:textColor="@color/text_secondary"
+        android:textColor="@color/text_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="72dp"
-        android:layout_marginRight="16dp"
-        android:layout_below="@id/text_authorInfo"/>
+        android:layout_below="@id/text_board_name"
+        android:layout_marginBottom="15dp"/>
 
-    <Space
-        android:layout_height="15dp"
-        android:layout_width="match_parent"
-        android:layout_below="@id/text_lastPostInfo" />
+    <TextView
+        android:id="@+id/text_post_time"
+        android:text=" - 2015-03-01 12:12"
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="16dp"
+        android:layout_alignBaseline="@id/text_author_name"
+        android:layout_toRightOf="@id/text_author_name"/>
+
+    <TextView
+        android:id="@+id/text_reply_info"
+        android:text="15/183"
+        android:textSize="14sp"
+        android:textColor="@color/text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:layout_alignBaseline="@id/text_author_name"/>
 
     <View
         android:id="@+id/view_divider_content"

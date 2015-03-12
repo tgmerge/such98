@@ -19,8 +19,9 @@ public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     public ImageView avatar;
     public TextView title;
-    public TextView authorInfo;
+    public TextView authorName;
     public TextView replyInfo;
+    public TextView postTime;
     public TextView content;
 
     public ImageView imgCopy;
@@ -38,8 +39,9 @@ public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         super(itemLayoutView);
         avatar = (ImageView) itemLayoutView.findViewById(R.id.img);
         title = (TextView) itemLayoutView.findViewById(R.id.text_title);
-        authorInfo = (TextView) itemLayoutView.findViewById(R.id.text_authorInfo);
+        authorName = (TextView) itemLayoutView.findViewById(R.id.text_author_name);
         replyInfo = (TextView) itemLayoutView.findViewById(R.id.text_replyInfo);
+        postTime = (TextView) itemLayoutView.findViewById(R.id.text_post_time);
         content = (TextView) itemLayoutView.findViewById(R.id.text_content);
         imgCopy = (ImageView) itemLayoutView.findViewById(R.id.image_copy);
         imgReply = (ImageView) itemLayoutView.findViewById(R.id.image_reply);

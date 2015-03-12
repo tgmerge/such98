@@ -6,6 +6,9 @@ import android.text.Spanned;
 import android.util.Pair;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -15,11 +18,25 @@ import java.util.Vector;
 public class TextUtil {
 
     public static final String longTimeString(String datetimeFromApi) {
-        return datetimeFromApi.replaceFirst("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})", "$1-$2-$3 $4:$5");
+        return datetimeFromApi.replaceFirst("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(.\\d+)?", "$1-$2-$3 $4:$5");
     }
 
     public static final String shortTimeString(String datetimeFromApi) {
-        return datetimeFromApi.replaceFirst("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})", "$2-$3 $4:$5");
+        return datetimeFromApi.replaceFirst("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(.\\d+)?", "$2-$3 $4:$5");
+    }
+
+    public static final String abbrTimeString(String datetimeFromApi) {
+        Date date = Calendar.getInstance().getTime();
+        String thisYear = new SimpleDateFormat("yyyy").format(date);
+        String today = new SimpleDateFormat("yyyy-MM-dd").format(date);
+
+        String longString = longTimeString(datetimeFromApi);
+        String result = longString.replace(today + " ", "");
+        if (result.equals(longString)) {
+            result = result.replaceFirst(" \\d{2}:\\d{2}", "");
+        }
+        result = result.replace(thisYear + "-", "");
+        return result;
     }
 
     public static final void setBBcodeToTextView(TextView textView, Context ctx, String bb) {

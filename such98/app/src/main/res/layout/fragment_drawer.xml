@@ -27,7 +27,7 @@
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:src="@drawable/ic_circle_grey600_48dp"
-                android:alpha="0.6"/>
+                android:alpha="0.4"/>
 
             <ImageView
                 android:id="@+id/drawer_avatar"
