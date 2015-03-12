@@ -4,29 +4,29 @@
     tools:context="me.tgmerge.such98.fragment.PostsFragment">
     <item
         android:id="@+id/action_refresh"
-        android:title="Refresh"
-        app:showAsAction="ifRoom"
+        android:title="刷新"
+        app:showAsAction="never"
         android:orderInCategory="1"
         android:icon="@drawable/ic_refresh_white_36dp"/>
     <item
         android:id="@+id/action_new"
-        android:title="Reply"
+        android:title="发表新帖"
         app:showAsAction="ifRoom"
         android:orderInCategory="2"
         android:icon="@drawable/ic_plus_white_36dp"/>
     <item
         android:id="@+id/action_toFirstPage"
-        android:title="First page"
+        android:title="转到首页"
         app:showAsAction="never"
         android:orderInCategory="3"/>
     <item
         android:id="@+id/action_toLastPage"
-        android:title="Last page"
+        android:title="转到末页"
         app:showAsAction="never"
         android:orderInCategory="4"/>
     <item
         android:id="@+id/action_toItem"
-        android:title="To floor..."
+        android:title="转到…"
         app:showAsAction="never"
         android:orderInCategory="5"/>
 </menu>
