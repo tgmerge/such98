@@ -56,6 +56,16 @@
                 android:text="username"
                 android:background="@android:color/transparent"/>
 
+            <ImageView
+                android:id="@+id/user_info_send_message"
+                android:src="@drawable/ic_email_outline_grey600_24dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="4dp"
+                android:clickable="true"
+                android:background="@drawable/background_transparent_touch_selector"/>
+
+
         </LinearLayout>
 
         <View

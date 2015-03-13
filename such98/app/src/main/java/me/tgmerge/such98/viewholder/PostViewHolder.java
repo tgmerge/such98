@@ -62,7 +62,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         HelperUtil.generalDebug("PostsFragment", "onClick " + v.toString());
         switch (v.getId()) {
             case R.id.img:
-                ActivityUtil.openUserInfoDialog(v.getContext(), data_postInfo.UserId);
+                ActivityUtil.openUserInfoDialog(v.getContext(), data_postInfo.UserName);
                 break;
             case R.id.image_copy:
                 ClipboardManager clipboard = (ClipboardManager) v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);

@@ -14,13 +14,14 @@ import org.apache.http.Header;
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.ImageUtil;
 import me.tgmerge.such98.util.TextUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
-public class UserInfoDialogFragment extends DialogFragment {
+public class UserInfoDialogFragment extends DialogFragment implements View.OnClickListener {
 
     private static final String ARG_PARAM_USER_ID = "id";
     private static final String ARG_PARAM_USER_NAME = "name";
@@ -67,6 +68,8 @@ public class UserInfoDialogFragment extends DialogFragment {
         mThisView = inflater.inflate(R.layout.dialog_fragment_user_info, container, false);
 
         getDialog().setCanceledOnTouchOutside(false);
+
+        mThisView.findViewById(R.id.user_info_send_message).setOnClickListener(this);
 
         return mThisView;
     }
@@ -128,5 +131,18 @@ public class UserInfoDialogFragment extends DialogFragment {
         TextView signature = (TextView) mThisView.findViewById(R.id.user_info_signature);
         TextUtil.setBBcodeToTextView(signature, getActivity(), userInfo.SignatureCode);
         signature.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.user_info_send_message:
+                if (mParamUserName == null || mParamUserName.equals("")) {
+                    HelperUtil.errorToast("Error: UserInfoDialogFragment没有传入用户名orz");
+                } else {
+                    ActivityUtil.openNewMessageDialog(getActivity(), mParamUserName, "");
+                }
+                break;
+        }
     }
 }

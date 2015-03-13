@@ -23,6 +23,7 @@ import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.fragment.BoardsFragment;
 import me.tgmerge.such98.fragment.MessageDialogFragment;
 import me.tgmerge.such98.fragment.MessagesFragment;
+import me.tgmerge.such98.fragment.NewMessageDialogFragment;
 import me.tgmerge.such98.fragment.NewPostDialogFragment;
 import me.tgmerge.such98.fragment.NewTopicDialogFragment;
 import me.tgmerge.such98.fragment.PostsFragment;
@@ -209,6 +210,18 @@ public final class ActivityUtil {
     }
 
     // dialog & dialog fragment
+
+    public static final void openNewMessageDialog(Context ctx, String receiverName, String content) {
+        logDebug("Starting NewMessageDialog(FragmentDialog), receiverName=" + receiverName);
+        if (ctx instanceof Activity) {
+            FragmentTransaction ft = ((Activity) ctx).getFragmentManager().beginTransaction();
+            ft.addToBackStack(null);
+            DialogFragment newFragment = NewMessageDialogFragment.newInstance(receiverName, content);
+            newFragment.show(ft, "NewMessageDialogFragment");
+        } else {
+            HelperUtil.errorToast("openMessageDialog: Context" + ctx.toString() + " is not Activity");
+        }
+    }
 
     public static final void openUserInfoDialog(Context ctx, String userName) {
         logDebug("Starting UserInfoDialog(FragmentDialog), userName=" + userName);
