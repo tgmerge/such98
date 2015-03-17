@@ -152,6 +152,7 @@
             android:paddingLeft="16dp"/>
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/drawer_function_message_all"
             android:text="全部消息"
             android:textSize="14sp"
