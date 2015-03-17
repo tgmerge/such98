@@ -47,6 +47,17 @@
                 android:background="@drawable/background_transparent_touch_selector"/>
 
             <TextView
+                android:id="@+id/text_floor_info"
+                android:text="1/100"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="3dp"
+                android:layout_alignBaseline="@id/text_title"
+                android:layout_alignParentRight="true"/>
+
+            <TextView
                 android:id="@+id/text_title"
                 android:text="Nunc vehicula dapibus ipsum. Duis venenatis risus"
                 android:textSize="16sp"
@@ -56,7 +67,9 @@
                 android:paddingBottom="3dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="52dp"/>
+                android:layout_marginLeft="52dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/text_floor_info"/>
 
             <TextView
                 android:id="@+id/text_author_name"

@@ -35,7 +35,7 @@
     <string name="adapter_boards_is_not_category"> </string>
 
     <!-- PostsAdapter -->
-    <string name="adapter_posts_default_title">回复 #%1$d</string>
+    <string name="adapter_posts_default_title">回复</string>
     <string name="adapter_posts_reply_info">%1$d 次点击, %2$d 次回复</string>
 
     <!-- TopicsAdapter -->

@@ -2,6 +2,7 @@ package me.tgmerge.such98.adapter;
 
 import android.app.Activity;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.RecyclerView;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,7 +83,8 @@ public class PostsAdapter extends RecyclerSwipeAdapter<XMLUtil.PostInfo, PostVie
         viewHolder.data_topicInfo = mTopicInfo;
         viewHolder.data_postInfo = mData.get(position);
 
-        viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? SuchApp.getStr(R.string.adapter_posts_default_title, dataItem.Floor) : dataItem.Title);
+        viewHolder.title.setText(dataItem.Floor != 1 && dataItem.Title.length() == 0 ? SuchApp.getStr(R.string.adapter_posts_default_title) : dataItem.Title);
+        viewHolder.floorInfo.setText(dataItem.Floor + "/" + (mTopicInfo.ReplyCount + 1));
         viewHolder.authorName.setText(dataItem.UserId == 0 ? "匿名" : dataItem.UserName);
         viewHolder.postTime.setText(" - " + TextUtil.longTimeString(dataItem.Time));
         TextUtil.setBBcodeToTextView(viewHolder.content, mAct, dataItem.Content); // todo prevent to process every time
