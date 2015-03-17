@@ -1,6 +1,7 @@
 package me.tgmerge.such98.adapter;
 
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +72,7 @@ public class BoardsAdapter extends RecyclerSwipeAdapter<XMLUtil.BoardInfo, Board
         viewHolder.icon.setImageResource(dataItem.IsCategory ? R.drawable.ic_folder_multiple_outline_white_36dp : R.drawable.ic_folder_outline_white_36dp);
         viewHolder.name.setText(dataItem.Name);
         viewHolder.isCategory.setText(dataItem.IsCategory ? SuchApp.getStr(R.string.adapter_boards_is_category) : SuchApp.getStr(R.string.adapter_boards_is_not_category));
-        viewHolder.description.setText(dataItem.Description);
+        viewHolder.description.setText(Html.fromHtml(dataItem.Description));
 
         viewHolder.data_boardId = dataItem.Id;
         viewHolder.data_isCat = dataItem.IsCategory;
