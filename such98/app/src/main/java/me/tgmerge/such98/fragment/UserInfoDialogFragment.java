@@ -140,7 +140,7 @@ public class UserInfoDialogFragment extends DialogFragment implements View.OnCli
                 if (mParamUserName == null || mParamUserName.equals("")) {
                     HelperUtil.errorToast("Error: UserInfoDialogFragment没有传入用户名orz");
                 } else {
-                    ActivityUtil.openNewMessageDialog(getActivity(), mParamUserName, "");
+                    ActivityUtil.openNewMessageDialog(getActivity(), mParamUserName, "", "");
                 }
                 break;
         }

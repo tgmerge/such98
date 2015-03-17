@@ -25,17 +25,20 @@ public class NewMessageDialogFragment extends DialogFragment implements View.OnC
 
     private static final String ARG_PARAM_RECEIVER_NAME = "receiverName";
     private static final String ARG_PARAM_CONTENT = "content";
+    private static final String ARG_PARAM_TITLE = "title";
 
     private String mParamReceiverName;
     private String mParamContent;
+    private String mParamTitle;
 
     View mThisView;
 
-    public static NewMessageDialogFragment newInstance(String paramReceiverName, String mParamContent) {
+    public static NewMessageDialogFragment newInstance(String paramReceiverName, String paramTitle, String paramContent) {
         NewMessageDialogFragment fragment = new NewMessageDialogFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM_RECEIVER_NAME, paramReceiverName);
-        args.putString(ARG_PARAM_CONTENT, mParamContent);
+        args.putString(ARG_PARAM_TITLE, paramTitle);
+        args.putString(ARG_PARAM_CONTENT, paramContent);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,6 +53,7 @@ public class NewMessageDialogFragment extends DialogFragment implements View.OnC
         if (getArguments() != null) {
             mParamReceiverName = getArguments().getString(ARG_PARAM_RECEIVER_NAME, "");
             mParamContent = getArguments().getString(ARG_PARAM_CONTENT);
+            mParamTitle = getArguments().getString(ARG_PARAM_TITLE);
         }
         setStyle(STYLE_NO_TITLE, 0);
     }
@@ -71,6 +75,13 @@ public class NewMessageDialogFragment extends DialogFragment implements View.OnC
 
         if (mParamReceiverName == null || mParamReceiverName.equals("")) {
             HelperUtil.errorToast("Invalid name/id.");
+        }
+
+        if (mParamTitle != null) {
+            ((EditText) mThisView.findViewById(R.id.new_message_title)).setText(mParamTitle);
+        }
+        if (mParamContent != null) {
+            ((EditText) mThisView.findViewById(R.id.new_message_content)).setText(mParamContent);
         }
 
         final ImageView imgAvatar = (ImageView) mThisView.findViewById(R.id.new_message_avatar);

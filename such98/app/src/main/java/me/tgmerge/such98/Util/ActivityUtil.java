@@ -211,12 +211,12 @@ public final class ActivityUtil {
 
     // dialog & dialog fragment
 
-    public static final void openNewMessageDialog(Context ctx, String receiverName, String content) {
+    public static final void openNewMessageDialog(Context ctx, String receiverName, String title, String content) {
         logDebug("Starting NewMessageDialog(FragmentDialog), receiverName=" + receiverName);
         if (ctx instanceof Activity) {
             FragmentTransaction ft = ((Activity) ctx).getFragmentManager().beginTransaction();
             ft.addToBackStack(null);
-            DialogFragment newFragment = NewMessageDialogFragment.newInstance(receiverName, content);
+            DialogFragment newFragment = NewMessageDialogFragment.newInstance(receiverName, title, content);
             newFragment.show(ft, "NewMessageDialogFragment");
         } else {
             HelperUtil.errorToast("openMessageDialog: Context" + ctx.toString() + " is not Activity");

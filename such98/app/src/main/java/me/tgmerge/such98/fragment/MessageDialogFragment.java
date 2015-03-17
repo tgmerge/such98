@@ -151,7 +151,7 @@ public class MessageDialogFragment extends DialogFragment implements View.OnClic
     }
 
     private void replyMsg() {
-
+        ActivityUtil.openNewMessageDialog(getActivity(), mParamSenderName, "RE: " + mParamTitle, "[quote][b]引用" + mParamSenderName + "在" + TextUtil.longTimeString(mParamSendTime) + "发送的短信[/b]\n" + mParamContent + "\n[/quote]");
     }
 
     @Override
