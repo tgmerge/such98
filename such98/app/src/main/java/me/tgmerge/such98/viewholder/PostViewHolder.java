@@ -13,6 +13,7 @@ import me.tgmerge.such98.R;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.HelperUtil;
+import me.tgmerge.such98.util.TextUtil;
 import me.tgmerge.such98.util.XMLUtil;
 
 public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -76,7 +77,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder implements View.OnCl
                 break;
             case R.id.image_quote:
                 String quoteTitle = SuchApp.getStr(R.string.view_holder_post_reply_title, data_postInfo.UserName, data_postInfo.Floor);
-                ActivityUtil.openNewPostDialog(v.getContext(), data_topicInfo.Id, quoteTitle, SuchApp.getStr(R.string.view_holder_post_quote_content, data_postInfo.UserName, data_postInfo.Time, data_postInfo.Floor, data_postInfo.Content));
+                ActivityUtil.openNewPostDialog(v.getContext(), data_topicInfo.Id, quoteTitle, SuchApp.getStr(R.string.view_holder_post_quote_content, data_postInfo.UserName, TextUtil.longTimeString(data_postInfo.Time), data_postInfo.Floor, data_postInfo.Content));
                 break;
             case R.id.show_post_action:
                 imgShowPostAction.setVisibility(View.GONE);
