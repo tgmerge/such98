@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.text.InputType;
 import android.widget.EditText;
 
+import org.apache.http.Header;
+
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.activity.LoginActivity;
 import me.tgmerge.such98.activity.LoginPageActivity;
@@ -379,6 +381,18 @@ public final class ActivityUtil {
         MessagesFragment fragment = MessagesFragment.newInstance(filter, startPos);
         transaction.replace(containerId, fragment);
         transaction.commit();
+    }
+
+    // - - - for callback
+
+    public static void defaultOnApiFailure(Context ctx, int statCode, Header[] headers, byte[] body, Throwable error) {
+        if (statCode == 401) {
+            // "Unauthorized"
+            HelperUtil.errorToast("登录信息失效，请重新登录(code=" + statCode + ", error=" + error.toString() + ")");
+            Action.relogin(ctx, true);
+        } else {
+            HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
+        }
     }
 
 

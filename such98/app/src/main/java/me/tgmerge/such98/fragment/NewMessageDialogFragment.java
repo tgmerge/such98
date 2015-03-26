@@ -16,6 +16,7 @@ import org.apache.http.Header;
 import me.tgmerge.such98.R;
 import me.tgmerge.such98.custom.SuchApp;
 import me.tgmerge.such98.util.APIUtil;
+import me.tgmerge.such98.util.ActivityUtil;
 import me.tgmerge.such98.util.CacheUtil;
 import me.tgmerge.such98.util.HelperUtil;
 import me.tgmerge.such98.util.ImageUtil;
@@ -104,7 +105,7 @@ public class NewMessageDialogFragment extends DialogFragment implements View.OnC
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
+                ActivityUtil.defaultOnApiFailure(getActivity(), statCode, headers, body, error);
             }
         }).execute();
     }

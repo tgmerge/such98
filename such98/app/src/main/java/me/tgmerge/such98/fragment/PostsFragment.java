@@ -86,7 +86,7 @@ public class PostsFragment extends RecyclerSwipeFragment {
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
+                ActivityUtil.defaultOnApiFailure(getActivity(), statCode, headers, body, error);
             }
         }).execute();
     }
@@ -148,8 +148,8 @@ public class PostsFragment extends RecyclerSwipeFragment {
 
             @Override
             public void onFailure(int statCode, Header[] headers, byte[] body, Throwable error) {
-                HelperUtil.errorToast(SuchApp.getStr(R.string.general_on_api_failure_toast_text, statCode, error.toString()));
                 setProgressFinished();
+                ActivityUtil.defaultOnApiFailure(getActivity(), statCode, headers, body, error);
             }
         }
 
