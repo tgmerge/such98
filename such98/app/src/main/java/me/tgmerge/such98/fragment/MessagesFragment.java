@@ -1,6 +1,9 @@
 package me.tgmerge.such98.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
 
 import org.apache.http.Header;
 
@@ -61,6 +64,21 @@ public class MessagesFragment extends RecyclerSwipeFragment {
         mPreviousPage = -1;
         mNextPage = 0;
         loadNextPage(messagesAdapter);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Activity activity = getActivity();
+        int containerId = ((View) mThisView.getParent()).getId();
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                ActivityUtil.reloadFragment(activity, containerId);
+                return true;
+            case R.id.action_new:
+                ActivityUtil.openNewMessageDialog(activity, , "", "");
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

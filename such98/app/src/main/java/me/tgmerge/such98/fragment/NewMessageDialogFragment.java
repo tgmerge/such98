@@ -78,6 +78,8 @@ public class NewMessageDialogFragment extends DialogFragment implements View.OnC
             HelperUtil.errorToast("Invalid name/id.");
         }
 
+        ((EditText) mThisView.findViewById(R.id.new_message_title)).setHint("发给 " + mParamReceiverName + " 的消息");
+
         if (mParamTitle != null) {
             ((EditText) mThisView.findViewById(R.id.new_message_title)).setText(mParamTitle);
         }
