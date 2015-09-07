@@ -313,7 +313,7 @@ public final class ActivityUtil {
         alert.show();
     }
 
-    public static final void openGotoTopicItemDialog(final Activity act, final int containerId, final int boardId, final int itemNum) {
+    public static  void openGotoTopicItemDialog(final Activity act, final int containerId, final int boardId, final int itemNum) {
         logDebug("Opening 'goto topic item' dialog, bID=" + boardId + ", itemNum=" + itemNum);
         AlertDialog.Builder alert = new AlertDialog.Builder(act);
         alert.setTitle(SuchApp.getStr(R.string.util_activity_goto_topic_dialog_title));
@@ -400,20 +400,20 @@ public final class ActivityUtil {
 
     private static final String ARG_INTENT_NOT_ROOT = "notRoot";
 
-    private static final void markIntentAsNotRoot(Intent intent) {
+    private static  void markIntentAsNotRoot(Intent intent) {
         intent.putExtra(ARG_INTENT_NOT_ROOT, 0);
     }
 
-    public static final boolean checkActivityIsRoot(Activity act) {
+    public static  boolean checkActivityIsRoot(Activity act) {
         return !(act.getIntent().hasExtra(ARG_INTENT_NOT_ROOT));
     }
 
-    private static final void logDebug(String msg) {
+    private static  void logDebug(String msg) {
         HelperUtil.generalDebug("ActivityUtil", msg);
     }
 
 
-    private static final void logError(String msg) {
+    private static  void logError(String msg) {
         HelperUtil.generalError("ActivityUtil", msg);
     }
 }
