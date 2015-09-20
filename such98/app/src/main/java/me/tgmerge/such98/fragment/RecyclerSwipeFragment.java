@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -111,13 +112,20 @@ public abstract class RecyclerSwipeFragment extends Fragment {
 
                 if (mHasNextPage) {
                     int visibleItemCount = mLayoutManager.getChildCount();
-                    int totalItemCount = mLayoutManager.getItemCount();
+                    int totalItemCount = mAdapter.getItemCount();
                     int pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
-                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                        // scrolled to bottom?
+//                    if ((visibleItemCount + pastVisibleItems - 1) >= totalItemCount) {
+//                        // scrolled to bottom?
+//                        loadNextPage(mAdapter);
+//                        return;
+//                    }
+
+                    int lastVisibleItem =  mLayoutManager.findLastVisibleItemPosition()+1;
+                    if (lastVisibleItem >= totalItemCount && dy > 0) {
                         loadNextPage(mAdapter);
                         return;
                     }
+
                 }
 
                 // otherwise...

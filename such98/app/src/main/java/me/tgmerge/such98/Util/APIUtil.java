@@ -47,6 +47,7 @@ public final class APIUtil {
             logDebug("APIRequest: a request is initializing, callback: " + callback.toString());
             mCallback = callback;
             mCtx = ctx;
+            sClient.setTimeout(5000);
         }
 
         protected void setURL(String url) {
