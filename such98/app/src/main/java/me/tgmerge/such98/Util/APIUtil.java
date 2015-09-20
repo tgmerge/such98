@@ -47,6 +47,7 @@ public final class APIUtil {
             logDebug("APIRequest: a request is initializing, callback: " + callback.toString());
             mCallback = callback;
             mCtx = ctx;
+            sClient.setTimeout(5000);
         }
 
         protected void setURL(String url) {
@@ -567,7 +568,7 @@ public final class APIUtil {
 
     // Add a parameter to passed-in URL.
     // if the "value" arg is null, nothing will be applied to URL.
-    private static final String addURIParamIfExists(String url, String key, String value) {
+    private static  String addURIParamIfExists(String url, String key, String value) {
         if (url == null || url.equals("")) {
             return url;
         }
@@ -582,17 +583,17 @@ public final class APIUtil {
     }
 
 
-    private static final String addURIParamIfExists(String url, String key, Integer value) {
+    private static  String addURIParamIfExists(String url, String key, Integer value) {
         return (value == null) ? url : addURIParamIfExists(url, key, String.valueOf(value));
     }
 
 
-    private static final void logDebug(String msg) {
+    private static  void logDebug(String msg) {
         HelperUtil.generalDebug("APIUtil", msg);
     }
 
 
-    private static final void logError(String msg) {
+    private static  void logError(String msg) {
         HelperUtil.generalError("APIUtil", msg);
     }
 }

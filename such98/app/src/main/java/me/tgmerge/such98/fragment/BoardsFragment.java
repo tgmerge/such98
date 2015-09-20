@@ -1,6 +1,7 @@
 package me.tgmerge.such98.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -56,6 +57,8 @@ public class BoardsFragment extends RecyclerSwipeFragment {
     protected void initialLoad() {
 
         final BoardsAdapter boardsAdapter = (BoardsAdapter) mAdapter;
+
+        Log.i("qqq","mParamId = "+ mParamId);
 
         if (mParamId == PARAM_ID_CUSTOM) {
             mBoardInfo.Id = PARAM_ID_CUSTOM;
@@ -154,7 +157,7 @@ public class BoardsFragment extends RecyclerSwipeFragment {
                     return;
                 }
 
-                if (!loadPrevious && boardsInfo.size() == 0) {
+                if (!loadPrevious && (boardsInfo.size() == 0 || boardsInfo.size() < sizeToLoad)) {
                     mHasNextPage = false;
                 }
 
@@ -198,9 +201,16 @@ public class BoardsFragment extends RecyclerSwipeFragment {
                     for (int i = 0; i < boardIdVec.values.size(); i++) {
                         ids[i] = boardIdVec.values.get(i);
                     }
-                    int[] rangedIds = Arrays.copyOfRange(ids, posToLoad, posToLoad + sizeToLoad);
+                    int[] rangedIds;
 
-                    new APIUtil.GetMultiBoards(getActivity(), rangedIds, 0, null, sizeToLoad, new Callback()).execute();
+                    if(posToLoad < ids.length){
+                        if(posToLoad + sizeToLoad > ids.length)  rangedIds = Arrays.copyOfRange(ids, posToLoad, ids.length);
+                        else rangedIds = Arrays.copyOfRange(ids, posToLoad, posToLoad + sizeToLoad);
+
+                        new APIUtil.GetMultiBoards(getActivity(), rangedIds, 0, null, sizeToLoad, new Callback()).execute();
+                    }
+
+
                 }
 
                 @Override

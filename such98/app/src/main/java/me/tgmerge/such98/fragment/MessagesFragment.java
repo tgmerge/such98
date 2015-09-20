@@ -75,7 +75,7 @@ public class MessagesFragment extends RecyclerSwipeFragment {
                 ActivityUtil.reloadFragment(activity, containerId);
                 return true;
             case R.id.action_new:
-                ActivityUtil.openNewMessageDialog(activity, "", "", "");
+                ActivityUtil.openNewMessageDialog(activity,"" , "", "");
                 return true;
         }
         return super.onOptionsItemSelected(item);

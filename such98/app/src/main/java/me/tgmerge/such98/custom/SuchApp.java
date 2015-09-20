@@ -1,5 +1,6 @@
 package me.tgmerge.such98.custom;
 
+import android.app.Application;
 import android.content.Context;
 
 /**
@@ -7,7 +8,7 @@ import android.content.Context;
  * Application.
  * Provide a static way to get Application context.
  */
-public final class SuchApp extends android.app.Application {
+public final class SuchApp extends Application {
 
     private static SuchApp instance;
 
@@ -15,7 +16,7 @@ public final class SuchApp extends android.app.Application {
         instance = this;
     }
 
-    public static final Context getContext() {
+    public static  Context getContext() {
         return instance;
     }
 
@@ -23,7 +24,7 @@ public final class SuchApp extends android.app.Application {
         return instance.getResources().getString(resId);
     }
 
-    public static final String getStr(int resId, Object... formatArgs) {
+    public static  String getStr(int resId, Object... formatArgs) {
         return instance.getResources().getString(resId, formatArgs);
     }
 
